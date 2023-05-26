@@ -21,15 +21,24 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
 
     List<Account> findByIdIn(@Param("id") List<Integer> id);
 
-    @Query("SELECT new com.jtk.ps.api.dto.AccountResponse(b.id, a.name, b.username, b.role, a.prodi) FROM Lecturer a INNER JOIN a.account b WHERE a.prodi = :prodi AND b.role NOT IN (0,3)")
+    @Query("SELECT new com.jtk.ps.api.dto.AccountResponse(b.id, a.name, b.username, b.role, a.prodi) FROM Account b INNER JOIN b.lecturer a WHERE a.prodi = :prodi AND b.role NOT IN (0,3)")
     List<AccountResponse> getAllAccountForCommittee(@Param("prodi")EProdi prodi);
 
-    @Query("SELECT new com.jtk.ps.api.dto.AccountResponse(b.id, a.name, b.username, b.role, a.prodi) FROM Lecturer a INNER JOIN a.account b WHERE a.prodi = :prodi")
+    @Query("SELECT new com.jtk.ps.api.dto.AccountResponse(b.id, a.name, b.username, b.role, a.prodi) FROM Account b INNER JOIN b.lecturer a WHERE a.prodi = :prodi")
     List<AccountResponse> getAllAccountForHeadStudyProgram(@Param("prodi")EProdi prodi);
 
-    @Query("SELECT new com.jtk.ps.api.dto.CommitteeResponse(a.id, a.name) FROM Lecturer a INNER JOIN a.account b WHERE b.role = 'COMMITTEE'")
+    @Query("SELECT new com.jtk.ps.api.dto.AccountResponse(b.id, a.name, b.username, b.role, a.prodi) FROM Account b INNER JOIN b.lecturer a WHERE a.prodi = :prodi AND b.role = 4")
+    List<AccountResponse> getAllAccountForSupervisor(@Param("prodi")EProdi prodi);
+
+    @Query("SELECT new com.jtk.ps.api.dto.CommitteeResponse(a.id, a.name, a.email) FROM Account b INNER JOIN b.lecturer a WHERE b.role = 'COMMITTEE'")
     List<CommitteeResponse> fetchCommitteeResponseDataInnerJoin();
 
-    @Query("SELECT new com.jtk.ps.api.dto.CommitteeResponse(a.id, a.name) FROM Lecturer a INNER JOIN a.account b WHERE b.role = 'COMMITTEE' AND a.account.id = :id")
+    @Query("SELECT new com.jtk.ps.api.dto.CommitteeResponse(a.id, a.name, a.email) FROM Account b INNER JOIN b.lecturer a WHERE b.role = 'COMMITTEE' AND a.id = :id")
     CommitteeResponse fetchCommitteeResponseDataInnerJoin(@Param("id") int id);
+
+    @Query("SELECT new com.jtk.ps.api.dto.CommitteeResponse(b.id, a.name, a.email) FROM Account b INNER JOIN b.lecturer a WHERE b.role = 4")
+    List<CommitteeResponse> fetchSupervisorResponseDataInnerJoin();
+
+    @Query("SELECT new com.jtk.ps.api.dto.CommitteeResponse(b.id, a.name, a.email) FROM Account b INNER JOIN b.lecturer a WHERE b.role = 4 AND a.id = :id")
+    CommitteeResponse fetchSupervisorResponseDataInnerJoin(@Param("id") int id);
 }

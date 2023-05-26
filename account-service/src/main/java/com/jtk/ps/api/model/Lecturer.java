@@ -22,7 +22,6 @@ public class Lecturer {
     @Column(name = "prodi_id")
     private EProdi prodi;
 
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "account_id", nullable = false)
-    private Account account;
+    @Column(name = "email")
+    private String email;
 }

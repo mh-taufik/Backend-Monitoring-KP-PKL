@@ -4,7 +4,8 @@ public enum ERole {
     COMMITTEE(0),
     PARTICIPANT(1),
     COMPANY(2),
-    HEAD_STUDY_PROGRAM(3);
+    HEAD_STUDY_PROGRAM(3),
+    SUPERVISOR(4);
 
 
     public final int id;

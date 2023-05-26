@@ -40,7 +40,7 @@ public class JwtUtil {
         Collection<? extends GrantedAuthority> roles = userDetails.getAuthorities();
         if (roles.contains(new SimpleGrantedAuthority(ERole.COMMITTEE.name()))) {
             claims.put(Constant.PayloadResponseConstant.ID_ROLE, 0);
-            Optional<Lecturer> dosen = lecturerRepository.findByAccountId(userDetails.getId());
+            Optional<Lecturer> dosen = Optional.ofNullable(accountRepository.findById(userDetails.getId()).get().getLecturer());
             dosen.ifPresent(value -> claims.put(Constant.PayloadResponseConstant.ID_PRODI, value.getProdi().id));
         }
         if (roles.contains(new SimpleGrantedAuthority(ERole.PARTICIPANT.name()))) {
@@ -52,7 +52,7 @@ public class JwtUtil {
         }
         if (roles.contains(new SimpleGrantedAuthority(ERole.HEAD_STUDY_PROGRAM.name()))) {
             claims.put(Constant.PayloadResponseConstant.ID_ROLE, 3);
-            Optional<Lecturer> dosen = lecturerRepository.findByAccountId(userDetails.getId());
+            Optional<Lecturer> dosen = Optional.ofNullable(accountRepository.findById(userDetails.getId()).get().getLecturer());
             dosen.ifPresent(value -> claims.put(Constant.PayloadResponseConstant.ID_PRODI, value.getProdi().id));
         }
         claims.put(Constant.PayloadResponseConstant.ID, id);
@@ -65,7 +65,7 @@ public class JwtUtil {
         Collection<? extends GrantedAuthority> roles = userDetails.getAuthorities();
         if (roles.contains(new SimpleGrantedAuthority(ERole.COMMITTEE.name()))) {
             claims.put(Constant.PayloadResponseConstant.ID_ROLE, 0);
-            Optional<Lecturer> dosen = lecturerRepository.findByAccountId(userDetails.getId());
+            Optional<Lecturer> dosen = Optional.ofNullable(accountRepository.findById(userDetails.getId()).get().getLecturer());
             dosen.ifPresent(value -> claims.put(Constant.PayloadResponseConstant.ID_PRODI, value.getProdi().id));
         }
         if (roles.contains(new SimpleGrantedAuthority(ERole.PARTICIPANT.name()))) {
@@ -77,7 +77,7 @@ public class JwtUtil {
         }
         if (roles.contains(new SimpleGrantedAuthority(ERole.HEAD_STUDY_PROGRAM.name()))) {
             claims.put(Constant.PayloadResponseConstant.ID_ROLE, 3);
-            Optional<Lecturer> dosen = lecturerRepository.findByAccountId(userDetails.getId());
+            Optional<Lecturer> dosen = Optional.ofNullable(accountRepository.findById(userDetails.getId()).get().getLecturer());
             dosen.ifPresent(value -> claims.put(Constant.PayloadResponseConstant.ID_PRODI, value.getProdi().id));
         }
         claims.put(Constant.PayloadResponseConstant.NAME, name);
@@ -91,7 +91,7 @@ public class JwtUtil {
         Collection<? extends GrantedAuthority> roles = userDetails.getAuthorities();
         if (roles.contains(new SimpleGrantedAuthority(ERole.COMMITTEE.name()))) {
             claims.put(Constant.PayloadResponseConstant.ID_ROLE, 0);
-            Optional<Lecturer> dosen = lecturerRepository.findByAccountId(userDetails.getId());
+            Optional<Lecturer> dosen = Optional.ofNullable(accountRepository.findById(userDetails.getId()).get().getLecturer());
             dosen.ifPresent(value -> claims.put(Constant.PayloadResponseConstant.ID_PRODI, value.getProdi().id));
         }
         if (roles.contains(new SimpleGrantedAuthority(ERole.PARTICIPANT.name()))) {
@@ -102,7 +102,7 @@ public class JwtUtil {
         }
         if (roles.contains(new SimpleGrantedAuthority(ERole.HEAD_STUDY_PROGRAM.name()))) {
             claims.put(Constant.PayloadResponseConstant.ID_ROLE, 3);
-            Optional<Lecturer> dosen = lecturerRepository.findByAccountId(userDetails.getId());
+            Optional<Lecturer> dosen = Optional.ofNullable(accountRepository.findById(userDetails.getId()).get().getLecturer());
             dosen.ifPresent(value -> claims.put(Constant.PayloadResponseConstant.ID_PRODI, value.getProdi().id));
         }
 

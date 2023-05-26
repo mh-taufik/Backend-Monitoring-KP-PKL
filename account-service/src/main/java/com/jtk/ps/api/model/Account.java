@@ -4,7 +4,9 @@ import lombok.*;
 import org.hibernate.Hibernate;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Entity
 @Table(name = "account")
@@ -25,6 +27,18 @@ public class Account {
 
     @Column(name = "role_id")
     private ERole role;
+
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "lecturer_id", nullable = true)
+    private Lecturer lecturer;
+
+    public Account(Integer id, String username, String password, ERole role) {
+        this.id = id;
+        this.username = username;
+        this.password = password;
+        this.role = role;
+        this.lecturer = null;
+    }
 
     @Override
     public boolean equals(Object o) {

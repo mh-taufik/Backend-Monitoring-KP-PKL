@@ -195,4 +195,15 @@ public class AccountController {
         }
     }
 
+    @GetMapping("/get-supervisor")
+    public ResponseEntity<Object>  getSupervisorById(@RequestParam(value = "id", required = false) Integer id) {
+        try {
+            if(id == null) {
+                return ResponseHandler.generateResponse("Get all supervisor succeed", HttpStatus.OK, service.getSupervisor());
+            }
+            return ResponseHandler.generateResponse("Get supervisor succeed", HttpStatus.OK, service.getSupervisor(id));
+        } catch (Exception e) {
+            return ResponseHandler.generateResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
 }
