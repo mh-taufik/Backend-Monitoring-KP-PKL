@@ -55,6 +55,11 @@ public class JwtUtil {
             Optional<Lecturer> dosen = Optional.ofNullable(accountRepository.findById(userDetails.getId()).get().getLecturer());
             dosen.ifPresent(value -> claims.put(Constant.PayloadResponseConstant.ID_PRODI, value.getProdi().id));
         }
+        if (roles.contains(new SimpleGrantedAuthority(ERole.SUPERVISOR.name()))) {
+            claims.put(Constant.PayloadResponseConstant.ID_ROLE, 4);
+            Optional<Lecturer> dosen = Optional.ofNullable(accountRepository.findById(userDetails.getId()).get().getLecturer());
+            dosen.ifPresent(value -> claims.put(Constant.PayloadResponseConstant.ID_PRODI, value.getProdi().id));
+        }
         claims.put(Constant.PayloadResponseConstant.ID, id);
         return doGenerateToken(claims, String.valueOf(userDetails.getId()));
     }
@@ -80,6 +85,11 @@ public class JwtUtil {
             Optional<Lecturer> dosen = Optional.ofNullable(accountRepository.findById(userDetails.getId()).get().getLecturer());
             dosen.ifPresent(value -> claims.put(Constant.PayloadResponseConstant.ID_PRODI, value.getProdi().id));
         }
+        if (roles.contains(new SimpleGrantedAuthority(ERole.SUPERVISOR.name()))) {
+            claims.put(Constant.PayloadResponseConstant.ID_ROLE, 4);
+            Optional<Lecturer> dosen = Optional.ofNullable(accountRepository.findById(userDetails.getId()).get().getLecturer());
+            dosen.ifPresent(value -> claims.put(Constant.PayloadResponseConstant.ID_PRODI, value.getProdi().id));
+        }
         claims.put(Constant.PayloadResponseConstant.NAME, name);
         claims.put(Constant.PayloadResponseConstant.ID, id);
         return doGenerateToken(claims, String.valueOf(userDetails.getId()));
@@ -102,6 +112,11 @@ public class JwtUtil {
         }
         if (roles.contains(new SimpleGrantedAuthority(ERole.HEAD_STUDY_PROGRAM.name()))) {
             claims.put(Constant.PayloadResponseConstant.ID_ROLE, 3);
+            Optional<Lecturer> dosen = Optional.ofNullable(accountRepository.findById(userDetails.getId()).get().getLecturer());
+            dosen.ifPresent(value -> claims.put(Constant.PayloadResponseConstant.ID_PRODI, value.getProdi().id));
+        }
+        if (roles.contains(new SimpleGrantedAuthority(ERole.SUPERVISOR.name()))) {
+            claims.put(Constant.PayloadResponseConstant.ID_ROLE, 4);
             Optional<Lecturer> dosen = Optional.ofNullable(accountRepository.findById(userDetails.getId()).get().getLecturer());
             dosen.ifPresent(value -> claims.put(Constant.PayloadResponseConstant.ID_PRODI, value.getProdi().id));
         }
@@ -193,6 +208,9 @@ public class JwtUtil {
                 break;
             case 3:
                 roles = ERole.HEAD_STUDY_PROGRAM;
+                break;
+            case 4:
+                roles = ERole.SUPERVISOR;
                 break;
             default:
                 roles = ERole.PARTICIPANT;

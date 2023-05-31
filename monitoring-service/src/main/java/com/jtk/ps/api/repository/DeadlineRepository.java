@@ -6,6 +6,6 @@ import com.jtk.ps.api.model.Rpp;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-public interface DeadlineRepository extends JpaRepository<Milestone, Integer> {
+public interface DeadlineRepository extends JpaRepository<Deadline, Integer> {
     Deadline findById(int id);
 }

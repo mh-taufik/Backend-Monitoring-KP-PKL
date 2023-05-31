@@ -24,7 +24,4 @@ public class SupervisorGradeResult {
 
     @Column(name = "grade", nullable = false)
     private Integer grade;
-
-    @Column(name = "description")
-    private String description;
 }

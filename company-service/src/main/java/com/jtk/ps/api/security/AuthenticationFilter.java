@@ -139,6 +139,8 @@ public class AuthenticationFilter extends OncePerRequestFilter {
                 return Collections.singleton(new SimpleGrantedAuthority(Constant.Role.COMPANY));
             case 3:
                 return Collections.singleton(new SimpleGrantedAuthority(Constant.Role.HEAD_STUDY_PROGRAM));
+            case 4:
+                return Collections.singleton(new SimpleGrantedAuthority(Constant.Role.SUPERVISOR));
             default:
                 return Collections.emptyList();
         }

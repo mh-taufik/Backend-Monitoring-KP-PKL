@@ -1,5 +1,6 @@
 package com.jtk.ps.api.service;
 
+import com.jtk.ps.api.dto.ParticipantResponse;
 import com.jtk.ps.api.dto.supervisor_mapping.SupervisorMappingLecturerResponse;
 import com.jtk.ps.api.dto.supervisor_mapping.SupervisorMappingResponse;
 import com.jtk.ps.api.dto.laporan.LaporanCreateRequest;
@@ -16,6 +17,9 @@ import com.jtk.ps.api.dto.supervisor_grade.SupervisorGradeResponse;
 import com.jtk.ps.api.model.*;
 import com.jtk.ps.api.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -27,7 +31,7 @@ import java.util.Optional;
 public class MonitoringService implements IMonitoringService {
 
     @Autowired
-    LogbookRepository logbookRepository;
+    private LogbookRepository logbookRepository;
     @Autowired
     private RppRepository rppRepository;
     @Autowired
@@ -48,6 +52,8 @@ public class MonitoringService implements IMonitoringService {
     private SupervisorGradeRepository supervisorGradeRepository;
     @Autowired
     private SupervisorGradeResultRepository supervisorGradeResultRepository;
+    @Autowired
+    private SupervisorMappingRepository supervisorMappingRepository;
     @Autowired
     private LaporanRepository laporanRepository;
     @Autowired
@@ -70,7 +76,7 @@ public class MonitoringService implements IMonitoringService {
         List<CompletionSchedule> completionScheduleList = completionScheduleRepository.findByRpp(rpp);
         List<CompletionScheduleResponse> completionScheduleResponse = new ArrayList<>();
         for(CompletionSchedule temp:completionScheduleList){
-            completionScheduleResponse.add(new CompletionScheduleResponse(temp.getId(), temp.getTaskName(), ETaskType.valueOfId(temp.getTaskType()).toString(), temp.getStartDate(), temp.getFinishDate()));
+            completionScheduleResponse.add(new CompletionScheduleResponse(temp.getId(), temp.getTaskName(), temp.getTaskType().name(), temp.getStartDate(), temp.getFinishDate()));
         }
 
         RppDetailResponse rppDetail = new RppDetailResponse(
@@ -335,24 +341,40 @@ null,
     }
 
     @Override
-    public SupervisorMappingLecturerResponse getSupervisorMappingByLecturer(int lecturerId) {
+    public List<SupervisorMappingResponse> getSupervisorMappingByLecturer(int lecturerId) {
+        List<SupervisorMapping> supervisorMapping = supervisorMappingRepository.findByLecturerId(lecturerId);
+        List<SupervisorMappingResponse> response = new ArrayList<>();
+        for(SupervisorMapping temp:supervisorMapping){
+            SupervisorMappingResponse mapping = new SupervisorMappingResponse();
+            mapping.setParticipantId(temp.getParticipantId());
+            mapping.setLecturerId(temp.getLecturerId());
+            mapping.setCompanyId(temp.getCompanyId());
+            mapping.setProdiId(temp.getProdiId());
+//            ResponseEntity<ResponseList<ParticipantResponse>> pResponse = restTemplate.exchange(
+//                    "http://participant-service/participant/get-all?year=" + currentYear,
+//                    HttpMethod.GET,
+//                    req,
+//                    new ParameterizedTypeReference<>() {
+//                    });
 
-        SupervisorMappingLecturerResponse response = new SupervisorMappingLecturerResponse();
+
+            response.add(mapping);
+        }
+        return response;
+    }
+
+    @Override
+    public List<SupervisorMappingResponse> getSupervisorMappingByCompany(int companyId) {
         return null;
     }
 
     @Override
-    public SupervisorMappingResponse getSupervisorMappingByCompany(int companyId) {
+    public List<SupervisorMappingResponse> getSupervisorMappingByProdi(int prodiId) {
         return null;
     }
 
     @Override
-    public SupervisorMappingResponse getSupervisorMappingByProdi(int prodiId) {
-        return null;
-    }
-
-    @Override
-    public SupervisorMappingResponse getSupervisorMappingByParticipant(int participantId) {
+    public List<SupervisorMappingResponse> getSupervisorMappingByParticipant(int participantId) {
         return null;
     }
 

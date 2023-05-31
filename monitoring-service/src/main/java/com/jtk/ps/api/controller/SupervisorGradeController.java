@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
-@RequestMapping("/supervisor_grade")
+    @RequestMapping("/supervisor_grade")
 public class SupervisorGradeController {
     @Autowired
     private IMonitoringService monitoringService;

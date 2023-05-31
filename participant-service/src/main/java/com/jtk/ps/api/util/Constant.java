@@ -46,6 +46,7 @@ public class Constant {
         public static final String PARTICIPANT = "PARTICIPANT";
         public static final String COMPANY = "COMPANY";
         public static final String HEAD_STUDY_PROGRAM = "HEAD_STUDY_PROGRAM";
+        public static final String SUPERVISOR = "SUPERVISOR";
     }
 
 

@@ -270,7 +270,6 @@ public class CompanyService implements ICompanyService {
         prerequisite.setCompany(newCompany);
         prerequisiteRepository.save(prerequisite);
 
-
         return newCompany;
     }
 

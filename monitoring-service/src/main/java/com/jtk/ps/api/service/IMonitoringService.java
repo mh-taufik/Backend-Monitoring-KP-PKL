@@ -54,14 +54,17 @@ public interface IMonitoringService {
 
     //Supervisor mapping
     void setSupervisorMapping(SupervisorMapping supervisorMapping);
-    SupervisorMappingLecturerResponse getSupervisorMappingByLecturer(int lecturerId);
-    SupervisorMappingResponse getSupervisorMappingByCompany(int companyId);
-    SupervisorMappingResponse getSupervisorMappingByProdi(int prodiId);
-    SupervisorMappingResponse getSupervisorMappingByParticipant(int participantId);
+    List<SupervisorMappingResponse> getSupervisorMappingByLecturer(int lecturerId);
+    List<SupervisorMappingResponse> getSupervisorMappingByCompany(int companyId);
+    List<SupervisorMappingResponse> getSupervisorMappingByProdi(int prodiId);
+    List<SupervisorMappingResponse> getSupervisorMappingByParticipant(int participantId);
 
     //Reminder
     void sendReminderParticipantLogbook();
     void sendReminderParticipantRpp();
     void sendReminderParticipantSelfAssessment();
     void sendReminderSupervisorGrade();
+
+    //Deadline
+
 }

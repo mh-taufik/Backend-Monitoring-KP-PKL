@@ -1,13 +1,11 @@
 package com.jtk.ps.api.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import io.swagger.models.auth.In;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.io.Serializable;
 import java.time.LocalDate;
 
 @Entity
@@ -28,7 +26,7 @@ public class CompletionSchedule {
     private String taskName;
 
     @Column(name = "task_type")
-    private Integer taskType;
+    private ETaskType taskType;
 
     @Column(name = "start_date")
     private LocalDate startDate;
@@ -52,11 +50,11 @@ public class CompletionSchedule {
         this.taskName = taskName;
     }
 
-    public Integer getTaskType() {
+    public ETaskType getTaskType() {
         return taskType;
     }
 
-    public void setTaskType(Integer taskType) {
+    public void setTaskType(ETaskType taskType) {
         this.taskType = taskType;
     }
 

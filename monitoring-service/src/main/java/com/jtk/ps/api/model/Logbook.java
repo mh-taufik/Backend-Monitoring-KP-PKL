@@ -57,7 +57,7 @@ public class Logbook {
     private String description;
 
     @Column(name = "grade")
-    private Integer grade;
+    private ENilai grade;
 
     @ManyToOne
     @JoinColumn(name = "status")
