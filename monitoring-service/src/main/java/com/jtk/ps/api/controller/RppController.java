@@ -1,16 +1,17 @@
 package com.jtk.ps.api.controller;
 
+import com.jtk.ps.api.dto.logbook.LogbookCreateRequest;
+import com.jtk.ps.api.dto.logbook.LogbookUpdateRequest;
+import com.jtk.ps.api.dto.rpp.RppCreateRequest;
 import com.jtk.ps.api.dto.rpp.RppDetailResponse;
 import com.jtk.ps.api.dto.rpp.RppResponse;
+import com.jtk.ps.api.dto.rpp.RppUpdateRequest;
 import com.jtk.ps.api.service.IMonitoringService;
 import com.jtk.ps.api.util.ResponseHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,7 +23,31 @@ public class RppController {
     @Autowired
     private IMonitoringService monitoringService;
 
-    @GetMapping("/list/{participant_id}")
+    @PostMapping("/create")
+    public ResponseEntity<Object> saveRpp(@RequestBody RppCreateRequest rppCreateRequest, HttpServletRequest request) {
+        try {
+            monitoringService.createRpp(rppCreateRequest);
+            return ResponseHandler.generateResponse("Save Rpp succeed", HttpStatus.OK);
+        } catch (HttpClientErrorException ex){
+            return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return ResponseHandler.generateResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/update")
+    public ResponseEntity<Object> updateRpp(@RequestBody RppUpdateRequest rppUpdateRequest, HttpServletRequest request) {
+        try {
+            monitoringService.updateRpp(rppUpdateRequest);
+            return ResponseHandler.generateResponse("Update Rpp succeed", HttpStatus.OK);
+        } catch (HttpClientErrorException ex){
+            return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return ResponseHandler.generateResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/get-all/{participant_id}")
     public ResponseEntity<Object> getRppList(@PathVariable("participant_id") Integer participantId, HttpServletRequest request) {
         try {
             List<RppResponse> rppList = monitoringService.getRppList(participantId);
@@ -34,7 +59,7 @@ public class RppController {
         }
     }
 
-    @GetMapping("/detail/{id_rpp}")
+    @GetMapping("/get/{id_rpp}")
     public ResponseEntity<Object> getRppDetail(@PathVariable("id_rpp") Integer idRpp, HttpServletRequest request) {
         try {
             RppDetailResponse rpp = monitoringService.getRppDetail(idRpp);

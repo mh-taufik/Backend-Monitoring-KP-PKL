@@ -29,11 +29,11 @@ public class RppDetailResponse {
     private List<Milestone> milestones;
     private List<Deliverable> deliverables;
     @JsonProperty("completion_schedules")
-    private List<CompletionScheduleResponse> completionSchedules;
+    private List<CompletionSchedule> completionSchedules;
     @JsonProperty("weekly_achievement_plans")
     private List<WeeklyAchievementPlan> weeklyAchievementPlans;
 
-    public RppDetailResponse(Rpp rpp, List<Milestone> milestones, List<Deliverable> deliverables, List<CompletionScheduleResponse> completionSchedules, List<WeeklyAchievementPlan> weeklyAchievementPlans) {
+    public RppDetailResponse(Rpp rpp, List<Milestone> milestones, List<Deliverable> deliverables, List<CompletionSchedule> completionSchedules, List<WeeklyAchievementPlan> weeklyAchievementPlans) {
         this.participantId = rpp.getParticipantId();
         this.workTitle = rpp.getWorkTitle();
         this.groupRole = rpp.getGroupRole();
@@ -48,7 +48,7 @@ public class RppDetailResponse {
         this.rppId = rppId;
     }
 
-    public RppDetailResponse(int participantId, int rppId, String workTitle, String groupRole, String taskDescription, LocalDate startDate, LocalDate finishDate, Status status, List<Milestone> milestones, List<Deliverable> deliverables, List<CompletionScheduleResponse> completionSchedules, List<WeeklyAchievementPlan> weeklyAchievementPlans) {
+    public RppDetailResponse(int participantId, int rppId, String workTitle, String groupRole, String taskDescription, LocalDate startDate, LocalDate finishDate, Status status, List<Milestone> milestones, List<Deliverable> deliverables, List<CompletionSchedule> completionSchedules, List<WeeklyAchievementPlan> weeklyAchievementPlans) {
         this.participantId = participantId;
         this.rppId = rppId;
         this.workTitle = workTitle;

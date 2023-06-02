@@ -28,10 +28,10 @@ public class LogbookDetailResponse {
     @JsonProperty("work_result")
     private String workResult;
     private String description;
-    private Integer grade;
+    private String grade;
     private Status status;
 
-    public LogbookDetailResponse(Integer id, Integer participantId, LocalDate date, String projectName, String projectManager, String technicalLeader, String task, String timeAndActivity, String tools, String workResult, String description, Integer grade, Status status) {
+    public LogbookDetailResponse(Integer id, Integer participantId, LocalDate date, String projectName, String projectManager, String technicalLeader, String task, String timeAndActivity, String tools, String workResult, String description, String grade, Status status) {
         this.id = id;
         this.participantId = participantId;
         this.date = date;
@@ -59,7 +59,7 @@ public class LogbookDetailResponse {
         this.tools = logbook.getTools();
         this.workResult = logbook.getWorkResult();
         this.description = logbook.getDescription();
-        this.grade = logbook.getGrade();
+        this.grade = logbook.getGrade().name();
         this.status = logbook.getStatus();
     }
 
@@ -151,11 +151,11 @@ public class LogbookDetailResponse {
         this.description = description;
     }
 
-    public Integer getGrade() {
+    public String getGrade() {
         return grade;
     }
 
-    public void setGrade(Integer grade) {
+    public void setGrade(String grade) {
         this.grade = grade;
     }
 

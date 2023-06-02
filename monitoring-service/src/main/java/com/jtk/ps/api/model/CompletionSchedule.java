@@ -1,6 +1,7 @@
 package com.jtk.ps.api.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,21 +18,27 @@ public class CompletionSchedule {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
+    @JsonProperty("id")
     private Integer id;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JsonBackReference
     private Rpp rpp;
 
     @Column(name = "task_name")
+    @JsonProperty("task_name")
     private String taskName;
 
     @Column(name = "task_type")
+    @JsonProperty("task_type")
     private ETaskType taskType;
 
     @Column(name = "start_date")
+    @JsonProperty("start_date")
     private LocalDate startDate;
 
     @Column(name = "finish_date")
+    @JsonProperty("finish_date")
     private LocalDate finishDate;
 
     public Rpp getRpp() {

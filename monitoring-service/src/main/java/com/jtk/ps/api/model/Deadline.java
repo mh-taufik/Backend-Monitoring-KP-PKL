@@ -27,4 +27,7 @@ public class Deadline {
     @Column(name = "start_assignment_date")
     private LocalDate startAssignmentDate;
 
+    @Column(name = "finish_assignment_date")
+    private LocalDate finishAssignmentDate;
+
 }

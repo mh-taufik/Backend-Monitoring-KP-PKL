@@ -16,7 +16,7 @@
         <module name="service-registry" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
+    <bytecodeTargetLevel target="11">
       <module name="account-service" target="11" />
       <module name="api-gateway" target="11" />
       <module name="company-service" target="11" />

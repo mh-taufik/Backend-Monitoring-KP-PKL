@@ -59,6 +59,9 @@ public class Logbook {
     @Column(name = "grade")
     private ENilai grade;
 
+    @Column(name = "encountered_problem")
+    private String encounteredProblem;
+
     @ManyToOne
     @JoinColumn(name = "status")
     private Status status;
@@ -74,6 +77,7 @@ public class Logbook {
         this.workResult = logbook.getWorkResult();
         this.tools = logbook.getTools();
         this.description = logbook.getDescription();
+        this.encounteredProblem = logbook.getEncounteredProblem();
     }
 
     public Logbook(LogbookUpdateRequest logbook) {
@@ -86,5 +90,6 @@ public class Logbook {
         this.timeAndActivity = logbook.getTimeAndActivity();
         this.tools = logbook.getTools();
         this.description = logbook.getDescription();
+        this.encounteredProblem = logbook.getEncounteredProblem();
     }
 }

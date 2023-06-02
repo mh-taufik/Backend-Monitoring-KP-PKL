@@ -20,7 +20,7 @@ public class LaporanController {
     @Autowired
     private IMonitoringService monitoringService;
 
-    @GetMapping("/list/{id_participant}")
+    @GetMapping("/get-all/{id_participant}")
     public ResponseEntity<Object> getListLaporan(@PathVariable("id_participant") Integer participantId, HttpServletRequest request) {
         try {
             List<LaporanResponse> listLaporan = monitoringService.getListLaporan(participantId);
@@ -32,7 +32,7 @@ public class LaporanController {
         }
     }
 
-    @GetMapping("/detail/{id_laporan}")
+    @GetMapping("/get/{id_laporan}")
     public ResponseEntity<Object> getLaporan(@PathVariable("id_laporan") Integer idLaporan, HttpServletRequest request) {
         try {
             LaporanResponse laporan = monitoringService.getLaporan(idLaporan);

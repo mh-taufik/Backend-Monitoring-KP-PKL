@@ -1,21 +1,22 @@
 package com.jtk.ps.api.controller;
 
+import com.jtk.ps.api.dto.CheckDate;
 import com.jtk.ps.api.dto.laporan.LaporanResponse;
-import com.jtk.ps.api.dto.self_assessment.SelfAssessmentDetailResponse;
-import com.jtk.ps.api.dto.self_assessment.SelfAssessmentResponse;
+import com.jtk.ps.api.dto.rpp.RppCreateRequest;
+import com.jtk.ps.api.dto.rpp.RppUpdateRequest;
+import com.jtk.ps.api.dto.self_assessment.*;
 import com.jtk.ps.api.service.IMonitoringService;
+import com.jtk.ps.api.util.Constant;
 import com.jtk.ps.api.util.ResponseHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/self-assessment")
@@ -23,11 +24,12 @@ public class SelfAssessmentController {
     @Autowired
     private IMonitoringService monitoringService;
 
-    @GetMapping("/detail/{id_self_assessment}")
-    public ResponseEntity<Object> getSelfAssessmentDetail(@PathVariable("id_self_assessment") Integer idSelfAssessment, HttpServletRequest request) {
+
+    @PostMapping("/create")
+    public ResponseEntity<Object> saveSelfAssessment(@RequestBody SelfAssessmentRequest selfAssessmentCreateRequest, HttpServletRequest request) {
         try {
-            SelfAssessmentDetailResponse response = monitoringService.getSelfAssessmentDetail(idSelfAssessment);
-            return ResponseHandler.generateResponse("Get RPP succeed", HttpStatus.OK, response);
+            monitoringService.createSelfAssessment(selfAssessmentCreateRequest);
+            return ResponseHandler.generateResponse("Save SelfAssessment succeed", HttpStatus.OK);
         } catch (HttpClientErrorException ex){
             return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
@@ -35,11 +37,59 @@ public class SelfAssessmentController {
         }
     }
 
-    @GetMapping("/list/{id_participant}")
+    @PostMapping("/update")
+    public ResponseEntity<Object> updateSelfAssessment(@RequestBody SelfAssessmentUpdateRequest selfAssessmentUpdateRequest, HttpServletRequest request) {
+        try {
+            monitoringService.updateSelfAssessment(selfAssessmentUpdateRequest);
+            return ResponseHandler.generateResponse("Update SelfAssessment succeed", HttpStatus.OK);
+        } catch (HttpClientErrorException ex){
+            return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return ResponseHandler.generateResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/get/{id_self_assessment}")
+    public ResponseEntity<Object> getSelfAssessmentDetail(@PathVariable("id_self_assessment") Integer idSelfAssessment, HttpServletRequest request) {
+        try {
+            SelfAssessmentDetailResponse response = monitoringService.getSelfAssessmentDetail(idSelfAssessment);
+            return ResponseHandler.generateResponse("Get Self Assessment succeed", HttpStatus.OK, response);
+        } catch (HttpClientErrorException ex){
+            return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return ResponseHandler.generateResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/get-all/{id_participant}")
     public ResponseEntity<Object> getSelfAssessmentList(@PathVariable("id_participant") Integer idParticipant, HttpServletRequest request) {
         try {
              List<SelfAssessmentResponse> response = monitoringService.getSelfAssessmentList(idParticipant);
-            return ResponseHandler.generateResponse("Get RPP succeed", HttpStatus.OK, response);
+            return ResponseHandler.generateResponse("Get All Self Assessment succeed", HttpStatus.OK, response);
+        } catch (HttpClientErrorException ex){
+            return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return ResponseHandler.generateResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/get-all-aspect")
+    public ResponseEntity<Object> getSelfAssessmentList(HttpServletRequest request) {
+        try {
+            List<SelfAssessmentAspectResponse> response = monitoringService.getSelfAssessmentAspect();
+            return ResponseHandler.generateResponse("Get Self Assessment Aspect succeed", HttpStatus.OK, response);
+        } catch (HttpClientErrorException ex){
+            return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return ResponseHandler.generateResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/check")
+    public ResponseEntity<Object> checkByDate(@RequestBody CheckDate date, HttpServletRequest request){
+        try {
+            Integer id = (Integer) Objects.requireNonNull(request.getAttribute(Constant.VerifyConstant.ID));
+            return ResponseHandler.generateResponse("Check date succeed", HttpStatus.OK, monitoringService.isSelfAssessmentExist(id, date.getDate()));
         } catch (HttpClientErrorException ex){
             return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {

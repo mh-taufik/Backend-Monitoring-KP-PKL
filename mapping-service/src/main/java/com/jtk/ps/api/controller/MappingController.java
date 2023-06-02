@@ -56,6 +56,23 @@ public class MappingController {
             return ResponseHandler.generateResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @GetMapping("/final")
+    public ResponseEntity<Object> getFinalMappingByProdi(HttpServletRequest request) {
+        try {
+            Integer idRole = (Integer) Objects.requireNonNull(request.getAttribute(Constant.VerifyConstant.ID_ROLE));
+            Integer idProdi = (Integer) Objects.requireNonNull(request.getAttribute(Constant.VerifyConstant.ID_PRODI));
+            String cookie = request.getHeader(Constant.PayloadResponseConstant.COOKIE);
+
+            FinalMappingResponse finalMapping = mappingService.getFinalMapping(idRole, idProdi, cookie);
+
+            return ResponseHandler.generateResponse("Get final mapping data succeed", HttpStatus.OK, finalMapping);
+        } catch (HttpClientErrorException ex) {
+            return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return ResponseHandler.generateResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
     
     @PostMapping("/final/create")
     @PreAuthorize("hasAuthority('COMMITTEE')")

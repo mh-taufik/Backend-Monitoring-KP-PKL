@@ -19,6 +19,9 @@ public class SupervisorGradeAspect {
     @Column(name = "description", nullable = false)
     private String description;
 
+    @Column(name = "max_grade")
+    private Integer maxGrade;
+
     @Column(name = "edited_by")
     private Integer editedBy;
 

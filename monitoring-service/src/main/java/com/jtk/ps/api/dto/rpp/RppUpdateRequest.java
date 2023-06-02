@@ -15,22 +15,12 @@ import java.util.List;
 public class RppUpdateRequest {
     @JsonProperty("rpp_id")
     private int rppId;
-    @JsonProperty("work_title")
-    private String workTitle;
-    @JsonProperty("group_role")
-    private String groupRole;
-    @JsonProperty("task_description")
-    private String taskDescription;
-    @JsonProperty("start_date")
-    private LocalDate startDate;
     @JsonProperty("finish_date")
     private LocalDate finishDate;
-    private Status status;
-    private List<Milestone> milestones;
-    private List<Deliverable> deliverables;
+    private List<MilestoneRequest> milestones;
+    private List<DeliverablesRequest> deliverables;
     @JsonProperty("completion_schedules")
-    private List<CompletionSchedule> completionSchedules;
+    private List<CompletionScheduleRequest> completionSchedules;
     @JsonProperty("weekly_achievement_plans")
-    private List<WeeklyAchievementPlan> weeklyAchievementPlans;
-
+    private List<WeeklyAchievementPlanRequest> weeklyAchievementPlans;
 }

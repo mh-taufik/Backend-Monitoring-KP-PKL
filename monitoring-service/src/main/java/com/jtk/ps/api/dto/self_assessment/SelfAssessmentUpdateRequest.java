@@ -9,16 +9,20 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class SelfAssessmentResponse {
+@NoArgsConstructor
+public class SelfAssessmentUpdateRequest {
+    @JsonProperty("id")
+    private Integer id;
+
     @JsonProperty("participant_id")
     private Integer participantId;
-    @JsonProperty("self_assessment_id")
-    private Integer selfAssessmentId;
+
     @JsonProperty("start_date")
     private LocalDate startDate;
+
     @JsonProperty("finish_date")
     private LocalDate finishDate;
-    private List<SelfAssessmentGradeDetailResponse> grade;
+
+    private List<AssessmentGradeRequest> grade;
 }

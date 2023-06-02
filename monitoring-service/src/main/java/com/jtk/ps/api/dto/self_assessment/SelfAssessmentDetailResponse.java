@@ -19,9 +19,9 @@ public class SelfAssessmentDetailResponse {
     @JsonProperty("finish_date")
     private LocalDate finishDate;
     @JsonProperty("aspect_list")
-    private List<SelfAssessmentAspectDetailResponse> aspectList;
+    private List<SelfAssessmentGradeDetailResponse> aspectList;
 
-    public SelfAssessmentDetailResponse(Integer participantId, Integer selfAssessmentId, LocalDate startDate, LocalDate finishDate, List<SelfAssessmentAspectDetailResponse> aspectList) {
+    public SelfAssessmentDetailResponse(Integer participantId, Integer selfAssessmentId, LocalDate startDate, LocalDate finishDate, List<SelfAssessmentGradeDetailResponse> aspectList) {
         this.participantId = participantId;
         this.selfAssessmentId = selfAssessmentId;
         this.startDate = startDate;
@@ -61,11 +61,11 @@ public class SelfAssessmentDetailResponse {
         this.finishDate = finishDate;
     }
 
-    public List<SelfAssessmentAspectDetailResponse> getAspectList() {
+    public List<SelfAssessmentGradeDetailResponse> getAspectList() {
         return aspectList;
     }
 
-    public void setAspectList(List<SelfAssessmentAspectDetailResponse> aspectList) {
+    public void setAspectList(List<SelfAssessmentGradeDetailResponse> aspectList) {
         this.aspectList = aspectList;
     }
 }

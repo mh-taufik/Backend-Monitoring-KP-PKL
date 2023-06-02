@@ -1,35 +1,38 @@
 package com.jtk.ps.api.service;
 
-import com.jtk.ps.api.dto.ParticipantResponse;
-import com.jtk.ps.api.dto.supervisor_mapping.SupervisorMappingLecturerResponse;
+import com.jtk.ps.api.dto.*;
+import com.jtk.ps.api.dto.deadline.DeadlineCreateRequest;
+import com.jtk.ps.api.dto.deadline.DeadlineResponse;
+import com.jtk.ps.api.dto.deadline.DeadlineUpdateRequest;
+import com.jtk.ps.api.dto.self_assessment.*;
+import com.jtk.ps.api.dto.supervisor_grade.*;
+import com.jtk.ps.api.dto.supervisor_mapping.SupervisorMappingCreateRequest;
 import com.jtk.ps.api.dto.supervisor_mapping.SupervisorMappingResponse;
 import com.jtk.ps.api.dto.laporan.LaporanCreateRequest;
 import com.jtk.ps.api.dto.laporan.LaporanResponse;
 import com.jtk.ps.api.dto.laporan.LaporanUpdateRequest;
 import com.jtk.ps.api.dto.logbook.*;
 import com.jtk.ps.api.dto.rpp.*;
-import com.jtk.ps.api.dto.self_assessment.SelfAssessmentAspectDetailResponse;
-import com.jtk.ps.api.dto.self_assessment.SelfAssessmentDetailResponse;
-import com.jtk.ps.api.dto.self_assessment.SelfAssessmentResponse;
-import com.jtk.ps.api.dto.supervisor_grade.Grade;
-import com.jtk.ps.api.dto.supervisor_grade.SupervisorGradeDetailResponse;
-import com.jtk.ps.api.dto.supervisor_grade.SupervisorGradeResponse;
+import com.jtk.ps.api.dto.supervisor_mapping.SupervisorMappingUpdateRequest;
 import com.jtk.ps.api.model.*;
 import com.jtk.ps.api.repository.*;
+import com.jtk.ps.api.util.Constant;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static java.time.temporal.TemporalAdjusters.next;
+import static java.time.DayOfWeek.SUNDAY;
+
 @Service
 public class MonitoringService implements IMonitoringService {
-
     @Autowired
     private LogbookRepository logbookRepository;
     @Autowired
@@ -51,6 +54,8 @@ public class MonitoringService implements IMonitoringService {
     @Autowired
     private SupervisorGradeRepository supervisorGradeRepository;
     @Autowired
+    private SupervisorGradeAspectRepository supervisorGradeAspectRepository;
+    @Autowired
     private SupervisorGradeResultRepository supervisorGradeResultRepository;
     @Autowired
     private SupervisorMappingRepository supervisorMappingRepository;
@@ -58,6 +63,10 @@ public class MonitoringService implements IMonitoringService {
     private LaporanRepository laporanRepository;
     @Autowired
     private StatusRepository statusRepository;
+    @Autowired
+    private DeadlineRepository deadlineRepository;
+    @Autowired
+    private RestTemplate restTemplate;
 
 
     @Override
@@ -73,17 +82,11 @@ public class MonitoringService implements IMonitoringService {
     @Override
     public RppDetailResponse getRppDetail(int id) {
         Rpp rpp = rppRepository.findById(id);
-        List<CompletionSchedule> completionScheduleList = completionScheduleRepository.findByRpp(rpp);
-        List<CompletionScheduleResponse> completionScheduleResponse = new ArrayList<>();
-        for(CompletionSchedule temp:completionScheduleList){
-            completionScheduleResponse.add(new CompletionScheduleResponse(temp.getId(), temp.getTaskName(), temp.getTaskType().name(), temp.getStartDate(), temp.getFinishDate()));
-        }
-
         RppDetailResponse rppDetail = new RppDetailResponse(
                 rpp,
                 milestoneRepository.findByRpp(rpp),
                 deliverablesRepository.findByRpp(rpp),
-                completionScheduleResponse,
+                completionScheduleRepository.findByRpp(rpp),
                 weeklyAchievementPlanRepository.findByRpp(rpp)
                 );
         return rppDetail;
@@ -98,55 +101,53 @@ public class MonitoringService implements IMonitoringService {
         rppNew.setTaskDescription(rpp.getTaskDescription());
         rppNew.setStartDate(rpp.getStartDate());
         rppNew.setFinishDate(rpp.getFinishDate());
-        rppNew.setStatus(statusRepository.findById(1));
-        rppNew.setMilestones(rpp.getMilestones());
-        rppNew.setDeliverables(rpp.getDeliverables());
-        rppNew.setCompletionSchedules(rpp.getCompletionSchedules());
-        rppNew.setWeeklyAchievementPlans(rpp.getWeeklyAchievementPlans());
+//        rppNew.setStatus(statusRepository.findById(1));
+//        TODO: Status set by date
+        Rpp temp = rppRepository.save(rppNew);
+        for(MilestoneRequest milestone:rpp.getMilestones()){
+            milestoneRepository.save(new Milestone(null, temp, milestone.getDescription(), milestone.getStartDate(), milestone.getFinishDate()));
+        }
+        for(DeliverablesRequest deliverable:rpp.getDeliverables()){
+            deliverablesRepository.save(new Deliverable(null, temp, deliverable.getDeliverables(), deliverable.getDueDate()));
+        }
+        for(CompletionScheduleRequest completionSchedule:rpp.getCompletionSchedules()){
+            completionScheduleRepository.save(new CompletionSchedule(null, temp, completionSchedule.getTaskName(), completionSchedule.getTaskType(), completionSchedule.getStartDate(), completionSchedule.getFinishDate()));
+        }
+        for(WeeklyAchievementPlanRequest weeklyAchievementPlan:rpp.getWeeklyAchievementPlans()){
+            weeklyAchievementPlanRepository.save(new WeeklyAchievementPlan(null, temp, weeklyAchievementPlan.getAchievementPlan(), weeklyAchievementPlan.getStartDate(), weeklyAchievementPlan.getFinishDate()));
+        }
 
-        rppRepository.save(rppNew);
     }
 
     @Override
     public void updateRpp(RppUpdateRequest rppUpdate) {
-//        RppDetailResponse rppOld = getRppDetail(id);
-        //check date
-        try {
-            Rpp rpp = new Rpp(
-                    rppUpdate.getRppId(),
-null,
-//                    rppUpdate.getParticipantId(),
-                    rppUpdate.getGroupRole(),
-                    rppUpdate.getWorkTitle(),
-                    rppUpdate.getTaskDescription(),
-                    rppUpdate.getStartDate(),
-                    rppUpdate.getFinishDate(),
-                    rppUpdate.getStatus(),
-                    rppUpdate.getMilestones(),
-                    rppUpdate.getDeliverables(),
-                    rppUpdate.getCompletionSchedules(),
-                    rppUpdate.getWeeklyAchievementPlans()
-            );
-            rppRepository.save(rpp);
-//            if(rppUpdate.getMilestones() != null){
-//                milestoneRepository.deleteAllByRppId(id);
-//                milestoneRepository.saveAll(rppUpdate.getMilestones());
-//            }
-//            if(rppUpdate.getDeliverables() != null){
-//                deliverablesRepository.deleteAllByRppId(id);
-//                deliverablesRepository.saveAll(rppUpdate.getDeliverables());
-//            }
-//            if(rppUpdate.getCompletionSchedules() != null){
-//                completionScheduleRepository.deleteAllByRppId(id);
-//                completionScheduleRepository.saveAll(rppUpdate.getCompletionSchedules());
-//            }
-//            if(rppUpdate.getWeeklyAchievementPlans() != null){
-//                weeklyAchievementPlanRepository.deleteAllByRppId(id);
-//                weeklyAchievementPlanRepository.saveAll(rppUpdate.getWeeklyAchievementPlans());
-//            }
-        } catch (Exception e){
+        //TODO: check date until this week sunday
+        LocalDate sunday = LocalDate.now().with(next(SUNDAY));
+        Rpp rpp = rppRepository.findById(rppUpdate.getRppId());
+        rpp.setFinishDate(rppUpdate.getFinishDate());
+        Rpp temp = rppRepository.save(rpp);
 
+        for(MilestoneRequest milestone:rppUpdate.getMilestones()){
+            if(milestone.getStartDate().isAfter(sunday))
+                milestoneRepository.save(new Milestone(null, temp, milestone.getDescription(), milestone.getStartDate(), milestone.getFinishDate()));
         }
+        for(DeliverablesRequest deliverable:rppUpdate.getDeliverables()){
+            if(deliverable.getDueDate().isAfter(sunday))
+                deliverablesRepository.save(new Deliverable(null, temp, deliverable.getDeliverables(), deliverable.getDueDate()));
+        }
+        for(CompletionScheduleRequest completionSchedule:rppUpdate.getCompletionSchedules()){
+            if(completionSchedule.getFinishDate().isAfter(sunday))
+                completionScheduleRepository.save(new CompletionSchedule(null, temp, completionSchedule.getTaskName(), completionSchedule.getTaskType(), completionSchedule.getStartDate(), completionSchedule.getFinishDate()));
+        }
+        for(WeeklyAchievementPlanRequest weeklyAchievementPlan:rppUpdate.getWeeklyAchievementPlans()){
+            if(weeklyAchievementPlan.getFinishDate().isAfter(sunday))
+                weeklyAchievementPlanRepository.save(new WeeklyAchievementPlan(null, temp, weeklyAchievementPlan.getAchievementPlan(), weeklyAchievementPlan.getStartDate(), weeklyAchievementPlan.getFinishDate()));
+        }
+    }
+
+    @Override
+    public Boolean isLogbookExist(int participantId, LocalDate date) {
+        return logbookRepository.isExist(participantId, date);
     }
 
     @Override
@@ -154,7 +155,7 @@ null,
         List<Logbook> logbookList = logbookRepository.findByParticipantId(participantId);
         List<LogbookResponse> responses = new ArrayList<>();
         for(Logbook temp:logbookList){
-            responses.add(new LogbookResponse(temp.getId(), temp.getDate(), temp.getGrade(), temp.getStatus().getStatus()));
+            responses.add(new LogbookResponse(temp.getId(), temp.getDate(), temp.getGrade().name().replace("_", " "), temp.getStatus().getStatus()));
         }
         return responses;
     }
@@ -167,7 +168,7 @@ null,
 
     @Override
     public void createLogbook(LogbookCreateRequest logbook) {
-        if(logbookRepository.logbookExist(logbook.getParticipantId(), logbook.getDate())) {
+        if(logbookRepository.isExist(logbook.getParticipantId(), logbook.getDate())) {
             throw new IllegalStateException("Logbook already created on this date, please update it instead");
         }
         Logbook newLogbook = new Logbook(logbook);
@@ -193,17 +194,50 @@ null,
         Logbook logbook = logbookRepository.findById(gradeRequest.getId());
         if(logbook.getId() != null && logbook.getGrade() == null){
             logbook.setGrade(gradeRequest.getGrade());
-            logbook.setStatus(statusRepository.findById(2));
             logbookRepository.save(logbook);
         }
     }
 
     @Override
-    public void createSelfAssessment() {
-//        List<SelfAssessment> assessmentList = ;
-        List<SelfAssessmentAspect> aspectLists = selfAssessmentAspectRepository.findAll();
-        for (SelfAssessmentAspect i:aspectLists){
+    public Boolean isSelfAssessmentExist(int participantId, LocalDate date) {
+        return selfAssessmentRepository.isExist(participantId, date);
+    }
 
+    @Override
+    public List<SelfAssessmentAspectResponse> getSelfAssessmentAspect() {
+        List<SelfAssessmentAspect> aspect = selfAssessmentAspectRepository.findAllActiveAspect();
+        List<SelfAssessmentAspectResponse> response = new ArrayList<>();
+        for(SelfAssessmentAspect temp:aspect){
+            response.add(new SelfAssessmentAspectResponse(temp.getId(), temp.getName(), temp.getDescription()));
+        }
+        return response;
+    }
+
+    @Override
+    public void createSelfAssessment(SelfAssessmentRequest request) {
+        try {
+            SelfAssessment selfAssessment = new SelfAssessment();
+            selfAssessment.setParticipantId(request.getParticipantId());
+            selfAssessment.setStartDate(request.getStartDate());
+            selfAssessment.setFinishDate(request.getFinishDate());
+            SelfAssessment sa = selfAssessmentRepository.save(selfAssessment);
+
+            List<SelfAssessmentAspect> aspectList = selfAssessmentAspectRepository.findAllActiveAspect();
+            List<SelfAssessmentGrade> gradeList = new ArrayList<>();
+            for (SelfAssessmentAspect aspect : aspectList) {
+                for(AssessmentGradeRequest grade: request.getGrade()) {
+                    if (aspect.getId() == grade.getAspectId()){
+                        if(grade.getGrade() == null)
+                            gradeList.add(new SelfAssessmentGrade(null, sa, aspect, 0, grade.getDescription()));
+                        else
+                            gradeList.add(new SelfAssessmentGrade(null, sa, aspect, grade.getGrade(), grade.getDescription()));
+                        break;
+                    }
+                }
+            }
+            selfAssessmentGradeRepository.saveAll(gradeList);
+        } catch (Exception e){
+            throw new IllegalStateException(e);
         }
     }
 
@@ -211,9 +245,9 @@ null,
     public SelfAssessmentDetailResponse getSelfAssessmentDetail(int id) {
         SelfAssessment selfAssessment = selfAssessmentRepository.findById(id);
         List<SelfAssessmentGrade> grades = selfAssessmentGradeRepository.findBySelfAssessmentId(id);
-        List<SelfAssessmentAspectDetailResponse> aspectList = new ArrayList<>();
+        List<SelfAssessmentGradeDetailResponse> aspectList = new ArrayList<>();
         for(SelfAssessmentGrade temp: grades){
-            aspectList.add(new SelfAssessmentAspectDetailResponse(
+            aspectList.add(new SelfAssessmentGradeDetailResponse(
                     temp.getSelfAssessmentAspect().getId(),
                     temp.getId(),
                     temp.getSelfAssessmentAspect().getName(),
@@ -236,19 +270,90 @@ null,
         List<SelfAssessment> selfAssessments = selfAssessmentRepository.findByParticipantId(idParticipant);
         List<SelfAssessmentResponse> responses = new ArrayList<>();
         for(SelfAssessment temp:selfAssessments){
-            responses.add(new SelfAssessmentResponse(temp.getParticipantId(), temp.getId(), temp.getStartDate(), temp.getFinishDate()));
+            List<SelfAssessmentGrade> grades = selfAssessmentGradeRepository.findBySelfAssessmentId(temp.getId());
+            List<SelfAssessmentGradeDetailResponse> grade = new ArrayList<>();
+            for(SelfAssessmentGrade temp2: grades){
+                grade.add(new SelfAssessmentGradeDetailResponse(
+                        temp2.getSelfAssessmentAspect().getId(),
+                        temp2.getId(),
+                        temp2.getSelfAssessmentAspect().getName(),
+                        temp2.getGrade(),
+                        temp2.getDescription())
+                );
+            }
+            responses.add(new SelfAssessmentResponse(temp.getParticipantId(), temp.getId(), temp.getStartDate(), temp.getFinishDate(), grade));
         }
+        responses.add(new SelfAssessmentResponse(idParticipant, null, null, null, getBestPerformance(idParticipant)));
         return responses;
     }
 
     @Override
-    public void updateSelfAssessment(int participantId) {
-
+    public List<SelfAssessmentGradeDetailResponse> getBestPerformance(int participantId) {
+        List<SelfAssessmentAspect> aspectList = selfAssessmentAspectRepository.findAllActiveAspect();
+        List<SelfAssessmentGradeDetailResponse> grades = new ArrayList<>();
+        for(SelfAssessmentAspect aspect:aspectList){
+            SelfAssessmentGrade grade = selfAssessmentGradeRepository.findMaxGradeByParticipantIdAndAspectId(participantId);
+            grades.add(new SelfAssessmentGradeDetailResponse(
+                    grade.getSelfAssessmentAspect().getId(),
+                    grade.getId(),
+                    grade.getSelfAssessmentAspect().getName(),
+                    grade.getGrade(),
+                    grade.getDescription()));
+        }
+        return grades;
     }
 
     @Override
-    public void createSupervisorGrade(int participantId) {
-        
+    public void updateSelfAssessment(SelfAssessmentUpdateRequest request) {
+        SelfAssessment selfAssessment = new SelfAssessment();
+        selfAssessment.setId(request.getId());
+        selfAssessment.setParticipantId(request.getParticipantId());
+        selfAssessment.setStartDate(request.getStartDate());
+        selfAssessment.setFinishDate(request.getFinishDate());
+        SelfAssessment sa = selfAssessmentRepository.save(selfAssessment);
+
+        List<SelfAssessmentAspect> aspectList = selfAssessmentAspectRepository.findAllActiveAspect();
+        List<SelfAssessmentGrade> gradeList = new ArrayList<>();
+        for (SelfAssessmentAspect aspect : aspectList) {
+            for(AssessmentGradeRequest grade: request.getGrade()) {
+                if (aspect.getId() == grade.getAspectId()){
+                    if(grade.getGrade() == null)
+                        gradeList.add(new SelfAssessmentGrade(grade.getGradeId(), sa, aspect, 0, grade.getDescription()));
+                    else
+                        gradeList.add(new SelfAssessmentGrade(grade.getGradeId(), sa, aspect, grade.getGrade(), grade.getDescription()));
+                    break;
+                }
+            }
+        }
+        selfAssessmentGradeRepository.saveAll(gradeList);
+    }
+
+    @Override
+    public void createSupervisorGrade(SupervisorGradeCreateRequest request) {
+        SupervisorGrade supervisorGrade = new SupervisorGrade();
+        supervisorGrade.setSupervisorId(request.getSupervisorId());
+        supervisorGrade.setParticipantId(request.getParticipantId());
+        supervisorGrade.setDate(request.getDate());
+        supervisorGrade.setPhase(request.getPhase());
+        SupervisorGrade temp = supervisorGradeRepository.save(supervisorGrade);
+        for(GradeRequest grade:request.getGradeList()){
+            SupervisorGradeAspect aspect = supervisorGradeAspectRepository.findById((int)grade.getAspectId());
+            supervisorGradeResultRepository.save(new SupervisorGradeResult(null, temp, aspect, grade.getGrade(), aspect.getMaxGrade()));
+        }
+    }
+
+    @Override
+    public void updateSupervisorGrade(SupervisorGradeUpdateRequest request) {
+        SupervisorGrade supervisorGrade = supervisorGradeRepository.findById((int)request.getId());
+        if(supervisorGrade != null){
+            supervisorGrade.setDate(request.getDate());
+            supervisorGrade.setPhase(request.getPhase());
+            SupervisorGrade temp = supervisorGradeRepository.save(supervisorGrade);
+            for (GradeRequest grade : request.getGradeList()) {
+                SupervisorGradeAspect aspect = supervisorGradeAspectRepository.findById((int) grade.getAspectId());
+                supervisorGradeResultRepository.save(new SupervisorGradeResult(null, temp, aspect, grade.getGrade(), aspect.getMaxGrade()));
+            }
+        }
     }
 
     @Override
@@ -336,12 +441,70 @@ null,
     }
 
     @Override
-    public void setSupervisorMapping(SupervisorMapping supervisorMapping) {
+    public void createSupervisorMapping(List<SupervisorMappingCreateRequest> supervisorMapping) {
 
     }
 
     @Override
-    public List<SupervisorMappingResponse> getSupervisorMappingByLecturer(int lecturerId) {
+    public void updateSupervisorMapping(List<SupervisorMappingUpdateRequest> supervisorMapping) {
+
+    }
+
+    @Override
+    public List<List<User>> getUserList(String cookie){
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(Constant.PayloadResponseConstant.COOKIE, cookie);
+        HttpEntity<String> req = new HttpEntity<>(headers);
+        List<List<User>> user = new ArrayList<>();
+
+//        //get participant
+//        List<User> participantList = new ArrayList<>();
+//        ResponseEntity<ResponseList<ParticipantResponse>> participantRes = restTemplate.exchange("http://participant-service/participant/get-all",
+//                HttpMethod.GET, req, new ParameterizedTypeReference<>() {});
+//        List<ParticipantResponse> participantResponseList = Objects.requireNonNull(participantRes.getBody()).getData();
+//        for (ParticipantResponse participant : participantResponseList) {
+//            participantList.add(new User(participant.getIdParticipant(), participant.getName()));
+//        }
+//        user.add(participantList);
+//
+//        //get company
+//        List<User> companyList = new ArrayList<>();
+//        ResponseEntity<ResponseList<CompanyResponse>> companyRes = restTemplate.exchange("http://company-service/company/get-all",
+//                HttpMethod.GET, req, new ParameterizedTypeReference<>() {});
+//        List<CompanyResponse> companyResponses = Objects.requireNonNull(companyRes.getBody()).getData();
+//        for (CompanyResponse company : companyResponses) {
+//            companyList.add(new User(company.getIdCompany(), company.getCompanyName()));
+//        }
+//        user.add(companyList);
+//
+//        //get Supervisor
+//        List<User> lecturerList = new ArrayList<>();
+//        ResponseEntity<ResponseList<CommitteeResponse>> committeeRes = restTemplate.exchange("http://account-service/get-supervisor",
+//                HttpMethod.GET, req, new ParameterizedTypeReference<>() {});
+//        List<CommitteeResponse> committeeResponses = Objects.requireNonNull(committeeRes.getBody()).getData();
+//        for (CommitteeResponse committee : committeeResponses) {
+//            lecturerList.add(new User(committee.getIdLecturer(), committee.getName()));
+//        }
+//        user.add(lecturerList);
+
+        return user;
+    }
+
+    @Override
+    public List<SupervisorMappingResponse> getSupervisorMapping(String cookie) {
+        List<SupervisorMapping> mapping = supervisorMappingRepository.findAll();
+        List<List<User>> user = getUserList(cookie);
+        List<User> participant = user.get(0);
+        List<User> company = user.get(1);
+        List<User> lecturer = user.get(2);
+
+
+
+        return null;
+    }
+
+    @Override
+    public List<SupervisorMappingResponse> getSupervisorMappingByLecturer(String cookie, int lecturerId) {
         List<SupervisorMapping> supervisorMapping = supervisorMappingRepository.findByLecturerId(lecturerId);
         List<SupervisorMappingResponse> response = new ArrayList<>();
         for(SupervisorMapping temp:supervisorMapping){
@@ -364,18 +527,50 @@ null,
     }
 
     @Override
-    public List<SupervisorMappingResponse> getSupervisorMappingByCompany(int companyId) {
+    public List<SupervisorMappingResponse> getSupervisorMappingByCompany(String cookie, int companyId) {
         return null;
     }
 
     @Override
-    public List<SupervisorMappingResponse> getSupervisorMappingByProdi(int prodiId) {
+    public List<SupervisorMappingResponse> getSupervisorMappingByProdi(String cookie, int prodiId) {
         return null;
     }
 
     @Override
-    public List<SupervisorMappingResponse> getSupervisorMappingByParticipant(int participantId) {
+    public List<SupervisorMappingResponse> getSupervisorMappingByYear(String cookie, int year) {
         return null;
+    }
+
+    @Override
+    public SupervisorMappingResponse getSupervisorMappingByParticipant(int participantId) {
+        return null;
+    }
+
+    @Override
+    public void createDeadline(DeadlineCreateRequest request) {
+        deadlineRepository.save(new Deadline(null, request.getName(), request.getDayRange(), request.getStartAssignmentDate(), request.getFinishAssignmentDate()));
+    }
+
+    @Override
+    public void updateDeadline(DeadlineUpdateRequest request) {
+        deadlineRepository.save(new Deadline(request.getId(), request.getName(), request.getDayRange(), request.getStartAssignmentDate(), request.getFinishAssignmentDate()));
+    }
+
+    @Override
+    public DeadlineResponse getDeadline(int id) {
+        Deadline deadline = deadlineRepository.findById(id);
+        DeadlineResponse response = new DeadlineResponse(deadline.getId(), deadline.getName(), deadline.getDayRange(), deadline.getStartAssignmentDate(), deadline.getFinishAssignmentDate());
+        return response;
+    }
+
+    @Override
+    public List<DeadlineResponse> getDeadline() {
+        List<Deadline> deadline = deadlineRepository.findAll();
+        List<DeadlineResponse> response = new ArrayList<>();
+        for(Deadline temp:deadline){
+            response.add(new DeadlineResponse(temp.getId(), temp.getName(), temp.getDayRange(), temp.getStartAssignmentDate(), temp.getFinishAssignmentDate()));
+        }
+        return response;
     }
 
     @Override
@@ -397,7 +592,5 @@ null,
     public void sendReminderSupervisorGrade() {
 
     }
-
-//    public
 
 }

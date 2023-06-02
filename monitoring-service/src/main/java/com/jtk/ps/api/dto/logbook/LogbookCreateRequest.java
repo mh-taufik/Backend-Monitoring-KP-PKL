@@ -3,6 +3,7 @@ package com.jtk.ps.api.dto.logbook;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.jtk.ps.api.model.Logbook;
 import com.jtk.ps.api.model.Status;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,6 +11,7 @@ import java.time.LocalDate;
 
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class LogbookCreateRequest {
     @JsonProperty("participant_id")
     private Integer participantId;
@@ -28,18 +30,9 @@ public class LogbookCreateRequest {
     private String workResult;
     private String description;
 
-    public LogbookCreateRequest(Integer id, Integer participantId, LocalDate date, String projectName, String projectManager, String technicalLeader, String task, String timeAndActivity, String tools, String workResult, String description, Integer grade, Status status) {
-        this.participantId = participantId;
-        this.date = date;
-        this.projectName = projectName;
-        this.projectManager = projectManager;
-        this.technicalLeader = technicalLeader;
-        this.task = task;
-        this.timeAndActivity = timeAndActivity;
-        this.tools = tools;
-        this.workResult = workResult;
-        this.description = description;
-    }
+    @JsonProperty("encountered_problem")
+    private String encounteredProblem;
+
 
     public LogbookCreateRequest(Logbook logbook) {
         this.participantId = logbook.getParticipantId();
@@ -52,5 +45,6 @@ public class LogbookCreateRequest {
         this.tools = logbook.getTools();
         this.workResult = logbook.getWorkResult();
         this.description = logbook.getDescription();
+        this.encounteredProblem = encounteredProblem;
     }
 }

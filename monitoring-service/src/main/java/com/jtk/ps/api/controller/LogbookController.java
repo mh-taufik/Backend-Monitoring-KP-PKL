@@ -1,7 +1,9 @@
 package com.jtk.ps.api.controller;
 
+import com.jtk.ps.api.dto.CheckDate;
 import com.jtk.ps.api.dto.logbook.*;
 import com.jtk.ps.api.service.IMonitoringService;
+import com.jtk.ps.api.util.Constant;
 import com.jtk.ps.api.util.ResponseHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -10,7 +12,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 
 import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/logbook")
@@ -42,7 +46,7 @@ public class LogbookController {
         }
     }
 
-    @GetMapping("/list/{participant_id}")
+    @GetMapping("/get-all/{participant_id}")
     public ResponseEntity<Object> getRppList(@PathVariable("participant_id") Integer participantId, HttpServletRequest request) {
         try {
             List<LogbookResponse> logbookList = monitoringService.getLogbookByParticipantId(participantId);
@@ -54,7 +58,7 @@ public class LogbookController {
         }
     }
 
-    @GetMapping("/detail/{id_logbook}")
+    @GetMapping("/get/{id_logbook}")
     public ResponseEntity<Object> getLogbookDetail(@PathVariable("id_logbook") Integer logbookId, HttpServletRequest request) {
         try {
             LogbookDetailResponse logbook = monitoringService.getLogbookDetail(logbookId);
@@ -66,11 +70,11 @@ public class LogbookController {
         }
     }
 
-    @PostMapping("/grade")
-    public ResponseEntity<Object> setLogbookGrade(@RequestBody LogbookGradeRequest gradeRequest, HttpServletRequest request){
+    @PostMapping("/check")
+    public ResponseEntity<Object> checkByDate(@RequestBody CheckDate date, HttpServletRequest request){
         try {
-            monitoringService.gradeLogbook(gradeRequest);
-            return ResponseHandler.generateResponse("Grade Logbook save succeed", HttpStatus.OK);
+            Integer id = (Integer) Objects.requireNonNull(request.getAttribute(Constant.VerifyConstant.ID));
+            return ResponseHandler.generateResponse("Check date succeed", HttpStatus.OK, monitoringService.isLogbookExist(id, date.getDate()));
         } catch (HttpClientErrorException ex){
             return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
