@@ -11,6 +11,7 @@ import com.jtk.ps.api.util.ResponseHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 
@@ -25,6 +26,7 @@ public class SupervisorGradeController {
 
 
     @PostMapping("/create")
+    @PreAuthorize("hasAnyAuthority('SUPERVISOR')")
     public ResponseEntity<Object> saveSupervisorGrade(@RequestBody SupervisorGradeCreateRequest supervisorGradeCreateRequest, HttpServletRequest request) {
         try {
             monitoringService.createSupervisorGrade(supervisorGradeCreateRequest);
@@ -36,7 +38,8 @@ public class SupervisorGradeController {
         }
     }
 
-    @PostMapping("/update")
+    @PutMapping("/update")
+    @PreAuthorize("hasAnyAuthority('SUPERVISOR')")
     public ResponseEntity<Object> updateSupervisorGrade(@RequestBody SupervisorGradeUpdateRequest supervisorGradeUpdateRequest, HttpServletRequest request) {
         try {
             monitoringService.updateSupervisorGrade(supervisorGradeUpdateRequest);
@@ -49,6 +52,7 @@ public class SupervisorGradeController {
     }
 
     @GetMapping("/{id_supervisor_grade}")
+    @PreAuthorize("hasAnyAuthority('COMMITTEE','PARTICIPANT','SUPERVISOR')")
     public ResponseEntity<Object> getSupervisorGrade(@PathVariable("id_supervisor_grade") Integer idSupervisorGrade, HttpServletRequest request) {
         try {
             SupervisorGradeDetailResponse response = monitoringService.getSupervisorGradeDetail(idSupervisorGrade);
@@ -61,6 +65,7 @@ public class SupervisorGradeController {
     }
 
     @GetMapping("/{id_participant}")
+    @PreAuthorize("hasAnyAuthority('COMMITTEE','PARTICIPANT','SUPERVISOR')")
     public ResponseEntity<Object> getSupervisorGradeList(@PathVariable("id_participant") Integer idParticipant, HttpServletRequest request) {
         try {
             List<SupervisorGradeResponse> response = monitoringService.getSupervisorGradeList(idParticipant);

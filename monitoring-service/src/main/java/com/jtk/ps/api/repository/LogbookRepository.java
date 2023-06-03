@@ -20,4 +20,19 @@ public interface LogbookRepository extends JpaRepository<Logbook, Integer> {
 
     @Query(value = "select if(count(*)>0, 'true', 'false') from Logbook where id = :id and grade is not null", nativeQuery = true)
     Boolean isChecked(@Param("id") int id);
+
+    @Query(value = "select count(*) from logbook l where l.participant_id = :participant_id and l.grade = :grade",nativeQuery = true)
+    Integer countByParticipantIdAndGrade(@Param("participant_id") int participantId, @Param("grade") int grade);
+    @Query(value = "select count(*) from logbook l where l.participant_id = :participant_id and l.grade is null",nativeQuery = true)
+    Integer countGradeNull(@Param("participant_id") int participantId);
+    @Query(value = "select count(*) from logbook l where l.participant_id = :participant_id and l.grade is not null",nativeQuery = true)
+    Integer countGradeNotNull(@Param("participant_id") int participantId);
+    @Query(value = "select count(*) from logbook l where l.participant_id = :participant_id and l.encountered_problem is null",nativeQuery = true)
+    Integer countEncounteredProblemNull(@Param("participant_id") int participantId);
+    @Query(value = "select count(*) from logbook l where l.participant_id = :participant_id and l.encountered_problem is not null",nativeQuery = true)
+    Integer countEncounteredProblemNotNull(@Param("participant_id") int participantId);
+    @Query(value = "select count(*) from logbook l where l.participant_id = :participant_id and l.status = 4",nativeQuery = true)
+    Integer countStatusLate(@Param("participant_id") int participantId);
+    @Query(value = "select count(*) from logbook l where l.participant_id = :participant_id and l.status = 5",nativeQuery = true)
+    Integer countStatusOnTime(@Param("participant_id") int participantId);
 }

@@ -8,6 +8,7 @@ import com.jtk.ps.api.util.ResponseHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 
@@ -21,6 +22,7 @@ public class LaporanController {
     private IMonitoringService monitoringService;
 
     @GetMapping("/get-all/{id_participant}")
+    @PreAuthorize("hasAnyAuthority('COMMITTEE','PARTICIPANT','SUPERVISOR')")
     public ResponseEntity<Object> getListLaporan(@PathVariable("id_participant") Integer participantId, HttpServletRequest request) {
         try {
             List<LaporanResponse> listLaporan = monitoringService.getListLaporan(participantId);
@@ -33,6 +35,7 @@ public class LaporanController {
     }
 
     @GetMapping("/get/{id_laporan}")
+    @PreAuthorize("hasAnyAuthority('COMMITTEE','PARTICIPANT','SUPERVISOR')")
     public ResponseEntity<Object> getLaporan(@PathVariable("id_laporan") Integer idLaporan, HttpServletRequest request) {
         try {
             LaporanResponse laporan = monitoringService.getLaporan(idLaporan);
@@ -45,6 +48,7 @@ public class LaporanController {
     }
 
     @PostMapping("/create")
+    @PreAuthorize("hasAnyAuthority('PARTICIPANT')")
     public ResponseEntity<Object> createLaporan(@RequestBody LaporanCreateRequest laporanCreateRequest, HttpServletRequest request){
         try {
             monitoringService.createLaporan(laporanCreateRequest);
@@ -54,7 +58,8 @@ public class LaporanController {
         }
     }
 
-    @PostMapping("/update")
+    @PutMapping("/update")
+    @PreAuthorize("hasAnyAuthority('PARTICIPANT')")
     public ResponseEntity<Object> updateLaporan(@RequestBody LaporanUpdateRequest laporanUpdateRequest, HttpServletRequest request){
         try {
             monitoringService.updateLaporan(laporanUpdateRequest);

@@ -387,6 +387,9 @@ public class MonitoringService implements IMonitoringService {
     @Override
     public void getMonitoringStatistic(int participantId) {
         //TODO: get all logbook, make percentage
+        Deadline logbookDeadline = deadlineRepository.findByName("logbook");
+//        int total = null;
+//        logbookRepository.
         //TODO: get all self assessment, make percentage
     }
 

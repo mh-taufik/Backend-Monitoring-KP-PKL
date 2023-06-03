@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
-@RequestMapping("/supervisor/mapping")
+@RequestMapping("/supervisor-mapping")
 public class SupervisorMappingController {
 //    @Autowired
 //    private IMonitoringService monitoringService;

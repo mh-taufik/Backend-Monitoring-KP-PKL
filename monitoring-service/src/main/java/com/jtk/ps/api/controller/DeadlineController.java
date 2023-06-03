@@ -11,6 +11,7 @@ import com.jtk.ps.api.util.ResponseHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 
@@ -40,6 +41,7 @@ public class DeadlineController {
     }
 
     @PostMapping("/create")
+    @PreAuthorize("hasAnyAuthority('COMMITTEE')")
     public ResponseEntity<Object> createDeadline(@RequestBody DeadlineCreateRequest deadlineCreateRequest, HttpServletRequest request){
         try {
             monitoringService.createDeadline(deadlineCreateRequest);
@@ -49,7 +51,8 @@ public class DeadlineController {
         }
     }
 
-    @PostMapping("/update")
+    @PutMapping("/update")
+    @PreAuthorize("hasAnyAuthority('COMMITTEE')")
     public ResponseEntity<Object> updateDeadline(@RequestBody DeadlineUpdateRequest deadlineUpdateRequest, HttpServletRequest request){
         try {
             monitoringService.updateDeadline(deadlineUpdateRequest);

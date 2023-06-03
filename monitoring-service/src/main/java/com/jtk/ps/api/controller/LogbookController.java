@@ -8,6 +8,7 @@ import com.jtk.ps.api.util.ResponseHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 
@@ -23,6 +24,7 @@ public class LogbookController {
     private IMonitoringService monitoringService;
 
     @PostMapping("/create")
+    @PreAuthorize("hasAnyAuthority('PARTICIPANT')")
     public ResponseEntity<Object> saveLogbook(@RequestBody LogbookCreateRequest logbookCreateRequest, HttpServletRequest request) {
         try {
             monitoringService.createLogbook(logbookCreateRequest);
@@ -34,7 +36,8 @@ public class LogbookController {
         }
     }
 
-    @PostMapping("/update")
+    @PutMapping("/update")
+    @PreAuthorize("hasAnyAuthority('PARTICIPANT')")
     public ResponseEntity<Object> updateLogbook(@RequestBody LogbookUpdateRequest logbookUpdateRequest, HttpServletRequest request) {
         try {
             monitoringService.updateLogbook(logbookUpdateRequest);
@@ -47,6 +50,7 @@ public class LogbookController {
     }
 
     @GetMapping("/get-all/{participant_id}")
+    @PreAuthorize("hasAnyAuthority('COMMITTEE','PARTICIPANT','SUPERVISOR')")
     public ResponseEntity<Object> getRppList(@PathVariable("participant_id") Integer participantId, HttpServletRequest request) {
         try {
             List<LogbookResponse> logbookList = monitoringService.getLogbookByParticipantId(participantId);
@@ -59,6 +63,7 @@ public class LogbookController {
     }
 
     @GetMapping("/get/{id_logbook}")
+    @PreAuthorize("hasAnyAuthority('COMMITTEE','PARTICIPANT','SUPERVISOR')")
     public ResponseEntity<Object> getLogbookDetail(@PathVariable("id_logbook") Integer logbookId, HttpServletRequest request) {
         try {
             LogbookDetailResponse logbook = monitoringService.getLogbookDetail(logbookId);

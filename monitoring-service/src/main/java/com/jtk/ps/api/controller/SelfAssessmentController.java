@@ -11,6 +11,7 @@ import com.jtk.ps.api.util.ResponseHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 
@@ -26,6 +27,7 @@ public class SelfAssessmentController {
 
 
     @PostMapping("/create")
+    @PreAuthorize("hasAnyAuthority('PARTICIPANT')")
     public ResponseEntity<Object> saveSelfAssessment(@RequestBody SelfAssessmentRequest selfAssessmentCreateRequest, HttpServletRequest request) {
         try {
             monitoringService.createSelfAssessment(selfAssessmentCreateRequest);
@@ -37,7 +39,8 @@ public class SelfAssessmentController {
         }
     }
 
-    @PostMapping("/update")
+    @PutMapping("/update")
+    @PreAuthorize("hasAnyAuthority('PARTICIPANT','SUPERVISOR')")
     public ResponseEntity<Object> updateSelfAssessment(@RequestBody SelfAssessmentUpdateRequest selfAssessmentUpdateRequest, HttpServletRequest request) {
         try {
             monitoringService.updateSelfAssessment(selfAssessmentUpdateRequest);
@@ -50,6 +53,7 @@ public class SelfAssessmentController {
     }
 
     @GetMapping("/get/{id_self_assessment}")
+    @PreAuthorize("hasAnyAuthority('COMMITTEE','PARTICIPANT','SUPERVISOR')")
     public ResponseEntity<Object> getSelfAssessmentDetail(@PathVariable("id_self_assessment") Integer idSelfAssessment, HttpServletRequest request) {
         try {
             SelfAssessmentDetailResponse response = monitoringService.getSelfAssessmentDetail(idSelfAssessment);
@@ -62,6 +66,7 @@ public class SelfAssessmentController {
     }
 
     @GetMapping("/get-all/{id_participant}")
+    @PreAuthorize("hasAnyAuthority('COMMITTEE','PARTICIPANT','SUPERVISOR')")
     public ResponseEntity<Object> getSelfAssessmentList(@PathVariable("id_participant") Integer idParticipant, HttpServletRequest request) {
         try {
              List<SelfAssessmentResponse> response = monitoringService.getSelfAssessmentList(idParticipant);
@@ -74,6 +79,7 @@ public class SelfAssessmentController {
     }
 
     @GetMapping("/get-all-aspect")
+    @PreAuthorize("hasAnyAuthority('COMMITTEE','PARTICIPANT','SUPERVISOR')")
     public ResponseEntity<Object> getSelfAssessmentList(HttpServletRequest request) {
         try {
             List<SelfAssessmentAspectResponse> response = monitoringService.getSelfAssessmentAspect();
