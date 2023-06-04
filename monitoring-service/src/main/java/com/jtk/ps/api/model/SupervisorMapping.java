@@ -1,10 +1,17 @@
 package com.jtk.ps.api.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import javax.persistence.*;
 import java.time.LocalDate;
 
 @Entity
 @Table(name = "supervisor_mapping")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class SupervisorMapping {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

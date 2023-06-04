@@ -41,6 +41,7 @@ public class LogbookController {
     @PreAuthorize("hasAnyAuthority('PARTICIPANT')")
     public ResponseEntity<Object> updateLogbook(@RequestBody LogbookUpdateRequest logbookUpdateRequest, HttpServletRequest request) {
         try {
+            logbookUpdateRequest.setParticipantId((Integer) request.getAttribute(Constant.VerifyConstant.ID));
             monitoringService.updateLogbook(logbookUpdateRequest);
             return ResponseHandler.generateResponse("Update Logbook succeed", HttpStatus.OK);
         } catch (HttpClientErrorException ex){
@@ -52,7 +53,7 @@ public class LogbookController {
 
     @GetMapping("/get-all/{participant_id}")
     @PreAuthorize("hasAnyAuthority('COMMITTEE','PARTICIPANT','SUPERVISOR')")
-    public ResponseEntity<Object> getRppList(@PathVariable("participant_id") Integer participantId, HttpServletRequest request) {
+    public ResponseEntity<Object> getLogbookList(@PathVariable("participant_id") Integer participantId, HttpServletRequest request) {
         try {
             List<LogbookResponse> logbookList = monitoringService.getLogbookByParticipantId(participantId);
             return ResponseHandler.generateResponse("Get Logbook list succeed", HttpStatus.OK, logbookList);
@@ -77,6 +78,7 @@ public class LogbookController {
     }
 
     @PostMapping("/check")
+    @PreAuthorize("hasAnyAuthority('PARTICIPANT')")
     public ResponseEntity<Object> checkByDate(@RequestBody CheckDate date, HttpServletRequest request){
         try {
             Integer id = (Integer) Objects.requireNonNull(request.getAttribute(Constant.VerifyConstant.ID));

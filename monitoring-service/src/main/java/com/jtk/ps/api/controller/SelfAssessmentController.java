@@ -93,6 +93,7 @@ public class SelfAssessmentController {
     }
 
     @PostMapping("/check")
+    @PreAuthorize("hasAnyAuthority('PARTICIPANT')")
     public ResponseEntity<Object> checkByDate(@RequestBody CheckDate date, HttpServletRequest request){
         try {
             Integer id = (Integer) Objects.requireNonNull(request.getAttribute(Constant.VerifyConstant.ID));

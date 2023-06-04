@@ -6,30 +6,27 @@ import com.jtk.ps.api.dto.deadline.DeadlineResponse;
 import com.jtk.ps.api.dto.deadline.DeadlineUpdateRequest;
 import com.jtk.ps.api.dto.self_assessment.*;
 import com.jtk.ps.api.dto.supervisor_grade.*;
-import com.jtk.ps.api.dto.supervisor_mapping.Participant;
-import com.jtk.ps.api.dto.supervisor_mapping.SupervisorMappingCreateRequest;
-import com.jtk.ps.api.dto.supervisor_mapping.SupervisorMappingResponse;
+import com.jtk.ps.api.dto.supervisor_mapping.*;
 import com.jtk.ps.api.dto.laporan.LaporanCreateRequest;
 import com.jtk.ps.api.dto.laporan.LaporanResponse;
 import com.jtk.ps.api.dto.laporan.LaporanUpdateRequest;
 import com.jtk.ps.api.dto.logbook.*;
 import com.jtk.ps.api.dto.rpp.*;
-import com.jtk.ps.api.dto.supervisor_mapping.SupervisorMappingUpdateRequest;
 import com.jtk.ps.api.model.*;
 import com.jtk.ps.api.repository.*;
 import com.jtk.ps.api.util.Constant;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.client.loadbalancer.Response;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.*;
 
+import static java.time.DayOfWeek.*;
 import static java.time.temporal.TemporalAdjusters.next;
-import static java.time.DayOfWeek.SUNDAY;
 
 @Service
 public class MonitoringService implements IMonitoringService {
@@ -155,7 +152,10 @@ public class MonitoringService implements IMonitoringService {
         List<Logbook> logbookList = logbookRepository.findByParticipantId(participantId);
         List<LogbookResponse> responses = new ArrayList<>();
         for(Logbook temp:logbookList){
-            responses.add(new LogbookResponse(temp.getId(), temp.getDate(), temp.getGrade().name().replace("_", " "), temp.getStatus().getStatus()));
+            if(temp.getGrade() != null)
+                responses.add(new LogbookResponse(temp.getId(), temp.getDate(), temp.getGrade().name().replace("_", " "), temp.getStatus().getStatus()));
+            else
+                responses.add(new LogbookResponse(temp.getId(), temp.getDate(), "BELUM DINILAI", temp.getStatus().getStatus()));
         }
         return responses;
     }
@@ -292,7 +292,7 @@ public class MonitoringService implements IMonitoringService {
         List<SelfAssessmentAspect> aspectList = selfAssessmentAspectRepository.findAllActiveAspect();
         List<SelfAssessmentGradeDetailResponse> grades = new ArrayList<>();
         for(SelfAssessmentAspect aspect:aspectList){
-            SelfAssessmentGrade grade = selfAssessmentGradeRepository.findMaxGradeByParticipantIdAndAspectId(participantId);
+            SelfAssessmentGrade grade = selfAssessmentGradeRepository.findMaxGradeByParticipantIdAndAspectId(participantId, aspect.getId());
             grades.add(new SelfAssessmentGradeDetailResponse(
                     grade.getSelfAssessmentAspect().getId(),
                     grade.getId(),
@@ -326,6 +326,32 @@ public class MonitoringService implements IMonitoringService {
             }
         }
         selfAssessmentGradeRepository.saveAll(gradeList);
+    }
+
+    @Override
+    public void createSelfAssessmentAspect(SelfAssessmentAspectRequest request, int creator) {
+        SelfAssessmentAspect aspect = new SelfAssessmentAspect();
+        aspect.setId(null);
+        aspect.setName(request.getName());
+        aspect.setDescription(request.getDescription());
+        aspect.setStartAssessmentDate(request.getStartAssessmentDate());
+        aspect.setEditedBy(creator);
+        aspect.setLastEditedDate(LocalDate.now());
+        aspect.setStatus(statusRepository.findById(6));
+        selfAssessmentAspectRepository.save(aspect);
+    }
+
+    @Override
+    public void updateSelfAssessmentAspect(SelfAssessmentAspectRequest request, int creator) {
+        SelfAssessmentAspect aspect = new SelfAssessmentAspect();
+        aspect.setId(request.getId());
+        aspect.setName(request.getName());
+        aspect.setDescription(request.getDescription());
+        aspect.setStartAssessmentDate(request.getStartAssessmentDate());
+        aspect.setEditedBy(creator);
+        aspect.setLastEditedDate(LocalDate.now());
+        aspect.setStatus(statusRepository.findById(6));
+        selfAssessmentAspectRepository.save(aspect);
     }
 
     @Override
@@ -385,26 +411,92 @@ public class MonitoringService implements IMonitoringService {
     }
 
     @Override
-    public void getMonitoringStatistic(int participantId) {
+    public StatisticResponse getMonitoringStatistic(int participantId) {
         //TODO: get all logbook, make percentage
+        final Set<DayOfWeek> businessDays = Set.of(MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY);
+
         //get jumlah total logbook yang seharusnya dikumpulkan menggunakan tanggal di deadline
         Deadline logbookDeadline = deadlineRepository.findByName("logbook");
-//        int total = null;
-//        logbookRepository.
+        int totalLogbook = (int) logbookDeadline.getStartAssignmentDate().datesUntil(logbookDeadline.getFinishAssignmentDate()).filter((t -> businessDays.contains(t.getDayOfWeek()))).count();
+        int submittedLogbook = logbookRepository.countByParticipantId(participantId);
+        int missingLogbook = totalLogbook - submittedLogbook;
+
         //Nilai Logbook
         HashMap<ENilai, Integer> nilai = new HashMap<>();
         nilai.put(ENilai.SANGAT_BAIK, logbookRepository.countByParticipantIdAndGrade(participantId, ENilai.SANGAT_BAIK.id));
         nilai.put(ENilai.BAIK, logbookRepository.countByParticipantIdAndGrade(participantId, ENilai.BAIK.id));
         nilai.put(ENilai.CUKUP, logbookRepository.countByParticipantIdAndGrade(participantId, ENilai.CUKUP.id));
         nilai.put(ENilai.KURANG, logbookRepository.countByParticipantIdAndGrade(participantId, ENilai.KURANG.id));
+
         //Kedisiplinan Logbook
         Integer onTime = logbookRepository.countStatusOnTime(participantId);
         Integer late = logbookRepository.countStatusLate(participantId);
         Integer match = logbookRepository.countEncounteredProblemNull(participantId);
         Integer notMatch = logbookRepository.countEncounteredProblemNotNull(participantId);
+
         //TODO: get all self assessment, make percentage
         //get jumlah total self assessment yang seharusnya dikumpulkan menggunakan tanggal di deadline
+        Deadline selfAssessmentDeadline = deadlineRepository.findByName("self assessment");
+        int totalSelfAssessment = (int) selfAssessmentDeadline.getStartAssignmentDate().datesUntil(selfAssessmentDeadline.getFinishAssignmentDate()).filter((t -> businessDays.contains(t.getDayOfWeek()))).count();
+        int submittedSelfAssessment = selfAssessmentRepository.countByParticipantId(participantId);
+        int missingSelfAssessment = totalSelfAssessment - submittedSelfAssessment;
+
+        StatisticResponse response = new StatisticResponse(
+            getPercentage(submittedLogbook, totalLogbook),
+            getPercentage(missingLogbook, totalLogbook),
+            getPercentage(onTime, totalLogbook),
+            getPercentage(late, totalLogbook),
+            getPercentage(match, totalLogbook),
+            getPercentage(notMatch, totalLogbook),
+            getPercentage(nilai.get(ENilai.SANGAT_BAIK), totalLogbook),
+            getPercentage(nilai.get(ENilai.BAIK), totalLogbook),
+            getPercentage(nilai.get(ENilai.CUKUP), totalLogbook),
+            getPercentage(nilai.get(ENilai.KURANG), totalLogbook),
+            getPercentage(submittedSelfAssessment, totalLogbook),
+            getPercentage(missingSelfAssessment, totalLogbook)
+        );
+        return response;
     }
+
+    @Override
+    public void createSupervisorGradeAspect(SupervisorGradeAspectRequest request, int creator) {
+        SupervisorGradeAspect aspect = new SupervisorGradeAspect();
+        aspect.setId(null);
+        aspect.setMaxGrade(request.getMaxGrade());
+        aspect.setDescription(request.getDescription());
+        aspect.setEditedBy(creator);
+        aspect.setLastEditDate(LocalDate.now());
+        aspect.setStatus(statusRepository.findById(6));
+        supervisorGradeAspectRepository.save(aspect);
+    }
+
+    @Override
+    public void updateSupervisorGradeAspect(SupervisorGradeAspectRequest request, int creator) {
+        SupervisorGradeAspect aspect = new SupervisorGradeAspect();
+        aspect.setId(request.getId());
+        aspect.setMaxGrade(request.getMaxGrade());
+        aspect.setDescription(request.getDescription());
+        aspect.setEditedBy(creator);
+        aspect.setLastEditDate(LocalDate.now());
+        aspect.setStatus(statusRepository.findById(6));
+        supervisorGradeAspectRepository.save(aspect);
+    }
+
+    @Override
+    public List<SupervisorGradeAspectResponse> getListSupervisorGradeAspect() {
+        List<SupervisorGradeAspect> aspectList = supervisorGradeAspectRepository.findAll();
+        List<SupervisorGradeAspectResponse> response = new ArrayList<>();
+        for (SupervisorGradeAspect aspect:aspectList){
+            response.add(new SupervisorGradeAspectResponse(aspect.getId(), aspect.getDescription(), aspect.getMaxGrade(), aspect.getEditedBy(), aspect.getLastEditDate(), aspect.getStatus().getStatus()));
+        }
+        return response;
+    }
+
+    public Percentage getPercentage(int count, int total){
+        float percent = (count/total)*100;
+        return new Percentage(count, percent + "%");
+    }
+
 
     @Override
     public void createLaporan(LaporanCreateRequest laporanCreateRequest, Integer participantId) {
@@ -457,46 +549,34 @@ public class MonitoringService implements IMonitoringService {
     }
 
     @Override
-    public void createSupervisorMapping(List<SupervisorMappingCreateRequest> supervisorMapping, String cookie) {
+    public void createSupervisorMapping(List<SupervisorMappingRequest> supervisorMappingRequest, String cookie, int creatorId) {
         HttpHeaders headers = new HttpHeaders();
         headers.add(Constant.PayloadResponseConstant.COOKIE, cookie);
         HttpEntity<String> req = new HttpEntity<>(headers);
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        // Get is final mapping (Mapping)
-        ResponseEntity<Response<Integer>> isFinalMappingD3Request =
-                restTemplate.exchange(
-                        "http://mapping-service/mapping/get-is-final/1",
-                        HttpMethod.GET,
-                        req,
-                        new ParameterizedTypeReference<Response<Integer>>() {
-                        });
-
-        if (isFinalMappingD3Request.getStatusCode().is4xxClientError() || isFinalMappingD3Request.getStatusCode().is5xxServerError()) {
-            throw new IllegalStateException("Error when getting is final mapping D3");
+        for(SupervisorMappingRequest request:supervisorMappingRequest){
+            List<SupervisorMapping> map = new ArrayList<>();
+            ResponseEntity<ResponseList<MappingResponse>> mappingRes = restTemplate.exchange("http://mapping-service/mapping/final/company/"+request.getCompanyId(),
+                    HttpMethod.GET, req, new ParameterizedTypeReference<>() {});
+            List<MappingResponse> mappingResponses = Objects.requireNonNull(mappingRes.getBody()).getData();
+            for (MappingResponse mapping : mappingResponses) {
+                map.add(new SupervisorMapping(null, LocalDate.now(), request.getCompanyId(), mapping.getParticipantId(), request.getLecturerId(), mapping.getProdiId(), creatorId));
+            }
+            supervisorMappingRepository.saveAll(map);
         }
-
-//        Integer isFinalMappingD3 = Objects.requireNonNull(isFinalMappingD3Request.getBody()).();
-
-        ResponseEntity<Response<Integer>> isFinalMappingD4Request =
-                restTemplate.exchange(
-                        "http://mapping-service/mapping/get-is-final/2",
-                        HttpMethod.GET,
-                        req,
-                        new ParameterizedTypeReference<Response<Integer>>() {
-                        });
-
-        if (isFinalMappingD4Request.getStatusCode().is4xxClientError() || isFinalMappingD4Request.getStatusCode().is5xxServerError()) {
-            throw new IllegalStateException("Error when getting is final mapping D4");
-        }
-
-//        Integer isFinalMappingD4 = Objects.requireNonNull(isFinalMappingD4Request.getBody()).getData();
-
     }
 
     @Override
-    public void updateSupervisorMapping(List<SupervisorMappingUpdateRequest> supervisorMapping) {
+    public void updateSupervisorMapping(List<SupervisorMappingRequest> supervisorMappingRequest, String cookie, int creatorId) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(Constant.PayloadResponseConstant.COOKIE, cookie);
+        HttpEntity<String> req = new HttpEntity<>(headers);
+        headers.setContentType(MediaType.APPLICATION_JSON);
 
+        for(SupervisorMappingRequest request:supervisorMappingRequest) {
+            supervisorMappingRepository.updateByCompanyId(request.getLecturerId(), request.getCompanyId(), creatorId);
+        }
     }
 
     @Override
@@ -513,7 +593,7 @@ public class MonitoringService implements IMonitoringService {
                 });
         List<ParticipantResponse> participantResponseList = Objects.requireNonNull(participantRes.getBody()).getData();
         for (ParticipantResponse participant : participantResponseList) {
-            participantList.put(participant.getIdParticipant(), participant.getName());
+            participantList.put(participant.getId(), participant.getName());
         }
         user.add(participantList);
 
@@ -530,7 +610,7 @@ public class MonitoringService implements IMonitoringService {
 
         //get Supervisor
         HashMap<Integer, String> lecturerList = new HashMap<>();
-        ResponseEntity<ResponseList<CommitteeResponse>> committeeRes = restTemplate.exchange("http://account-service/get-supervisor",
+        ResponseEntity<ResponseList<CommitteeResponse>> committeeRes = restTemplate.exchange("http://account-service/account/get-supervisor",
                 HttpMethod.GET, req, new ParameterizedTypeReference<>() {
                 });
         List<CommitteeResponse> committeeResponses = Objects.requireNonNull(committeeRes.getBody()).getData();
@@ -543,26 +623,26 @@ public class MonitoringService implements IMonitoringService {
     }
 
     @Override
-    public List<SupervisorMappingResponse> getSupervisorMapping(String cookie) {
-        List<SupervisorMapping> mapping = supervisorMappingRepository.findAllGroupByCompanyId();
+    public List<SupervisorMappingResponse> getSupervisorMapping(String cookie, int prodi) {
+        List<SupervisorMapping> mapping = supervisorMappingRepository.findAllGroupByCompanyId(prodi);
         List<HashMap<Integer, String>> user = getUserList(cookie);
-        HashMap<Integer, String> participant = user.get(1);
-        HashMap<Integer, String> company = user.get(1);
-        HashMap<Integer, String> lecturer = user.get(2);
+        HashMap<Integer, String> participantList = user.get(0);
+        HashMap<Integer, String> companyList = user.get(1);
+        HashMap<Integer, String> lecturerList = user.get(2);
+
         List<SupervisorMappingResponse> response = new ArrayList<>();
         for(SupervisorMapping map:mapping){
             List<SupervisorMapping> temp = supervisorMappingRepository.findByCompanyId(map.getCompanyId());
-            List<Participant> participantList = new ArrayList<>();
+            List<Participant> participants = new ArrayList<>();
             for(SupervisorMapping temp2 : temp){
-                participantList.add(new Participant(temp2.getParticipantId(), participant.get(temp2.getParticipantId())));
+                participants.add(new Participant(temp2.getParticipantId(), participantList.get(temp2.getParticipantId())));
             }
             response.add(new SupervisorMappingResponse(
-                    map.getCompanyId(), company.get(map.getCompanyId()),
-                    map.getLecturerId(), lecturer.get(map.getLecturerId()),
-                    map.getProdiId(), map.getDate(), participantList)
+                    map.getCompanyId(), companyList.get(map.getCompanyId()),
+                    map.getLecturerId(), lecturerList.get(map.getLecturerId()),
+                    map.getProdiId(), map.getDate(), participants)
             );
         }
-
         return response;
     }
 
@@ -595,17 +675,12 @@ public class MonitoringService implements IMonitoringService {
     }
 
     @Override
-    public List<SupervisorMappingResponse> getSupervisorMappingByProdi(String cookie, int prodiId) {
+    public List<SupervisorMappingResponse> getSupervisorMappingByYear(String accessToken, int year) {
         return null;
     }
 
     @Override
-    public List<SupervisorMappingResponse> getSupervisorMappingByYear(String cookie, int year) {
-        return null;
-    }
-
-    @Override
-    public SupervisorMappingResponse getSupervisorMappingByParticipant(int participantId) {
+    public SupervisorMappingResponse getSupervisorMappingByParticipant(String accessToken, int participantId) {
         return null;
     }
 
@@ -634,6 +709,11 @@ public class MonitoringService implements IMonitoringService {
             response.add(new DeadlineResponse(temp.getId(), temp.getName(), temp.getDayRange(), temp.getStartAssignmentDate(), temp.getFinishAssignmentDate()));
         }
         return response;
+    }
+
+    @Override
+    public void getDashboardData(int participantId) {
+
     }
 
     @Override

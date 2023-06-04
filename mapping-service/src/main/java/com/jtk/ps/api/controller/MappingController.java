@@ -29,7 +29,7 @@ public class MappingController {
     private IMappingService mappingService;
 
     @GetMapping("/final/company/{id_company}")
-    @PreAuthorize("hasAnyAuthority('COMMITTEE','COMPANY','HEAD_STUDY_PROGRAM')")
+    @PreAuthorize("hasAnyAuthority('COMMITTEE','COMPANY','HEAD_STUDY_PROGRAM','SUPERVISOR')")
     public ResponseEntity<Object> getParticipantInFinalMapping(@PathVariable("id_company") Integer idCompany) {
         try {
             List<ParticipantFinalMappingResponse> listParticipant = mappingService.getParticipantFinalMapping(idCompany);

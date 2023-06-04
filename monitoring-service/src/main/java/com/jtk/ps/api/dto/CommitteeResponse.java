@@ -9,11 +9,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CommitteeResponse {
-
+    private String name;
+    private String email;
     @JsonProperty("id_lecturer")
     private Integer idLecturer;
-
-    private String name;
-
-    private String email;
 }

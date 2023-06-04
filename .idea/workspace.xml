@@ -4,12 +4,29 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d4c7c1a4-fecb-4126-864a-961220f9e7ef" name="Changes" comment="fix monitoring-service controller">
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="d4c7c1a4-fecb-4126-864a-961220f9e7ef" name="Changes" comment="MonitoringService add to project">
+      <change afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/dto/CreateId.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/dto/self_assessment/SelfAssessmentAspectRequest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/dto/supervisor_grade/Percentage.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/dto/supervisor_grade/StatisticResponse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/dto/supervisor_grade/SupervisorGradeAspectRequest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/dto/supervisor_grade/SupervisorGradeAspectResponse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/dto/supervisor_mapping/MappingResponse.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/monitoring-service/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mapping-service/src/main/java/com/jtk/ps/api/controller/MappingController.java" beforeDir="false" afterPath="$PROJECT_DIR$/mapping-service/src/main/java/com/jtk/ps/api/controller/MappingController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/controller/LogbookController.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/controller/LogbookController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/controller/SelfAssessmentController.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/controller/SelfAssessmentController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/controller/SupervisorMappingController.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/controller/SupervisorMappingController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/dto/CommitteeResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/dto/CommitteeResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/dto/ParticipantResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/dto/ParticipantResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/dto/supervisor_mapping/SupervisorMappingCreateRequest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/dto/supervisor_mapping/SupervisorMappingRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/dto/supervisor_mapping/SupervisorMappingRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/model/SupervisorMapping.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/model/SupervisorMapping.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/repository/LogbookRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/repository/LogbookRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/repository/SelfAssessmentGradeRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/repository/SelfAssessmentGradeRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/repository/SelfAssessmentRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/repository/SelfAssessmentRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/repository/SupervisorMappingRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/repository/SupervisorMappingRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/service/IMonitoringService.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/service/IMonitoringService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/service/MonitoringService.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/service/MonitoringService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -73,6 +90,11 @@
   }
 }</component>
   <component name="RecentsManager">
+    <key name="CreateClassDialog.RecentsKey">
+      <recent name="com.jtk.ps.api.dto.self_assessment" />
+      <recent name="com.jtk.ps.api.dto.supervisor_grade" />
+      <recent name="com.jtk.ps.api.dto.supervisor_mapping" />
+    </key>
     <key name="CopyClassDialog.RECENTS_KEY">
       <recent name="com.jtk.ps.api.dto" />
       <recent name="com.jtk.ps.api.dto.supervisor_mapping" />
@@ -234,7 +256,21 @@
       <option name="project" value="LOCAL" />
       <updated>1685864137154</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="MonitoringService add to project">
+      <created>1685865199190</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1685865199190</updated>
+    </task>
+    <task id="LOCAL-00005" summary="MonitoringService add to project">
+      <created>1685865222567</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1685865222567</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -252,26 +288,12 @@
     <MESSAGE value="asd" />
     <MESSAGE value="fix mapping-service controller" />
     <MESSAGE value="fix monitoring-service controller" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix monitoring-service controller" />
+    <MESSAGE value="MonitoringService add to project" />
+    <option name="LAST_COMMIT_MESSAGE" value="MonitoringService add to project" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
-        <line-breakpoint type="java-line">
-          <url>file://$PROJECT_DIR$/account-service/src/main/java/com/jtk/ps/api/service/AccountService.java</url>
-          <line>39</line>
-          <option name="timeStamp" value="2" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" log-stack="true" type="java-line">
-          <url>file://$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/controller/SupervisorMappingController.java</url>
-          <line>28</line>
-          <option name="timeStamp" value="23" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/service/MonitoringService.java</url>
-          <line>547</line>
-          <option name="timeStamp" value="32" />
-        </line-breakpoint>
         <breakpoint type="java-exception">
           <properties class="java.net.ConnectException" package="java.net" />
           <option name="timeStamp" value="3" />
@@ -296,24 +318,6 @@
           <properties class="java.lang.IllegalStateException" package="java.lang" />
           <option name="timeStamp" value="12" />
         </breakpoint>
-        <line-breakpoint enabled="true" type="java-method">
-          <url>file://$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/service/MonitoringService.java</url>
-          <line>545</line>
-          <properties class="com.jtk.ps.api.service.MonitoringService" method="getSupervisorMapping">
-            <option name="EMULATED" value="true" />
-            <option name="WATCH_EXIT" value="false" />
-          </properties>
-          <option name="timeStamp" value="31" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-method">
-          <url>file://$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/service/MonitoringService.java</url>
-          <line>502</line>
-          <properties class="com.jtk.ps.api.service.MonitoringService" method="getUserList">
-            <option name="EMULATED" value="true" />
-            <option name="WATCH_EXIT" value="false" />
-          </properties>
-          <option name="timeStamp" value="33" />
-        </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
     <watches-manager>
