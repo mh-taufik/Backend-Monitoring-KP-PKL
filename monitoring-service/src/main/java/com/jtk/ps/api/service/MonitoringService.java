@@ -546,7 +546,7 @@ public class MonitoringService implements IMonitoringService {
     public List<SupervisorMappingResponse> getSupervisorMapping(String cookie) {
         List<SupervisorMapping> mapping = supervisorMappingRepository.findAllGroupByCompanyId();
         List<HashMap<Integer, String>> user = getUserList(cookie);
-        HashMap<Integer, String> participant = user.get(0);
+        HashMap<Integer, String> participant = user.get(1);
         HashMap<Integer, String> company = user.get(1);
         HashMap<Integer, String> lecturer = user.get(2);
         List<SupervisorMappingResponse> response = new ArrayList<>();

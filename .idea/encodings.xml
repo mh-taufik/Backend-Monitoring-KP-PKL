@@ -5,6 +5,8 @@
     <file url="file://$PROJECT_DIR$/api-gateway/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/api-gateway/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/company-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/monitoring-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/monitoring-service/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/management-content-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/management-content-service/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/mapping-service/src/main/java" charset="UTF-8" />
