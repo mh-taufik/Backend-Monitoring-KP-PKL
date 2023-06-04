@@ -30,7 +30,7 @@ public class AccountController {
     @Autowired
     private IAccountService service;
     @GetMapping(value = "/get-all")
-    @PreAuthorize("hasAnyAuthority('COMMITTEE', 'HEAD_STUDY_PROGRAM')")
+    @PreAuthorize("hasAnyAuthority('COMMITTEE', 'HEAD_STUDY_PROGRAM', 'SUPERVISOR')")
     public ResponseEntity<Object> getAccounts(@ApiParam(hidden = true) @CookieValue(name = "accessToken", required = false) String accessToken, HttpServletRequest request) {
         try {
             String token = (String) request.getAttribute("accessToken");
@@ -142,7 +142,7 @@ public class AccountController {
     }
 
     @PostMapping("/committee-change-password")
-    @PreAuthorize("hasAnyAuthority('COMMITTEE', 'HEAD_STUDY_PROGRAM')")
+    @PreAuthorize("hasAnyAuthority('COMMITTEE', 'HEAD_STUDY_PROGRAM', 'SUPERVISOR')")
     public ResponseEntity<Object> committeeChangePassword(@RequestBody @Valid CommitteePasswordRequest committeePasswordRequest) {
         if (!committeePasswordRequest.getNewPassword().equals(committeePasswordRequest.getConfirmNewPassword())) {
             return ResponseHandler.generateResponse("New password is not the same as the confirmation of new password", HttpStatus.BAD_REQUEST);

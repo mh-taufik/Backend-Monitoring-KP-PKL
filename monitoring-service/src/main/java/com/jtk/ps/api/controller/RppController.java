@@ -29,8 +29,8 @@ public class RppController {
     @PreAuthorize("hasAnyAuthority('PARTICIPANT')")
     public ResponseEntity<Object> saveRpp(@RequestBody RppCreateRequest rppCreateRequest, HttpServletRequest request) {
         try {
-            rppCreateRequest.setParticipantId((Integer) request.getAttribute(Constant.VerifyConstant.ID));
-            monitoringService.createRpp(rppCreateRequest);
+            Integer participantId = (Integer) request.getAttribute(Constant.VerifyConstant.ID);
+            monitoringService.createRpp(rppCreateRequest, participantId);
             return ResponseHandler.generateResponse("Save Rpp succeed", HttpStatus.OK);
         } catch (HttpClientErrorException ex){
             return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);

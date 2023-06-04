@@ -6,6 +6,7 @@ import com.jtk.ps.api.dto.deadline.DeadlineResponse;
 import com.jtk.ps.api.dto.deadline.DeadlineUpdateRequest;
 import com.jtk.ps.api.dto.self_assessment.*;
 import com.jtk.ps.api.dto.supervisor_grade.*;
+import com.jtk.ps.api.dto.supervisor_mapping.Participant;
 import com.jtk.ps.api.dto.supervisor_mapping.SupervisorMappingCreateRequest;
 import com.jtk.ps.api.dto.supervisor_mapping.SupervisorMappingResponse;
 import com.jtk.ps.api.dto.laporan.LaporanCreateRequest;
@@ -18,15 +19,14 @@ import com.jtk.ps.api.model.*;
 import com.jtk.ps.api.repository.*;
 import com.jtk.ps.api.util.Constant;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
+import org.springframework.cloud.client.loadbalancer.Response;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static java.time.temporal.TemporalAdjusters.next;
 import static java.time.DayOfWeek.SUNDAY;
@@ -93,9 +93,9 @@ public class MonitoringService implements IMonitoringService {
     }
 
     @Override
-    public void createRpp(RppCreateRequest rpp) {
+    public void createRpp(RppCreateRequest rpp, Integer participantId) {
         Rpp rppNew = new Rpp();
-        rppNew.setParticipantId(rpp.getParticipantId());
+        rppNew.setParticipantId(participantId);
         rppNew.setWorkTitle(rpp.getWorkTitle());
         rppNew.setGroupRole(rpp.getGroupRole());
         rppNew.setTaskDescription(rpp.getTaskDescription());
@@ -167,8 +167,8 @@ public class MonitoringService implements IMonitoringService {
     }
 
     @Override
-    public void createLogbook(LogbookCreateRequest logbook) {
-        if(logbookRepository.isExist(logbook.getParticipantId(), logbook.getDate())) {
+    public void createLogbook(LogbookCreateRequest logbook, Integer participantId) {
+        if(logbookRepository.isExist(participantId, logbook.getDate())) {
             throw new IllegalStateException("Logbook already created on this date, please update it instead");
         }
         Logbook newLogbook = new Logbook(logbook);
@@ -214,10 +214,10 @@ public class MonitoringService implements IMonitoringService {
     }
 
     @Override
-    public void createSelfAssessment(SelfAssessmentRequest request) {
+    public void createSelfAssessment(SelfAssessmentRequest request, Integer participantId) {
         try {
             SelfAssessment selfAssessment = new SelfAssessment();
-            selfAssessment.setParticipantId(request.getParticipantId());
+            selfAssessment.setParticipantId(participantId);
             selfAssessment.setStartDate(request.getStartDate());
             selfAssessment.setFinishDate(request.getFinishDate());
             SelfAssessment sa = selfAssessmentRepository.save(selfAssessment);
@@ -387,21 +387,34 @@ public class MonitoringService implements IMonitoringService {
     @Override
     public void getMonitoringStatistic(int participantId) {
         //TODO: get all logbook, make percentage
+        //get jumlah total logbook yang seharusnya dikumpulkan menggunakan tanggal di deadline
         Deadline logbookDeadline = deadlineRepository.findByName("logbook");
 //        int total = null;
 //        logbookRepository.
+        //Nilai Logbook
+        HashMap<ENilai, Integer> nilai = new HashMap<>();
+        nilai.put(ENilai.SANGAT_BAIK, logbookRepository.countByParticipantIdAndGrade(participantId, ENilai.SANGAT_BAIK.id));
+        nilai.put(ENilai.BAIK, logbookRepository.countByParticipantIdAndGrade(participantId, ENilai.BAIK.id));
+        nilai.put(ENilai.CUKUP, logbookRepository.countByParticipantIdAndGrade(participantId, ENilai.CUKUP.id));
+        nilai.put(ENilai.KURANG, logbookRepository.countByParticipantIdAndGrade(participantId, ENilai.KURANG.id));
+        //Kedisiplinan Logbook
+        Integer onTime = logbookRepository.countStatusOnTime(participantId);
+        Integer late = logbookRepository.countStatusLate(participantId);
+        Integer match = logbookRepository.countEncounteredProblemNull(participantId);
+        Integer notMatch = logbookRepository.countEncounteredProblemNotNull(participantId);
         //TODO: get all self assessment, make percentage
+        //get jumlah total self assessment yang seharusnya dikumpulkan menggunakan tanggal di deadline
     }
 
     @Override
-    public void createLaporan(LaporanCreateRequest laporanCreateRequest) {
+    public void createLaporan(LaporanCreateRequest laporanCreateRequest, Integer participantId) {
         Laporan laporan = new Laporan();
-        laporan.setParticipant(laporanCreateRequest.getParticipantId());
+        laporan.setParticipant(participantId);
         laporan.setUriName(laporanCreateRequest.getUri());
         laporan.setPhase(laporanCreateRequest.getPhase());
         laporan.setUploadDate(LocalDate.now());
 
-        if(laporanRepository.findByParticipantIdAndPhase(laporanCreateRequest.getParticipantId(), laporanCreateRequest.getPhase()) == null){
+        if(laporanRepository.findByParticipantIdAndPhase(participantId, laporanCreateRequest.getPhase()) == null){
             laporan.setId(null);
         }
         laporanRepository.save(laporan);
@@ -444,7 +457,40 @@ public class MonitoringService implements IMonitoringService {
     }
 
     @Override
-    public void createSupervisorMapping(List<SupervisorMappingCreateRequest> supervisorMapping) {
+    public void createSupervisorMapping(List<SupervisorMappingCreateRequest> supervisorMapping, String cookie) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(Constant.PayloadResponseConstant.COOKIE, cookie);
+        HttpEntity<String> req = new HttpEntity<>(headers);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        // Get is final mapping (Mapping)
+        ResponseEntity<Response<Integer>> isFinalMappingD3Request =
+                restTemplate.exchange(
+                        "http://mapping-service/mapping/get-is-final/1",
+                        HttpMethod.GET,
+                        req,
+                        new ParameterizedTypeReference<Response<Integer>>() {
+                        });
+
+        if (isFinalMappingD3Request.getStatusCode().is4xxClientError() || isFinalMappingD3Request.getStatusCode().is5xxServerError()) {
+            throw new IllegalStateException("Error when getting is final mapping D3");
+        }
+
+//        Integer isFinalMappingD3 = Objects.requireNonNull(isFinalMappingD3Request.getBody()).();
+
+        ResponseEntity<Response<Integer>> isFinalMappingD4Request =
+                restTemplate.exchange(
+                        "http://mapping-service/mapping/get-is-final/2",
+                        HttpMethod.GET,
+                        req,
+                        new ParameterizedTypeReference<Response<Integer>>() {
+                        });
+
+        if (isFinalMappingD4Request.getStatusCode().is4xxClientError() || isFinalMappingD4Request.getStatusCode().is5xxServerError()) {
+            throw new IllegalStateException("Error when getting is final mapping D4");
+        }
+
+//        Integer isFinalMappingD4 = Objects.requireNonNull(isFinalMappingD4Request.getBody()).getData();
 
     }
 
@@ -454,68 +500,82 @@ public class MonitoringService implements IMonitoringService {
     }
 
     @Override
-    public List<List<User>> getUserList(String cookie){
+    public List<HashMap<Integer, String>> getUserList(String cookie){
         HttpHeaders headers = new HttpHeaders();
         headers.add(Constant.PayloadResponseConstant.COOKIE, cookie);
         HttpEntity<String> req = new HttpEntity<>(headers);
-        List<List<User>> user = new ArrayList<>();
+        List<HashMap<Integer, String>> user = new ArrayList<>();
 
-//        //get participant
-//        List<User> participantList = new ArrayList<>();
-//        ResponseEntity<ResponseList<ParticipantResponse>> participantRes = restTemplate.exchange("http://participant-service/participant/get-all",
-//                HttpMethod.GET, req, new ParameterizedTypeReference<>() {});
-//        List<ParticipantResponse> participantResponseList = Objects.requireNonNull(participantRes.getBody()).getData();
-//        for (ParticipantResponse participant : participantResponseList) {
-//            participantList.add(new User(participant.getIdParticipant(), participant.getName()));
-//        }
-//        user.add(participantList);
-//
-//        //get company
-//        List<User> companyList = new ArrayList<>();
-//        ResponseEntity<ResponseList<CompanyResponse>> companyRes = restTemplate.exchange("http://company-service/company/get-all",
-//                HttpMethod.GET, req, new ParameterizedTypeReference<>() {});
-//        List<CompanyResponse> companyResponses = Objects.requireNonNull(companyRes.getBody()).getData();
-//        for (CompanyResponse company : companyResponses) {
-//            companyList.add(new User(company.getIdCompany(), company.getCompanyName()));
-//        }
-//        user.add(companyList);
-//
-//        //get Supervisor
-//        List<User> lecturerList = new ArrayList<>();
-//        ResponseEntity<ResponseList<CommitteeResponse>> committeeRes = restTemplate.exchange("http://account-service/get-supervisor",
-//                HttpMethod.GET, req, new ParameterizedTypeReference<>() {});
-//        List<CommitteeResponse> committeeResponses = Objects.requireNonNull(committeeRes.getBody()).getData();
-//        for (CommitteeResponse committee : committeeResponses) {
-//            lecturerList.add(new User(committee.getIdLecturer(), committee.getName()));
-//        }
-//        user.add(lecturerList);
+       //get participant
+        HashMap<Integer, String> participantList = new HashMap<>();
+        ResponseEntity<ResponseList<ParticipantResponse>> participantRes = restTemplate.exchange("http://participant-service/participant/get-all?type=dropdown",
+                HttpMethod.GET, req, new ParameterizedTypeReference<>() {
+                });
+        List<ParticipantResponse> participantResponseList = Objects.requireNonNull(participantRes.getBody()).getData();
+        for (ParticipantResponse participant : participantResponseList) {
+            participantList.put(participant.getIdParticipant(), participant.getName());
+        }
+        user.add(participantList);
+
+        //get company
+        HashMap<Integer, String> companyList = new HashMap<>();
+        ResponseEntity<ResponseList<CompanyResponse>> companyRes = restTemplate.exchange("http://company-service/company/get-all",
+                HttpMethod.GET, req, new ParameterizedTypeReference<>() {
+                });
+        List<CompanyResponse> companyResponses = Objects.requireNonNull(companyRes.getBody()).getData();
+        for (CompanyResponse company : companyResponses) {
+            companyList.put(company.getIdCompany(), company.getCompanyName());
+        }
+        user.add(companyList);
+
+        //get Supervisor
+        HashMap<Integer, String> lecturerList = new HashMap<>();
+        ResponseEntity<ResponseList<CommitteeResponse>> committeeRes = restTemplate.exchange("http://account-service/get-supervisor",
+                HttpMethod.GET, req, new ParameterizedTypeReference<>() {
+                });
+        List<CommitteeResponse> committeeResponses = Objects.requireNonNull(committeeRes.getBody()).getData();
+        for (CommitteeResponse committee : committeeResponses) {
+            lecturerList.put(committee.getIdLecturer(), committee.getName());
+        }
+        user.add(lecturerList);
 
         return user;
     }
 
     @Override
     public List<SupervisorMappingResponse> getSupervisorMapping(String cookie) {
-        List<SupervisorMapping> mapping = supervisorMappingRepository.findAll();
-        List<List<User>> user = getUserList(cookie);
-        List<User> participant = user.get(0);
-        List<User> company = user.get(1);
-        List<User> lecturer = user.get(2);
+        List<SupervisorMapping> mapping = supervisorMappingRepository.findAllGroupByCompanyId();
+        List<HashMap<Integer, String>> user = getUserList(cookie);
+        HashMap<Integer, String> participant = user.get(0);
+        HashMap<Integer, String> company = user.get(1);
+        HashMap<Integer, String> lecturer = user.get(2);
+        List<SupervisorMappingResponse> response = new ArrayList<>();
+        for(SupervisorMapping map:mapping){
+            List<SupervisorMapping> temp = supervisorMappingRepository.findByCompanyId(map.getCompanyId());
+            List<Participant> participantList = new ArrayList<>();
+            for(SupervisorMapping temp2 : temp){
+                participantList.add(new Participant(temp2.getParticipantId(), participant.get(temp2.getParticipantId())));
+            }
+            response.add(new SupervisorMappingResponse(
+                    map.getCompanyId(), company.get(map.getCompanyId()),
+                    map.getLecturerId(), lecturer.get(map.getLecturerId()),
+                    map.getProdiId(), map.getDate(), participantList)
+            );
+        }
 
-
-
-        return null;
+        return response;
     }
 
     @Override
     public List<SupervisorMappingResponse> getSupervisorMappingByLecturer(String cookie, int lecturerId) {
-        List<SupervisorMapping> supervisorMapping = supervisorMappingRepository.findByLecturerId(lecturerId);
-        List<SupervisorMappingResponse> response = new ArrayList<>();
-        for(SupervisorMapping temp:supervisorMapping){
-            SupervisorMappingResponse mapping = new SupervisorMappingResponse();
-            mapping.setParticipantId(temp.getParticipantId());
-            mapping.setLecturerId(temp.getLecturerId());
-            mapping.setCompanyId(temp.getCompanyId());
-            mapping.setProdiId(temp.getProdiId());
+//        List<SupervisorMapping> supervisorMapping = supervisorMappingRepository.findByLecturerId(lecturerId);
+//        List<SupervisorMappingResponse> response = new ArrayList<>();
+//        for(SupervisorMapping temp:supervisorMapping){
+//            SupervisorMappingResponse mapping = new SupervisorMappingResponse();
+//            mapping.setParticipantId(temp.getParticipantId());
+//            mapping.setLecturerId(temp.getLecturerId());
+//            mapping.setCompanyId(temp.getCompanyId());
+//            mapping.setProdiId(temp.getProdiId());
 //            ResponseEntity<ResponseList<ParticipantResponse>> pResponse = restTemplate.exchange(
 //                    "http://participant-service/participant/get-all?year=" + currentYear,
 //                    HttpMethod.GET,
@@ -524,9 +584,9 @@ public class MonitoringService implements IMonitoringService {
 //                    });
 
 
-            response.add(mapping);
-        }
-        return response;
+//            response.add(mapping);
+//        }
+        return null;
     }
 
     @Override

@@ -11,8 +11,6 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 public class RppCreateRequest {
-    @JsonProperty("participant_id")
-    private int participantId;
     @JsonProperty("work_title")
     private String workTitle;
     @JsonProperty("group_role")

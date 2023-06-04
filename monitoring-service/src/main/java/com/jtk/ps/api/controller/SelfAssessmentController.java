@@ -30,7 +30,8 @@ public class SelfAssessmentController {
     @PreAuthorize("hasAnyAuthority('PARTICIPANT')")
     public ResponseEntity<Object> saveSelfAssessment(@RequestBody SelfAssessmentRequest selfAssessmentCreateRequest, HttpServletRequest request) {
         try {
-            monitoringService.createSelfAssessment(selfAssessmentCreateRequest);
+            Integer participantId = (Integer) request.getAttribute(Constant.VerifyConstant.ID);
+            monitoringService.createSelfAssessment(selfAssessmentCreateRequest, participantId);
             return ResponseHandler.generateResponse("Save SelfAssessment succeed", HttpStatus.OK);
         } catch (HttpClientErrorException ex){
             return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);

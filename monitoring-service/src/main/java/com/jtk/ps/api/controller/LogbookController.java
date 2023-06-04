@@ -27,7 +27,8 @@ public class LogbookController {
     @PreAuthorize("hasAnyAuthority('PARTICIPANT')")
     public ResponseEntity<Object> saveLogbook(@RequestBody LogbookCreateRequest logbookCreateRequest, HttpServletRequest request) {
         try {
-            monitoringService.createLogbook(logbookCreateRequest);
+            Integer participantId = (Integer) request.getAttribute(Constant.VerifyConstant.ID);
+            monitoringService.createLogbook(logbookCreateRequest, participantId);
             return ResponseHandler.generateResponse("Save Logbook succeed", HttpStatus.OK);
         } catch (HttpClientErrorException ex){
             return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);

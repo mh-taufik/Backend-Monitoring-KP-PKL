@@ -5,14 +5,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class SupervisorMappingResponse {
-    @JsonProperty("participant_id")
-    private Integer participantId;
-    @JsonProperty("participant_name")
-    private String participantName;
     @JsonProperty("company_id")
     private Integer companyId;
     @JsonProperty("company_name")
@@ -23,4 +22,6 @@ public class SupervisorMappingResponse {
     private String lecturerName;
     @JsonProperty("prodi_id")
     private Integer prodiId;
+    private LocalDate date;
+    private List<Participant> participant;
 }

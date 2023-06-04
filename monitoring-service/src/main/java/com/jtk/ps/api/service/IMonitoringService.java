@@ -1,6 +1,5 @@
 package com.jtk.ps.api.service;
 
-import com.jtk.ps.api.dto.User;
 import com.jtk.ps.api.dto.deadline.DeadlineCreateRequest;
 import com.jtk.ps.api.dto.deadline.DeadlineResponse;
 import com.jtk.ps.api.dto.deadline.DeadlineUpdateRequest;
@@ -20,9 +19,9 @@ import com.jtk.ps.api.dto.supervisor_grade.SupervisorGradeDetailResponse;
 import com.jtk.ps.api.dto.rpp.RppDetailResponse;
 import com.jtk.ps.api.dto.supervisor_grade.SupervisorGradeResponse;
 import com.jtk.ps.api.dto.supervisor_mapping.SupervisorMappingUpdateRequest;
-import com.jtk.ps.api.model.SelfAssessment;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 
 public interface IMonitoringService {
@@ -30,21 +29,21 @@ public interface IMonitoringService {
     List<RppResponse> getRppList(int participantId);
 
     RppDetailResponse getRppDetail(int id);
-    void createRpp(RppCreateRequest rpp);
+    void createRpp(RppCreateRequest rpp, Integer participantId);
     void updateRpp(RppUpdateRequest rpp);
 
     //Logbook
     Boolean isLogbookExist(int participantId, LocalDate date);
     List<LogbookResponse> getLogbookByParticipantId(int participantId);
     LogbookDetailResponse getLogbookDetail(int id);
-    void createLogbook(LogbookCreateRequest logbook);
+    void createLogbook(LogbookCreateRequest logbook, Integer participantId);
     void updateLogbook(LogbookUpdateRequest logbook);
     void gradeLogbook(LogbookGradeRequest gradeRequest);
 
     //Self Assessment
     Boolean isSelfAssessmentExist(int participantId, LocalDate date);
     List<SelfAssessmentAspectResponse> getSelfAssessmentAspect();
-    void createSelfAssessment(SelfAssessmentRequest request);
+    void createSelfAssessment(SelfAssessmentRequest request, Integer participantId);
     SelfAssessmentDetailResponse getSelfAssessmentDetail(int id);
     List<SelfAssessmentResponse> getSelfAssessmentList(int idParticipant);
     List<SelfAssessmentGradeDetailResponse> getBestPerformance(int participantId);
@@ -58,15 +57,15 @@ public interface IMonitoringService {
     void getMonitoringStatistic(int participantId);
 
     //Laporan KP PKL
-    void createLaporan(LaporanCreateRequest laporanCreateRequest);
+    void createLaporan(LaporanCreateRequest laporanCreateRequest, Integer participantId);
     void updateLaporan(LaporanUpdateRequest laporanUpdateRequest);
     LaporanResponse getLaporan(Integer id);
     List<LaporanResponse> getListLaporan(Integer participantId);
 
     //Supervisor mapping
-    void createSupervisorMapping(List<SupervisorMappingCreateRequest> supervisorMappingCreateRequest);
+    void createSupervisorMapping(List<SupervisorMappingCreateRequest> supervisorMappingCreateRequest, String cookie);
     void updateSupervisorMapping(List<SupervisorMappingUpdateRequest> supervisorMapping);
-    List<List<User>> getUserList(String token);
+    List<HashMap<Integer, String>> getUserList(String token);
     List<SupervisorMappingResponse> getSupervisorMapping(String accessToken);
     List<SupervisorMappingResponse> getSupervisorMappingByLecturer(String accessToken, int lecturerId);
     List<SupervisorMappingResponse> getSupervisorMappingByCompany(String accessToken, int companyId);

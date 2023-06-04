@@ -11,9 +11,6 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SelfAssessmentRequest {
-    @JsonProperty("participant_id")
-    private Integer participantId;
-
     @JsonProperty("start_date")
     private LocalDate startDate;
 

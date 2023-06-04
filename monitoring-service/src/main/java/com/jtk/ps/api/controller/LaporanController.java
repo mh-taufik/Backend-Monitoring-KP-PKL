@@ -4,6 +4,7 @@ import com.jtk.ps.api.dto.laporan.LaporanCreateRequest;
 import com.jtk.ps.api.dto.laporan.LaporanResponse;
 import com.jtk.ps.api.dto.laporan.LaporanUpdateRequest;
 import com.jtk.ps.api.service.IMonitoringService;
+import com.jtk.ps.api.util.Constant;
 import com.jtk.ps.api.util.ResponseHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -51,7 +52,8 @@ public class LaporanController {
     @PreAuthorize("hasAnyAuthority('PARTICIPANT')")
     public ResponseEntity<Object> createLaporan(@RequestBody LaporanCreateRequest laporanCreateRequest, HttpServletRequest request){
         try {
-            monitoringService.createLaporan(laporanCreateRequest);
+            Integer participantId = (Integer) request.getAttribute(Constant.VerifyConstant.ID);
+            monitoringService.createLaporan(laporanCreateRequest, participantId);
             return ResponseHandler.generateResponse("Create Laporan succeed", HttpStatus.OK);
         } catch (Exception e) {
             return ResponseHandler.generateResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);

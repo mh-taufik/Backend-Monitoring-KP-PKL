@@ -9,8 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class LaporanCreateRequest {
-    @JsonProperty("participant_id")
-    private Integer participantId;
     private String uri;
     private Integer phase;
 }
