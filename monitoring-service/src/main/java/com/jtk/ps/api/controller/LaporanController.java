@@ -1,5 +1,6 @@
 package com.jtk.ps.api.controller;
 
+import com.jtk.ps.api.dto.CreateId;
 import com.jtk.ps.api.dto.laporan.LaporanCreateRequest;
 import com.jtk.ps.api.dto.laporan.LaporanResponse;
 import com.jtk.ps.api.dto.laporan.LaporanUpdateRequest;
@@ -53,8 +54,8 @@ public class LaporanController {
     public ResponseEntity<Object> createLaporan(@RequestBody LaporanCreateRequest laporanCreateRequest, HttpServletRequest request){
         try {
             Integer participantId = (Integer) request.getAttribute(Constant.VerifyConstant.ID);
-            monitoringService.createLaporan(laporanCreateRequest, participantId);
-            return ResponseHandler.generateResponse("Create Laporan succeed", HttpStatus.OK);
+            CreateId id = monitoringService.createLaporan(laporanCreateRequest, participantId);
+            return ResponseHandler.generateResponse("Create Laporan succeed", HttpStatus.OK, id);
         } catch (Exception e) {
             return ResponseHandler.generateResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }

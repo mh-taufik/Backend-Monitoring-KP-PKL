@@ -1,5 +1,6 @@
 package com.jtk.ps.api.controller;
 
+import com.jtk.ps.api.dto.CreateId;
 import com.jtk.ps.api.dto.logbook.LogbookCreateRequest;
 import com.jtk.ps.api.dto.logbook.LogbookUpdateRequest;
 import com.jtk.ps.api.dto.rpp.RppCreateRequest;
@@ -30,8 +31,8 @@ public class RppController {
     public ResponseEntity<Object> saveRpp(@RequestBody RppCreateRequest rppCreateRequest, HttpServletRequest request) {
         try {
             Integer participantId = (Integer) request.getAttribute(Constant.VerifyConstant.ID);
-            monitoringService.createRpp(rppCreateRequest, participantId);
-            return ResponseHandler.generateResponse("Save Rpp succeed", HttpStatus.OK);
+            CreateId id = monitoringService.createRpp(rppCreateRequest, participantId);
+            return ResponseHandler.generateResponse("Save Rpp succeed", HttpStatus.OK, id);
         } catch (HttpClientErrorException ex){
             return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {

@@ -1,6 +1,7 @@
 package com.jtk.ps.api.controller;
 
 import com.jtk.ps.api.dto.CheckDate;
+import com.jtk.ps.api.dto.CreateId;
 import com.jtk.ps.api.dto.logbook.*;
 import com.jtk.ps.api.service.IMonitoringService;
 import com.jtk.ps.api.util.Constant;
@@ -28,8 +29,8 @@ public class LogbookController {
     public ResponseEntity<Object> saveLogbook(@RequestBody LogbookCreateRequest logbookCreateRequest, HttpServletRequest request) {
         try {
             Integer participantId = (Integer) request.getAttribute(Constant.VerifyConstant.ID);
-            monitoringService.createLogbook(logbookCreateRequest, participantId);
-            return ResponseHandler.generateResponse("Save Logbook succeed", HttpStatus.OK);
+            CreateId id = monitoringService.createLogbook(logbookCreateRequest, participantId);
+            return ResponseHandler.generateResponse("Save Logbook succeed", HttpStatus.OK, id);
         } catch (HttpClientErrorException ex){
             return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
@@ -43,7 +44,7 @@ public class LogbookController {
         try {
             logbookUpdateRequest.setParticipantId((Integer) request.getAttribute(Constant.VerifyConstant.ID));
             monitoringService.updateLogbook(logbookUpdateRequest);
-            return ResponseHandler.generateResponse("Update Logbook succeed", HttpStatus.OK);
+            return ResponseHandler.generateResponse("Update Logbook succeed", HttpStatus.OK, new CreateId());
         } catch (HttpClientErrorException ex){
             return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {

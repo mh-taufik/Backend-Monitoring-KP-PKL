@@ -1,5 +1,6 @@
 package com.jtk.ps.api.controller;
 
+import com.jtk.ps.api.dto.CreateId;
 import com.jtk.ps.api.dto.rpp.RppCreateRequest;
 import com.jtk.ps.api.dto.rpp.RppUpdateRequest;
 import com.jtk.ps.api.dto.supervisor_grade.SupervisorGradeCreateRequest;
@@ -29,8 +30,8 @@ public class SupervisorGradeController {
     @PreAuthorize("hasAnyAuthority('SUPERVISOR')")
     public ResponseEntity<Object> saveSupervisorGrade(@RequestBody SupervisorGradeCreateRequest supervisorGradeCreateRequest, HttpServletRequest request) {
         try {
-            monitoringService.createSupervisorGrade(supervisorGradeCreateRequest);
-            return ResponseHandler.generateResponse("Save SupervisorGrade succeed", HttpStatus.OK);
+            CreateId id = monitoringService.createSupervisorGrade(supervisorGradeCreateRequest);
+            return ResponseHandler.generateResponse("Save SupervisorGrade succeed", HttpStatus.OK, id);
         } catch (HttpClientErrorException ex){
             return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {

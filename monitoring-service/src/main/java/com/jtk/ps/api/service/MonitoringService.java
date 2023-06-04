@@ -90,7 +90,7 @@ public class MonitoringService implements IMonitoringService {
     }
 
     @Override
-    public void createRpp(RppCreateRequest rpp, Integer participantId) {
+    public CreateId createRpp(RppCreateRequest rpp, Integer participantId) {
         Rpp rppNew = new Rpp();
         rppNew.setParticipantId(participantId);
         rppNew.setWorkTitle(rpp.getWorkTitle());
@@ -113,7 +113,7 @@ public class MonitoringService implements IMonitoringService {
         for(WeeklyAchievementPlanRequest weeklyAchievementPlan:rpp.getWeeklyAchievementPlans()){
             weeklyAchievementPlanRepository.save(new WeeklyAchievementPlan(null, temp, weeklyAchievementPlan.getAchievementPlan(), weeklyAchievementPlan.getStartDate(), weeklyAchievementPlan.getFinishDate()));
         }
-
+        return new CreateId(temp.getId());
     }
 
     @Override
@@ -167,7 +167,7 @@ public class MonitoringService implements IMonitoringService {
     }
 
     @Override
-    public void createLogbook(LogbookCreateRequest logbook, Integer participantId) {
+    public CreateId createLogbook(LogbookCreateRequest logbook, Integer participantId) {
         if(logbookRepository.isExist(participantId, logbook.getDate())) {
             throw new IllegalStateException("Logbook already created on this date, please update it instead");
         }
@@ -177,7 +177,8 @@ public class MonitoringService implements IMonitoringService {
         }else{
             newLogbook.setStatus(statusRepository.findById(5));
         }
-        logbookRepository.save(newLogbook);
+        Logbook temp = logbookRepository.save(newLogbook);
+        return new CreateId(temp.getId());
     }
 
     @Override
@@ -214,7 +215,7 @@ public class MonitoringService implements IMonitoringService {
     }
 
     @Override
-    public void createSelfAssessment(SelfAssessmentRequest request, Integer participantId) {
+    public CreateId createSelfAssessment(SelfAssessmentRequest request, Integer participantId) {
         try {
             SelfAssessment selfAssessment = new SelfAssessment();
             selfAssessment.setParticipantId(participantId);
@@ -236,6 +237,7 @@ public class MonitoringService implements IMonitoringService {
                 }
             }
             selfAssessmentGradeRepository.saveAll(gradeList);
+            return new CreateId(sa.getId());
         } catch (Exception e){
             throw new IllegalStateException(e);
         }
@@ -355,7 +357,7 @@ public class MonitoringService implements IMonitoringService {
     }
 
     @Override
-    public void createSupervisorGrade(SupervisorGradeCreateRequest request) {
+    public CreateId createSupervisorGrade(SupervisorGradeCreateRequest request) {
         SupervisorGrade supervisorGrade = new SupervisorGrade();
         supervisorGrade.setSupervisorId(request.getSupervisorId());
         supervisorGrade.setParticipantId(request.getParticipantId());
@@ -366,6 +368,7 @@ public class MonitoringService implements IMonitoringService {
             SupervisorGradeAspect aspect = supervisorGradeAspectRepository.findById((int)grade.getAspectId());
             supervisorGradeResultRepository.save(new SupervisorGradeResult(null, temp, aspect, grade.getGrade(), aspect.getMaxGrade()));
         }
+        return new CreateId(temp.getId());
     }
 
     @Override
@@ -499,7 +502,7 @@ public class MonitoringService implements IMonitoringService {
 
 
     @Override
-    public void createLaporan(LaporanCreateRequest laporanCreateRequest, Integer participantId) {
+    public CreateId createLaporan(LaporanCreateRequest laporanCreateRequest, Integer participantId) {
         Laporan laporan = new Laporan();
         laporan.setParticipant(participantId);
         laporan.setUriName(laporanCreateRequest.getUri());
@@ -509,7 +512,8 @@ public class MonitoringService implements IMonitoringService {
         if(laporanRepository.findByParticipantIdAndPhase(participantId, laporanCreateRequest.getPhase()) == null){
             laporan.setId(null);
         }
-        laporanRepository.save(laporan);
+        Laporan temp = laporanRepository.save(laporan);
+        return new CreateId(temp.getId());
     }
 
     @Override

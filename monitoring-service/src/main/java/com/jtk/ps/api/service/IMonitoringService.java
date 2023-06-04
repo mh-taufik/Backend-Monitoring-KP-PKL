@@ -1,5 +1,6 @@
 package com.jtk.ps.api.service;
 
+import com.jtk.ps.api.dto.CreateId;
 import com.jtk.ps.api.dto.deadline.DeadlineCreateRequest;
 import com.jtk.ps.api.dto.deadline.DeadlineResponse;
 import com.jtk.ps.api.dto.deadline.DeadlineUpdateRequest;
@@ -24,20 +25,20 @@ public interface IMonitoringService {
     //RPP
     List<RppResponse> getRppList(int participantId);
     RppDetailResponse getRppDetail(int id);
-    void createRpp(RppCreateRequest rpp, Integer participantId);
+    CreateId createRpp(RppCreateRequest rpp, Integer participantId);
     void updateRpp(RppUpdateRequest rpp);
 
     //Logbook
     Boolean isLogbookExist(int participantId, LocalDate date);
     List<LogbookResponse> getLogbookByParticipantId(int participantId);
     LogbookDetailResponse getLogbookDetail(int id);
-    void createLogbook(LogbookCreateRequest logbook, Integer participantId);
+    CreateId createLogbook(LogbookCreateRequest logbook, Integer participantId);
     void updateLogbook(LogbookUpdateRequest logbook);
     void gradeLogbook(LogbookGradeRequest gradeRequest);
 
     //Self Assessment
     Boolean isSelfAssessmentExist(int participantId, LocalDate date);
-    void createSelfAssessment(SelfAssessmentRequest request, Integer participantId);
+    CreateId createSelfAssessment(SelfAssessmentRequest request, Integer participantId);
     SelfAssessmentDetailResponse getSelfAssessmentDetail(int id);
     List<SelfAssessmentResponse> getSelfAssessmentList(int idParticipant);
     List<SelfAssessmentGradeDetailResponse> getBestPerformance(int participantId);
@@ -47,7 +48,7 @@ public interface IMonitoringService {
     List<SelfAssessmentAspectResponse> getSelfAssessmentAspect();
 
     //Supervisor Grade
-    void createSupervisorGrade(SupervisorGradeCreateRequest request);
+    CreateId createSupervisorGrade(SupervisorGradeCreateRequest request);
     void updateSupervisorGrade(SupervisorGradeUpdateRequest request);
     SupervisorGradeDetailResponse getSupervisorGradeDetail(int id);
     List<SupervisorGradeResponse> getSupervisorGradeList(int participantId);
@@ -56,9 +57,8 @@ public interface IMonitoringService {
     void updateSupervisorGradeAspect(SupervisorGradeAspectRequest request, int creator);
     List<SupervisorGradeAspectResponse> getListSupervisorGradeAspect();
 
-
     //Laporan KP PKL
-    void createLaporan(LaporanCreateRequest laporanCreateRequest, Integer participantId);
+    CreateId createLaporan(LaporanCreateRequest laporanCreateRequest, Integer participantId);
     void updateLaporan(LaporanUpdateRequest laporanUpdateRequest);
     LaporanResponse getLaporan(Integer id);
     List<LaporanResponse> getListLaporan(Integer participantId);

@@ -77,14 +77,14 @@ public class SupervisorMappingController {
         }
     }
 
-    @PutMapping("/create")
+    @PutMapping("/update")
     @PreAuthorize("hasAnyAuthority('COMMITTEE')")
     public ResponseEntity<Object> updateSupervisorMapping(@RequestBody List<SupervisorMappingRequest> supervisorMappingRequest, HttpServletRequest request){
         try {
             String cookie = request.getHeader(Constant.PayloadResponseConstant.COOKIE);
             int prodi = (int) request.getAttribute(Constant.VerifyConstant.ID_PRODI);
             monitoringService.updateSupervisorMapping(supervisorMappingRequest, cookie, prodi);
-            return ResponseHandler.generateResponse("Create Supervisor Mapping succeed", HttpStatus.OK);
+            return ResponseHandler.generateResponse("Update Supervisor Mapping succeed", HttpStatus.OK);
         } catch (Exception e) {
             return ResponseHandler.generateResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }

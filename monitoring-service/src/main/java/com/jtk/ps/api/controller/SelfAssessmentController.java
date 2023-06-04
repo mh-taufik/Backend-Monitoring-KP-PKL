@@ -1,6 +1,7 @@
 package com.jtk.ps.api.controller;
 
 import com.jtk.ps.api.dto.CheckDate;
+import com.jtk.ps.api.dto.CreateId;
 import com.jtk.ps.api.dto.laporan.LaporanResponse;
 import com.jtk.ps.api.dto.rpp.RppCreateRequest;
 import com.jtk.ps.api.dto.rpp.RppUpdateRequest;
@@ -31,8 +32,8 @@ public class SelfAssessmentController {
     public ResponseEntity<Object> saveSelfAssessment(@RequestBody SelfAssessmentRequest selfAssessmentCreateRequest, HttpServletRequest request) {
         try {
             Integer participantId = (Integer) request.getAttribute(Constant.VerifyConstant.ID);
-            monitoringService.createSelfAssessment(selfAssessmentCreateRequest, participantId);
-            return ResponseHandler.generateResponse("Save SelfAssessment succeed", HttpStatus.OK);
+            CreateId id = monitoringService.createSelfAssessment(selfAssessmentCreateRequest, participantId);
+            return ResponseHandler.generateResponse("Save SelfAssessment succeed", HttpStatus.OK, id);
         } catch (HttpClientErrorException ex){
             return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
