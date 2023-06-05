@@ -6,6 +6,7 @@ import com.jtk.ps.api.dto.laporan.LaporanResponse;
 import com.jtk.ps.api.dto.rpp.RppCreateRequest;
 import com.jtk.ps.api.dto.rpp.RppUpdateRequest;
 import com.jtk.ps.api.dto.self_assessment.*;
+import com.jtk.ps.api.dto.supervisor_grade.SupervisorGradeAspectRequest;
 import com.jtk.ps.api.service.IMonitoringService;
 import com.jtk.ps.api.util.Constant;
 import com.jtk.ps.api.util.ResponseHandler;
@@ -80,9 +81,37 @@ public class SelfAssessmentController {
         }
     }
 
-    @GetMapping("/get-all-aspect")
+    @PostMapping("/aspect/create")
+    @PreAuthorize("hasAnyAuthority('COMMITTEE')")
+    public ResponseEntity<Object> createSelfAssessmentAspect(@RequestBody SelfAssessmentAspectRequest selfAssessmentAspectRequest, HttpServletRequest request) {
+        try {
+            Integer id = (Integer) Objects.requireNonNull(request.getAttribute(Constant.VerifyConstant.ID));
+            monitoringService.createSelfAssessmentAspect(selfAssessmentAspectRequest, id);
+            return ResponseHandler.generateResponse("Create Self Assessment Aspect succeed", HttpStatus.OK, id);
+        } catch (HttpClientErrorException ex){
+            return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return ResponseHandler.generateResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PutMapping("/aspect/update")
+    @PreAuthorize("hasAnyAuthority('COMMITTEE')")
+    public ResponseEntity<Object> updateSelfAssessmentAspect(@RequestBody SelfAssessmentAspectRequest selfAssessmentAspectRequest, HttpServletRequest request) {
+        try {
+            Integer id = (Integer) Objects.requireNonNull(request.getAttribute(Constant.VerifyConstant.ID));
+            monitoringService.updateSelfAssessmentAspect(selfAssessmentAspectRequest, id);
+            return ResponseHandler.generateResponse("Update Self Assessment Aspect succeed", HttpStatus.OK);
+        } catch (HttpClientErrorException ex){
+            return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return ResponseHandler.generateResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/aspect/get")
     @PreAuthorize("hasAnyAuthority('COMMITTEE','PARTICIPANT','SUPERVISOR')")
-    public ResponseEntity<Object> getSelfAssessmentList(HttpServletRequest request) {
+    public ResponseEntity<Object> getSelfAssessmentAspect(HttpServletRequest request) {
         try {
             List<SelfAssessmentAspectResponse> response = monitoringService.getSelfAssessmentAspect();
             return ResponseHandler.generateResponse("Get Self Assessment Aspect succeed", HttpStatus.OK, response);
@@ -92,7 +121,6 @@ public class SelfAssessmentController {
             return ResponseHandler.generateResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
     @PostMapping("/check")
     @PreAuthorize("hasAnyAuthority('PARTICIPANT')")
     public ResponseEntity<Object> checkByDate(@RequestBody CheckDate date, HttpServletRequest request){

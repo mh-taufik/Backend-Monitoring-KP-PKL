@@ -18,4 +18,6 @@ public interface LaporanRepository extends JpaRepository<Laporan, Integer>{
 
 //    @Query(value = "select id, uri_name, upload_date, phase from Laporan where participant_id = :id", nativeQuery = true)
     List<Laporan> findByParticipantId(int participantId);
+    @Query(value = "select if(count(*)>0, 'true', 'false') from laporan where participant_id = :participant_id and phase = :phase", nativeQuery = true)
+    Boolean isExist(@Param("participant_id") int participantId, @Param("phase")  int phase);
 }

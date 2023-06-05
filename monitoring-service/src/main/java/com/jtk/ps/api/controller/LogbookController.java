@@ -52,6 +52,21 @@ public class LogbookController {
         }
     }
 
+
+
+    @PutMapping("/grade/{id_logbook}")
+    @PreAuthorize("hasAnyAuthority('PARTICIPANT')")
+    public ResponseEntity<Object> gradeLogbook(@RequestBody LogbookGradeRequest logbookGradeRequest, HttpServletRequest request) {
+        try {
+            monitoringService.gradeLogbook(logbookGradeRequest);
+            return ResponseHandler.generateResponse("Save Grade Logbook succeed", HttpStatus.OK);
+        } catch (HttpClientErrorException ex){
+            return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return ResponseHandler.generateResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @GetMapping("/get-all/{participant_id}")
     @PreAuthorize("hasAnyAuthority('COMMITTEE','PARTICIPANT','SUPERVISOR')")
     public ResponseEntity<Object> getLogbookList(@PathVariable("participant_id") Integer participantId, HttpServletRequest request) {

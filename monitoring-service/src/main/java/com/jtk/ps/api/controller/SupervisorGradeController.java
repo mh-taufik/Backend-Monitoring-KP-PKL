@@ -1,13 +1,9 @@
 package com.jtk.ps.api.controller;
 
 import com.jtk.ps.api.dto.CreateId;
-import com.jtk.ps.api.dto.rpp.RppCreateRequest;
-import com.jtk.ps.api.dto.rpp.RppUpdateRequest;
-import com.jtk.ps.api.dto.supervisor_grade.SupervisorGradeCreateRequest;
-import com.jtk.ps.api.dto.supervisor_grade.SupervisorGradeDetailResponse;
-import com.jtk.ps.api.dto.supervisor_grade.SupervisorGradeResponse;
-import com.jtk.ps.api.dto.supervisor_grade.SupervisorGradeUpdateRequest;
+import com.jtk.ps.api.dto.supervisor_grade.*;
 import com.jtk.ps.api.service.IMonitoringService;
+import com.jtk.ps.api.util.Constant;
 import com.jtk.ps.api.util.ResponseHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,6 +14,7 @@ import org.springframework.web.client.HttpClientErrorException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/supervisor/grade")
@@ -71,6 +68,60 @@ public class SupervisorGradeController {
         try {
             List<SupervisorGradeResponse> response = monitoringService.getSupervisorGradeList(idParticipant);
             return ResponseHandler.generateResponse("Get Supervisor Grade List succeed", HttpStatus.OK, response);
+        } catch (HttpClientErrorException ex){
+            return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return ResponseHandler.generateResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/statistic/{id_participant}")
+    @PreAuthorize("hasAnyAuthority('COMMITTEE','PARTICIPANT','SUPERVISOR')")
+    public ResponseEntity<Object> get(@PathVariable("id_participant") Integer idParticipant, HttpServletRequest request) {
+        try {
+            StatisticResponse response = monitoringService.getMonitoringStatistic(idParticipant);
+            return ResponseHandler.generateResponse("Get statistic succeed", HttpStatus.OK, response);
+        } catch (HttpClientErrorException ex){
+            return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return ResponseHandler.generateResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/aspect/create")
+    @PreAuthorize("hasAnyAuthority('COMMITTEE')")
+    public ResponseEntity<Object> saveSupervisorGradeAspect(@RequestBody SupervisorGradeAspectRequest supervisorGradeAspectRequest, HttpServletRequest request) {
+        try {
+            Integer id = (Integer) Objects.requireNonNull(request.getAttribute(Constant.VerifyConstant.ID));
+            monitoringService.createSupervisorGradeAspect(supervisorGradeAspectRequest, id);
+            return ResponseHandler.generateResponse("Save Supervisor grade aspect succeed", HttpStatus.OK, id);
+        } catch (HttpClientErrorException ex){
+            return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return ResponseHandler.generateResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PutMapping("/aspect/update")
+    @PreAuthorize("hasAnyAuthority('COMMITTEE')")
+    public ResponseEntity<Object> updateSupervisorGradeAspect(@RequestBody SupervisorGradeAspectRequest supervisorGradeAspectRequest, HttpServletRequest request) {
+        try {
+            Integer id = (Integer) Objects.requireNonNull(request.getAttribute(Constant.VerifyConstant.ID));
+            monitoringService.updateSupervisorGradeAspect(supervisorGradeAspectRequest, id);
+            return ResponseHandler.generateResponse("Update Supervisor grade aspect succeed", HttpStatus.OK);
+        } catch (HttpClientErrorException ex){
+            return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return ResponseHandler.generateResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/aspect/get")
+    @PreAuthorize("hasAnyAuthority('COMMITTEE','PARTICIPANT','SUPERVISOR')")
+    public ResponseEntity<Object> getSupervisorGradeAspect(HttpServletRequest request) {
+        try {
+            List<SupervisorGradeAspectResponse> response = monitoringService.getListSupervisorGradeAspect();
+            return ResponseHandler.generateResponse("Get Supervisor Grade succeed", HttpStatus.OK, response);
         } catch (HttpClientErrorException ex){
             return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {

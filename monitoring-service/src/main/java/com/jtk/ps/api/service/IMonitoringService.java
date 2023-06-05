@@ -1,21 +1,22 @@
 package com.jtk.ps.api.service;
 
 import com.jtk.ps.api.dto.CreateId;
+import com.jtk.ps.api.dto.DashboardCommittee;
+import com.jtk.ps.api.dto.DashboardLecturer;
+import com.jtk.ps.api.dto.DashboardParticipant;
 import com.jtk.ps.api.dto.deadline.DeadlineCreateRequest;
 import com.jtk.ps.api.dto.deadline.DeadlineResponse;
 import com.jtk.ps.api.dto.deadline.DeadlineUpdateRequest;
+import com.jtk.ps.api.dto.rpp.*;
 import com.jtk.ps.api.dto.self_assessment.*;
 import com.jtk.ps.api.dto.supervisor_grade.*;
+import com.jtk.ps.api.dto.supervisor_mapping.SupervisorMappingLecturerResponse;
 import com.jtk.ps.api.dto.supervisor_mapping.SupervisorMappingRequest;
 import com.jtk.ps.api.dto.supervisor_mapping.SupervisorMappingResponse;
 import com.jtk.ps.api.dto.laporan.LaporanCreateRequest;
 import com.jtk.ps.api.dto.laporan.LaporanResponse;
 import com.jtk.ps.api.dto.laporan.LaporanUpdateRequest;
 import com.jtk.ps.api.dto.logbook.*;
-import com.jtk.ps.api.dto.rpp.RppResponse;
-import com.jtk.ps.api.dto.rpp.RppCreateRequest;
-import com.jtk.ps.api.dto.rpp.RppUpdateRequest;
-import com.jtk.ps.api.dto.rpp.RppDetailResponse;
 
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -27,6 +28,14 @@ public interface IMonitoringService {
     RppDetailResponse getRppDetail(int id);
     CreateId createRpp(RppCreateRequest rpp, Integer participantId);
     void updateRpp(RppUpdateRequest rpp);
+    void createMilestone(List<MilestoneRequest> request, int rppId);
+    void updateMilestone(List<MilestoneRequest> request, int rppId);
+    void createDeliverables(List<DeliverablesRequest> request, int rppId);
+    void updateDeliverables(List<DeliverablesRequest> request, int rppId);
+    void createCompletionSchedule(List<CompletionScheduleRequest> request, int rppId);
+    void updateCompletionSchedule(List<CompletionScheduleRequest> request, int rppId);
+    void createWeeklyAchievementPlan(List<WeeklyAchievementPlanRequest> request, int rppId);
+    void updateWeeklyAchievementPlan(List<WeeklyAchievementPlanRequest> request, int rppId);
 
     //Logbook
     Boolean isLogbookExist(int participantId, LocalDate date);
@@ -62,15 +71,15 @@ public interface IMonitoringService {
     void updateLaporan(LaporanUpdateRequest laporanUpdateRequest);
     LaporanResponse getLaporan(Integer id);
     List<LaporanResponse> getListLaporan(Integer participantId);
+    Integer getPhase();
+    Boolean isLaporanExist(int participantId, int phase);
 
     //Supervisor mapping
     void createSupervisorMapping(List<SupervisorMappingRequest> supervisorMappingRequest, String cookie, int creatorId);
     void updateSupervisorMapping(List<SupervisorMappingRequest> supervisorMappingRequest, String cookie, int creatorId);
     List<HashMap<Integer, String>> getUserList(String token);
     List<SupervisorMappingResponse> getSupervisorMapping(String accessToken, int prodi);
-    List<SupervisorMappingResponse> getSupervisorMappingByLecturer(String accessToken, int lecturerId);
-    List<SupervisorMappingResponse> getSupervisorMappingByCompany(String accessToken, int companyId);
-    List<SupervisorMappingResponse> getSupervisorMappingByYear(String accessToken, int year);
+    List<SupervisorMappingLecturerResponse> getSupervisorMappingByLecturer(String accessToken, int lecturerId);
     SupervisorMappingResponse getSupervisorMappingByParticipant(String accessToken, int participantId);
 
     //Deadline
@@ -80,7 +89,9 @@ public interface IMonitoringService {
     List<DeadlineResponse> getDeadline();
 
     //Monitoring
-    void getDashboardData(int participantId);
+    DashboardParticipant getDashboardDataParticipant(int participantId);
+    DashboardLecturer getDashboardDataLecturer(int lecturerId);
+    DashboardCommittee getDashboardDataCommittee(int committeeId);
 
     //Reminder
     void sendReminderParticipantLogbook();

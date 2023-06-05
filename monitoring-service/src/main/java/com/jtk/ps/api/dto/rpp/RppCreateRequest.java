@@ -21,10 +21,4 @@ public class RppCreateRequest {
     private LocalDate startDate;
     @JsonProperty("finish_date")
     private LocalDate finishDate;
-    private List<MilestoneRequest> milestones;
-    private List<DeliverablesRequest> deliverables;
-    @JsonProperty("completion_schedules")
-    private List<CompletionScheduleRequest> completionSchedules;
-    @JsonProperty("weekly_achievement_plans")
-    private List<WeeklyAchievementPlanRequest> weeklyAchievementPlans;
 }

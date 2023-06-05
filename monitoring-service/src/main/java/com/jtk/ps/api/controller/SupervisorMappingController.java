@@ -22,7 +22,7 @@ public class SupervisorMappingController {
     private IMonitoringService monitoringService;
 
     @GetMapping("/get-all")
-    public ResponseEntity<Object> getSupervisorMappingByProdi(@RequestParam(value = "lecturer_id", required = false) Integer lecturerId, @RequestParam(value = "participant_id", required = false) Integer participantId, @RequestParam(value = "prodi_id", required = false) Integer prodiId, @RequestParam(value = "year", required = false) Integer year, HttpServletRequest request) {
+    public ResponseEntity<Object> getSupervisorMappingByProdi(@RequestParam(value = "year", required = false) Integer year, HttpServletRequest request) {
         try {
             String cookie = request.getHeader(Constant.PayloadResponseConstant.COOKIE);
             int prodi = (int) request.getAttribute(Constant.VerifyConstant.ID_PRODI);
@@ -89,6 +89,4 @@ public class SupervisorMappingController {
             return ResponseHandler.generateResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-
 }

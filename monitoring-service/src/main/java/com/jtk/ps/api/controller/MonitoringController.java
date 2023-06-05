@@ -14,7 +14,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import javax.servlet.http.HttpServletRequest;
 
 @RestController
-@RequestMapping("/deadline")
+@RequestMapping("")
 public class MonitoringController {
     @Autowired
     private IMonitoringService monitoringService;

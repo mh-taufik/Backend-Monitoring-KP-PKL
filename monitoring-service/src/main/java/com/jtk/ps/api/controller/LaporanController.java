@@ -1,5 +1,7 @@
 package com.jtk.ps.api.controller;
 
+import com.jtk.ps.api.dto.CheckDate;
+import com.jtk.ps.api.dto.CheckLaporan;
 import com.jtk.ps.api.dto.CreateId;
 import com.jtk.ps.api.dto.laporan.LaporanCreateRequest;
 import com.jtk.ps.api.dto.laporan.LaporanResponse;
@@ -16,6 +18,7 @@ import org.springframework.web.client.HttpClientErrorException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/laporan")
@@ -67,6 +70,31 @@ public class LaporanController {
         try {
             monitoringService.updateLaporan(laporanUpdateRequest);
             return ResponseHandler.generateResponse("Update Laporan succeed", HttpStatus.OK);
+        } catch (Exception e) {
+            return ResponseHandler.generateResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/get-phase")
+    @PreAuthorize("hasAnyAuthority('COMMITTEE','PARTICIPANT','SUPERVISOR')")
+    public ResponseEntity<Object> getLaporanPhase(@PathVariable("id_participant") Integer participantId, HttpServletRequest request) {
+        try {
+            return ResponseHandler.generateResponse("Get Phase Laporan succeed", HttpStatus.OK, monitoringService.getPhase());
+        } catch (HttpClientErrorException ex){
+            return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return ResponseHandler.generateResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/check")
+    @PreAuthorize("hasAnyAuthority('PARTICIPANT')")
+    public ResponseEntity<Object> checkByDate(@RequestBody CheckLaporan check, HttpServletRequest request){
+        try {
+            Integer id = (Integer) Objects.requireNonNull(request.getAttribute(Constant.VerifyConstant.ID));
+            return ResponseHandler.generateResponse("Check by phase succeed", HttpStatus.OK, monitoringService.isLaporanExist(id, check.getPhase()));
+        } catch (HttpClientErrorException ex){
+            return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             return ResponseHandler.generateResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
