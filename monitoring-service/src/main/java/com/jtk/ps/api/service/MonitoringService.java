@@ -761,17 +761,21 @@ public class MonitoringService implements IMonitoringService {
 
     @Override
     public DashboardParticipant getDashboardDataParticipant(int participantId) {
-        return null;
+        DashboardParticipant response = new DashboardParticipant();
+
+        return response;
     }
 
     @Override
     public DashboardLecturer getDashboardDataLecturer(int lecturerId) {
-        return null;
+        DashboardLecturer response = new DashboardLecturer();
+        return response;
     }
 
     @Override
     public DashboardCommittee getDashboardDataCommittee(int committeeId) {
-        return null;
+        DashboardCommittee response = new DashboardCommittee();
+        return response;
     }
 
     @Override

@@ -77,7 +77,7 @@ public class LaporanController {
 
     @GetMapping("/get-phase")
     @PreAuthorize("hasAnyAuthority('COMMITTEE','PARTICIPANT','SUPERVISOR')")
-    public ResponseEntity<Object> getLaporanPhase(@PathVariable("id_participant") Integer participantId, HttpServletRequest request) {
+    public ResponseEntity<Object> getLaporanPhase(HttpServletRequest request) {
         try {
             return ResponseHandler.generateResponse("Get Phase Laporan succeed", HttpStatus.OK, monitoringService.getPhase());
         } catch (HttpClientErrorException ex){
