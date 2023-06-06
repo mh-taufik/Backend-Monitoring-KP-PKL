@@ -65,31 +65,4 @@ public class Logbook {
     @ManyToOne
     @JoinColumn(name = "status")
     private Status status;
-
-    public Logbook(LogbookCreateRequest logbook) {
-        this.participantId = logbook.getParticipantId();
-        this.date = logbook.getDate();
-        this.projectName = logbook.getProjectName();
-        this.projectManager = logbook.getProjectManager();
-        this.technicalLeader = logbook.getTechnicalLeader();
-        this.task = logbook.getTask();
-        this.timeAndActivity = logbook.getTimeAndActivity();
-        this.workResult = logbook.getWorkResult();
-        this.tools = logbook.getTools();
-        this.description = logbook.getDescription();
-        this.encounteredProblem = logbook.getEncounteredProblem();
-    }
-
-    public Logbook(LogbookUpdateRequest logbook) {
-        this.participantId = logbook.getParticipantId();
-        this.date = logbook.getDate();
-        this.projectName = logbook.getProjectName();
-        this.projectManager = logbook.getProjectManager();
-        this.technicalLeader = logbook.getTechnicalLeader();
-        this.task = logbook.getTask();
-        this.timeAndActivity = logbook.getTimeAndActivity();
-        this.tools = logbook.getTools();
-        this.description = logbook.getDescription();
-        this.encounteredProblem = logbook.getEncounteredProblem();
-    }
 }

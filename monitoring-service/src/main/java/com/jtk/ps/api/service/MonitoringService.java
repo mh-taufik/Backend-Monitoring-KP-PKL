@@ -23,6 +23,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.temporal.ChronoField;
 import java.util.*;
 
 import static java.time.DayOfWeek.*;
@@ -228,7 +229,26 @@ public class MonitoringService implements IMonitoringService {
 
     @Override
     public LogbookDetailResponse getLogbookDetail(int id) {
-        LogbookDetailResponse logbookResponse = new LogbookDetailResponse(logbookRepository.findById(id));
+        LogbookDetailResponse logbookResponse = new LogbookDetailResponse();
+        Logbook logbook = logbookRepository.findById(id);
+        logbookResponse.setId(logbook.getId());
+        logbookResponse.setParticipantId(logbook.getParticipantId());
+        logbookResponse.setDate(logbook.getDate());
+        logbookResponse.setProjectName(logbook.getProjectName());
+        logbookResponse.setProjectManager(logbook.getProjectManager());
+        logbookResponse.setTechnicalLeader(logbook.getTechnicalLeader());
+        logbookResponse.setTask(logbook.getTask());
+        logbookResponse.setTimeAndActivity(logbook.getTimeAndActivity());
+        logbookResponse.setTools(logbook.getTools());
+        logbookResponse.setWorkResult(logbook.getWorkResult());
+        if(logbook.getEncounteredProblem() == null)
+            logbookResponse.setGrade("-");
+        else
+            logbookResponse.setGrade(logbook.getEncounteredProblem());
+        if(logbook.getGrade() == null)
+            logbookResponse.setGrade("BELUM DINILAI");
+        else
+            logbookResponse.setGrade(logbook.getGrade().name());
         return logbookResponse;
     }
 
@@ -237,7 +257,26 @@ public class MonitoringService implements IMonitoringService {
         if(logbookRepository.isExist(participantId, logbook.getDate())) {
             throw new IllegalStateException("Logbook already created on this date, please update it instead");
         }
-        Logbook newLogbook = new Logbook(logbook);
+        if(logbook.getDate().isAfter(LocalDate.now())) {
+            throw new IllegalStateException("pengumpulan belum dibuka logbook untuk tanggal "+logbook.getDate());
+        }
+        Logbook newLogbook = new Logbook(
+                null,
+                participantId,
+                logbook.getDate(),
+                logbook.getProjectName(),
+                logbook.getProjectManager(),
+                logbook.getTechnicalLeader(),
+                logbook.getTask(),
+                logbook.getTimeAndActivity(),
+                logbook.getTools(),
+                logbook.getWorkResult(),
+                logbook.getDescription(),
+                ENilai.BELUM_DINILAI,
+                logbook.getEncounteredProblem(),
+                null
+        );
+
         if(LocalDate.now().isAfter(newLogbook.getDate())){
             newLogbook.setStatus(statusRepository.findById(4));
         }else{
@@ -252,7 +291,35 @@ public class MonitoringService implements IMonitoringService {
         if(logbookRepository.isChecked(logbook.getId())) {
             throw new IllegalStateException("Logbook already been graded, cant be edit anymore");
         }
-        Logbook newLogbook = new Logbook(logbook);
+        Logbook newLogbook = logbookRepository.findById((int)logbook.getId());
+        if(!logbook.getDescription().isEmpty()){
+            newLogbook.setDescription(logbook.getDescription());
+        }
+        if(!logbook.getProjectName().isEmpty()){
+            newLogbook.setProjectName(logbook.getProjectName());
+        }
+        if(!logbook.getProjectManager().isEmpty()){
+            newLogbook.setProjectManager(logbook.getProjectManager());
+        }
+        if(!logbook.getTechnicalLeader().isEmpty()){
+            newLogbook.setTechnicalLeader(logbook.getTechnicalLeader());
+        }
+        if(!logbook.getTask().isEmpty()){
+            newLogbook.setTask(logbook.getTask());
+        }
+        if(!logbook.getTimeAndActivity().isEmpty()){
+            newLogbook.setTimeAndActivity(logbook.getTimeAndActivity());
+        }
+        if(!logbook.getTools().isEmpty()){
+            newLogbook.setTools(logbook.getTools());
+        }
+        if(!logbook.getWorkResult().isEmpty()){
+            newLogbook.setWorkResult(logbook.getWorkResult());
+        }
+        if(!logbook.getEncounteredProblem().isEmpty()){
+            newLogbook.setEncounteredProblem(logbook.getEncounteredProblem());
+        }
+
         logbookRepository.save(newLogbook);
     }
 
@@ -509,7 +576,6 @@ public class MonitoringService implements IMonitoringService {
         Integer match = logbookRepository.countEncounteredProblemNull(participantId);
         Integer notMatch = logbookRepository.countEncounteredProblemNotNull(participantId);
 
-        //TODO: get all self assessment, make percentage
         //get jumlah total self assessment yang seharusnya dikumpulkan menggunakan tanggal di deadline
         Deadline selfAssessmentDeadline = deadlineRepository.findByName("'%self assessment%'");
         int totalSelfAssessment = (int) selfAssessmentDeadline.getStartAssignmentDate().datesUntil(selfAssessmentDeadline.getFinishAssignmentDate()).filter((t -> businessDays.contains(t.getDayOfWeek()))).count();
@@ -768,7 +834,16 @@ public class MonitoringService implements IMonitoringService {
 
     @Override
     public void updateDeadline(DeadlineUpdateRequest request) {
-        deadlineRepository.save(new Deadline(request.getId(), request.getName(), request.getDayRange(), request.getStartAssignmentDate(), request.getFinishAssignmentDate()));
+        Deadline deadline = deadlineRepository.findById((int)request.getId());
+        if(request.getDayRange() != null)
+            deadline.setDayRange(request.getDayRange());
+        if(!request.getName().isEmpty())
+            deadline.setName(request.getName());
+        if(request.getStartAssignmentDate() != null)
+            deadline.setStartAssignmentDate(request.getStartAssignmentDate());
+        if(request.getFinishAssignmentDate() != null)
+            deadline.setFinishAssignmentDate(request.getFinishAssignmentDate());
+        deadlineRepository.save(deadline);
     }
 
     @Override
@@ -792,15 +867,26 @@ public class MonitoringService implements IMonitoringService {
     public DashboardParticipant getDashboardDataParticipant(int participantId) {
         DashboardParticipant response = new DashboardParticipant();
         final Set<DayOfWeek> businessDays = Set.of(MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY);
+
         Deadline logbook = deadlineRepository.findByName("'%logbook%'");
-        int totalLogbook = (int) logbook.getStartAssignmentDate().datesUntil(logbook.getFinishAssignmentDate()).filter((t -> businessDays.contains(t.getDayOfWeek()))).count();
+        int totalLogbook = 0;
+        if(LocalDate.now().isAfter(logbook.getFinishAssignmentDate())){
+            totalLogbook = (int) logbook.getStartAssignmentDate().datesUntil(logbook.getFinishAssignmentDate()).filter((t -> businessDays.contains(t.getDayOfWeek()))).count();
+        }else{
+            totalLogbook = (int) logbook.getStartAssignmentDate().datesUntil(LocalDate.now()).filter((t -> businessDays.contains(t.getDayOfWeek()))).count();
+        }
         response.setLogbookSubmitted(logbookRepository.countByParticipantId(participantId));
         response.setLogbookMissing(totalLogbook- response.getLogbookSubmitted());
 
         Deadline selfAssessment = deadlineRepository.findByName("'%self assessment%'");
-        int totalSelfAssessment = (int) selfAssessment.getStartAssignmentDate().datesUntil(selfAssessment.getFinishAssignmentDate()).filter((t -> businessDays.contains(t.getDayOfWeek()))).count();
+        int totalSelfAssessment = 0;
+        if(LocalDate.now().isAfter(selfAssessment.getFinishAssignmentDate())){
+            totalSelfAssessment = selfAssessment.getFinishAssignmentDate().get(ChronoField.ALIGNED_WEEK_OF_YEAR) - selfAssessment.getStartAssignmentDate().get(ChronoField.ALIGNED_WEEK_OF_YEAR);
+        }else{
+            totalSelfAssessment = LocalDate.now().get(ChronoField.ALIGNED_WEEK_OF_YEAR) - selfAssessment.getStartAssignmentDate().get(ChronoField.ALIGNED_WEEK_OF_YEAR);
+        }
         response.setSelfAssessmentSubmitted(selfAssessmentRepository.countByParticipantId(participantId));
-        response.setSelfAssessmentMissing(response.getSelfAssessmentSubmitted());
+        response.setSelfAssessmentMissing(totalSelfAssessment - response.getSelfAssessmentSubmitted());
 
         String laporan = deadlineRepository.findLaporanPhaseNow(LocalDate.now()).getName();
         int totalLaporan = laporan.charAt(laporan.length()-1);
@@ -814,30 +900,80 @@ public class MonitoringService implements IMonitoringService {
     @Override
     public DashboardLecturer getDashboardDataLecturer(int lecturerId) {
         DashboardLecturer response = new DashboardLecturer();
+        final Set<DayOfWeek> businessDays = Set.of(MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY);
+        List<SupervisorMapping> supervisorMapping = supervisorMappingRepository.findByLecturerId(lecturerId);
+        List<Integer> participants = new ArrayList<>();
+        for(SupervisorMapping map:supervisorMapping){
+            participants.add(map.getParticipantId());
+        }
+
         Deadline logbook = deadlineRepository.findByName("'%logbook%'");
+        int totalLogbook = 0;
+        if(LocalDate.now().isAfter(logbook.getFinishAssignmentDate())){
+            totalLogbook = (int) logbook.getStartAssignmentDate().datesUntil(logbook.getFinishAssignmentDate()).filter((t -> businessDays.contains(t.getDayOfWeek()))).count() * participants.size();
+        }else{
+            totalLogbook = (int) logbook.getStartAssignmentDate().datesUntil(LocalDate.now()).filter((t -> businessDays.contains(t.getDayOfWeek()))).count() * participants.size();
+        }
+        response.setLogbookSubmitted(logbookRepository.countAllInParticipantId(participants));
+        response.setLogbookMissing(totalLogbook- response.getLogbookSubmitted());
+
+        Deadline selfAssessment = deadlineRepository.findByName("'%self assessment%'");
+        int totalSelfAssessment = 0;
+        if(LocalDate.now().isAfter(selfAssessment.getFinishAssignmentDate())){
+            totalSelfAssessment = selfAssessment.getFinishAssignmentDate().get(ChronoField.ALIGNED_WEEK_OF_YEAR) - selfAssessment.getStartAssignmentDate().get(ChronoField.ALIGNED_WEEK_OF_YEAR) * participants.size();
+        }else{
+            totalSelfAssessment = LocalDate.now().get(ChronoField.ALIGNED_WEEK_OF_YEAR) - selfAssessment.getStartAssignmentDate().get(ChronoField.ALIGNED_WEEK_OF_YEAR) * participants.size();
+        }
+        response.setSelfAssessmentSubmitted(selfAssessmentRepository.countAllInParticipantId(participants));
+        response.setSelfAssessmentMissing(totalSelfAssessment - response.getSelfAssessmentSubmitted());
+
+        String laporan = deadlineRepository.findLaporanPhaseNow(LocalDate.now()).getName();
+        int totalLaporan = laporan.charAt(laporan.length()-1);
+        response.setLaporanSubmitted(laporanRepository.countAllInParticipantId(participants));
+        response.setLaporanMissing(response.getSelfAssessmentSubmitted() - totalLaporan);
+        response.setRppSubmitted(rppRepository.countAllInParticipantId(participants));
+        response.setRppMissing(participants.size() - response.getRppSubmitted());
 
         return response;
     }
 
     @Override
-    public DashboardCommittee getDashboardDataCommittee(int prodi) {
+    public DashboardCommittee getDashboardDataCommittee(int prodiId) {
         DashboardCommittee response = new DashboardCommittee();
         final Set<DayOfWeek> businessDays = Set.of(MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY);
+        List<SupervisorMapping> supervisorMapping = supervisorMappingRepository.findByProdiId(prodiId);
+        List<Integer> participants = new ArrayList<>();
+        for(SupervisorMapping map:supervisorMapping){
+            participants.add(map.getParticipantId());
+        }
+
         Deadline logbook = deadlineRepository.findByName("'%logbook%'");
-        int totalLogbook = (int) logbook.getStartAssignmentDate().datesUntil(logbook.getFinishAssignmentDate()).filter((t -> businessDays.contains(t.getDayOfWeek()))).count();
-//        response.setLogbookSubmitted(logbookRepository.countByParticipantId(participantId));
-//        response.setLogbookMissing(totalLogbook- response.getLogbookSubmitted());
-//
-//        Deadline selfAssessment = deadlineRepository.findByName("'%self assessment%'");
-//        int totalSelfAssessment = (int) selfAssessment.getStartAssignmentDate().datesUntil(selfAssessment.getFinishAssignmentDate()).filter((t -> businessDays.contains(t.getDayOfWeek()))).count();
-//        response.setSelfAssessmentSubmitted(selfAssessmentRepository.countByParticipantId(participantId));
-//        response.setSelfAssessmentMissing(response.getSelfAssessmentSubmitted());
-//
-//        String laporan = deadlineRepository.findLaporanPhaseNow(LocalDate.now()).getName();
-//        int totalLaporan = laporan.charAt(laporan.length()-1);
-//        response.setLaporanSubmitted(laporanRepository.countByParticipantId(participantId));
-//        response.setLaporanMissing(response.getSelfAssessmentSubmitted() - totalLaporan);
-//        response.setRppSubmitted(rppRepository.countByParticipantId(participantId));
+        int totalLogbook = 0;
+        if(LocalDate.now().isAfter(logbook.getFinishAssignmentDate())){
+            totalLogbook = (int) logbook.getStartAssignmentDate().datesUntil(logbook.getFinishAssignmentDate()).filter((t -> businessDays.contains(t.getDayOfWeek()))).count() * participants.size();
+        }else{
+            totalLogbook = (int) logbook.getStartAssignmentDate().datesUntil(LocalDate.now()).filter((t -> businessDays.contains(t.getDayOfWeek()))).count() * participants.size();
+        }
+        response.setLogbookSubmitted(logbookRepository.countAllInParticipantId(participants));
+        response.setLogbookMissing(totalLogbook- response.getLogbookSubmitted());
+
+        Deadline selfAssessment = deadlineRepository.findByName("'%self assessment%'");
+        int totalSelfAssessment = 0;
+        if(LocalDate.now().isAfter(selfAssessment.getFinishAssignmentDate())){
+            totalSelfAssessment = selfAssessment.getFinishAssignmentDate().get(ChronoField.ALIGNED_WEEK_OF_YEAR) - selfAssessment.getStartAssignmentDate().get(ChronoField.ALIGNED_WEEK_OF_YEAR) * participants.size();
+        }else{
+            totalSelfAssessment = LocalDate.now().get(ChronoField.ALIGNED_WEEK_OF_YEAR) - selfAssessment.getStartAssignmentDate().get(ChronoField.ALIGNED_WEEK_OF_YEAR) * participants.size();
+        }
+        response.setSelfAssessmentSubmitted(selfAssessmentRepository.countAllInParticipantId(participants));
+        response.setSelfAssessmentMissing(totalSelfAssessment - response.getSelfAssessmentSubmitted());
+
+        String laporan = deadlineRepository.findLaporanPhaseNow(LocalDate.now()).getName();
+        int totalLaporan = laporan.charAt(laporan.length()-1);
+        response.setLaporanSubmitted(laporanRepository.countAllInParticipantId(participants));
+        response.setLaporanMissing(response.getSelfAssessmentSubmitted() - totalLaporan);
+        response.setRppSubmitted(rppRepository.countAllInParticipantId(participants));
+        response.setRppMissing(participants.size() - response.getRppSubmitted());
+
         return response;
     }
 

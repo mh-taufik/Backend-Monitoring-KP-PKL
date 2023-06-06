@@ -13,8 +13,6 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class LogbookCreateRequest {
-    @JsonProperty("participant_id")
-    private Integer participantId;
     private LocalDate date;
     @JsonProperty("project_name")
     private String projectName;
@@ -29,22 +27,6 @@ public class LogbookCreateRequest {
     @JsonProperty("work_result")
     private String workResult;
     private String description;
-
     @JsonProperty("encountered_problem")
     private String encounteredProblem;
-
-
-    public LogbookCreateRequest(Logbook logbook) {
-        this.participantId = logbook.getParticipantId();
-        this.date = logbook.getDate();
-        this.projectName = logbook.getProjectName();
-        this.projectManager = logbook.getProjectManager();
-        this.technicalLeader = logbook.getTechnicalLeader();
-        this.task = logbook.getTask();
-        this.timeAndActivity = logbook.getTimeAndActivity();
-        this.tools = logbook.getTools();
-        this.workResult = logbook.getWorkResult();
-        this.description = logbook.getDescription();
-        this.encounteredProblem = encounteredProblem;
-    }
 }

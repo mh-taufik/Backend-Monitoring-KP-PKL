@@ -42,7 +42,6 @@ public class LogbookController {
     @PreAuthorize("hasAnyAuthority('PARTICIPANT')")
     public ResponseEntity<Object> updateLogbook(@RequestBody LogbookUpdateRequest logbookUpdateRequest, HttpServletRequest request) {
         try {
-            logbookUpdateRequest.setParticipantId((Integer) request.getAttribute(Constant.VerifyConstant.ID));
             monitoringService.updateLogbook(logbookUpdateRequest);
             return ResponseHandler.generateResponse("Update Logbook succeed", HttpStatus.OK, new CreateId());
         } catch (HttpClientErrorException ex){

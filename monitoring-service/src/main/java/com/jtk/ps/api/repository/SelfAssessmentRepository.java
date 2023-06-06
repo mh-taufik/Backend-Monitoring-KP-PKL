@@ -16,6 +16,6 @@ public interface SelfAssessmentRepository extends JpaRepository<SelfAssessment, 
     Boolean isExist(@Param("participant_id") int participantId, @Param("date") LocalDate date);
     @Query(value = "select count(*) from self_assessment where participant_id = :participant_id",nativeQuery = true)
     Integer countByParticipantId(@Param("participant_id") int participantId);
-    @Query(value = "select count(*) from self_assessment where start_date >= :start and finish_date <= :end",nativeQuery = true)
-    Integer countAllForCommittee(@Param("start") LocalDate start, @Param("end") LocalDate end);
+    @Query(value = "select count(*) from self_assessment where participant_id in (:participant)",nativeQuery = true)
+    Integer countAllInParticipantId(@Param("participant") List<Integer> participant);
 }

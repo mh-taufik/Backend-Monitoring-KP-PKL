@@ -14,9 +14,6 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class LogbookUpdateRequest {
     private Integer id;
-    @JsonProperty("participant_id")
-    private Integer participantId;
-    private LocalDate date;
     @JsonProperty("project_name")
     private String projectName;
     @JsonProperty("project_manager")
@@ -30,22 +27,7 @@ public class LogbookUpdateRequest {
     @JsonProperty("work_result")
     private String workResult;
     private String description;
-
     @JsonProperty("encountered_problem")
     private String encounteredProblem;
 
-    public LogbookUpdateRequest(Logbook logbook) {
-        this.id = logbook.getId();
-        this.participantId = logbook.getParticipantId();
-        this.date = logbook.getDate();
-        this.projectName = logbook.getProjectName();
-        this.projectManager = logbook.getProjectManager();
-        this.technicalLeader = logbook.getTechnicalLeader();
-        this.task = logbook.getTask();
-        this.timeAndActivity = logbook.getTimeAndActivity();
-        this.tools = logbook.getTools();
-        this.workResult = logbook.getWorkResult();
-        this.description = logbook.getDescription();
-        this.encounteredProblem = logbook.getEncounteredProblem();
-    }
 }

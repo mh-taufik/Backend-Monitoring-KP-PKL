@@ -11,6 +11,7 @@
         <module name="management-content-service" />
         <module name="api-gateway" />
         <module name="mapping-service" />
+        <module name="monitoring-service" />
         <module name="company-service" />
         <module name="account-service" />
         <module name="service-registry" />
@@ -22,6 +23,7 @@
       <module name="company-service" target="11" />
       <module name="management-content-service" target="11" />
       <module name="mapping-service" target="11" />
+      <module name="monitoring-service" target="11" />
       <module name="participant-service" target="11" />
       <module name="service-registry" target="11" />
     </bytecodeTargetLevel>
@@ -31,9 +33,9 @@
       <module name="account-service" options="-parameters" />
       <module name="api-gateway" options="-parameters" />
       <module name="company-service" options="-parameters" />
-      <module name="monitoring-service" options="-parameters" />
       <module name="management-content-service" options="-parameters" />
       <module name="mapping-service" options="-parameters" />
+      <module name="monitoring-service" options="-parameters" />
       <module name="participant-service" options="-parameters" />
       <module name="service-registry" options="-parameters" />
     </option>

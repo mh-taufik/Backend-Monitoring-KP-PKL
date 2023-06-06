@@ -1,6 +1,7 @@
 package com.jtk.ps.api.model;
 
 public enum ENilai {
+    BELUM_DINILAI(0),
     SANGAT_BAIK(1),
     BAIK(2),
     CUKUP(3),

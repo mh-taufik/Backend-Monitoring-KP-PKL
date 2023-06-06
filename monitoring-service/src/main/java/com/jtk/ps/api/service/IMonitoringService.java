@@ -91,7 +91,7 @@ public interface IMonitoringService {
     //Monitoring
     DashboardParticipant getDashboardDataParticipant(int participantId);
     DashboardLecturer getDashboardDataLecturer(int lecturerId);
-    DashboardCommittee getDashboardDataCommittee(int committeeId);
+    DashboardCommittee getDashboardDataCommittee(int prodiId);
 
     //Reminder
     void sendReminderParticipantLogbook();
