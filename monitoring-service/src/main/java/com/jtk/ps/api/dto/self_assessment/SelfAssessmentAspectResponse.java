@@ -14,4 +14,5 @@ public class SelfAssessmentAspectResponse {
     @JsonProperty("aspect_name")
     private String aspectName;
     private String description;
+    private String status;
 }

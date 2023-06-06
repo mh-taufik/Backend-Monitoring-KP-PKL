@@ -28,6 +28,8 @@ public class LogbookDetailResponse {
     @JsonProperty("work_result")
     private String workResult;
     private String description;
+    @JsonProperty("encountered_problem")
+    private String encounteredProblem;
     private String grade;
     private Status status;
 
@@ -61,6 +63,7 @@ public class LogbookDetailResponse {
         this.description = logbook.getDescription();
         this.grade = logbook.getGrade().name();
         this.status = logbook.getStatus();
+        this.encounteredProblem = logbook.getEncounteredProblem();
     }
 
     public Integer getId() {

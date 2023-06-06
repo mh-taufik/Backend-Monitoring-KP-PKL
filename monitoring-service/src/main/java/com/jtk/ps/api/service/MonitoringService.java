@@ -71,7 +71,22 @@ public class MonitoringService implements IMonitoringService {
         List<Rpp> rppList = rppRepository.findByParticipantId(participantId);
         List<RppResponse> responses = new ArrayList<>();
         for(Rpp temp:rppList){
-            responses.add(new RppResponse(temp.getId(), temp.getWorkTitle(), temp.getStartDate(), temp.getFinishDate(), temp.getStatus().getStatus()));
+            Rpp rpp = rppRepository.findById((int)temp.getId());
+            if(rpp.getStartDate().isBefore(LocalDate.now()) && rpp.getFinishDate().isAfter(LocalDate.now())){
+                rpp.setStatus(statusRepository.findById(9));
+                rppRepository.save(rpp);
+                responses.add(new RppResponse(temp.getId(), temp.getWorkTitle(), temp.getStartDate(), temp.getFinishDate(), rpp.getStatus().getStatus()));
+            }
+            if(rpp.getFinishDate().isBefore(LocalDate.now())){
+                rpp.setStatus(statusRepository.findById(10));
+                rppRepository.save(rpp);
+                responses.add(new RppResponse(temp.getId(), temp.getWorkTitle(), temp.getStartDate(), temp.getFinishDate(), rpp.getStatus().getStatus()));
+            }
+            if(rpp.getStartDate().isAfter(LocalDate.now())){
+                rpp.setStatus(statusRepository.findById(11));
+                rppRepository.save(rpp);
+                responses.add(new RppResponse(temp.getId(), temp.getWorkTitle(), temp.getStartDate(), temp.getFinishDate(), rpp.getStatus().getStatus()));
+            }
         }
         return responses;
     }
@@ -98,6 +113,15 @@ public class MonitoringService implements IMonitoringService {
         rppNew.setTaskDescription(rpp.getTaskDescription());
         rppNew.setStartDate(rpp.getStartDate());
         rppNew.setFinishDate(rpp.getFinishDate());
+        if((rpp.getStartDate().isBefore(LocalDate.now()) || rpp.getStartDate().isEqual(LocalDate.now())) && (rpp.getFinishDate().isAfter(LocalDate.now()) || rpp.getFinishDate().isEqual(LocalDate.now()))) {
+            rppNew.setStatus(statusRepository.findById(9));
+        }
+        if(rpp.getFinishDate().isBefore(LocalDate.now())){
+            rppNew.setStatus(statusRepository.findById(10));
+        }
+        if(rpp.getStartDate().isAfter(LocalDate.now())){
+            rppNew.setStatus(statusRepository.findById(11));
+        }
         Rpp temp = rppRepository.save(rppNew);
         return new CreateId(temp.getId());
     }
@@ -195,9 +219,9 @@ public class MonitoringService implements IMonitoringService {
         List<LogbookResponse> responses = new ArrayList<>();
         for(Logbook temp:logbookList){
             if(temp.getGrade() != null)
-                responses.add(new LogbookResponse(temp.getId(), temp.getDate(), temp.getGrade().name().replace("_", " "), temp.getStatus().getStatus()));
+                responses.add(new LogbookResponse(temp.getId(), temp.getDate(), temp.getGrade().name().replace("_", " "), temp.getStatus().getStatus(), temp.getProjectName()));
             else
-                responses.add(new LogbookResponse(temp.getId(), temp.getDate(), "BELUM DINILAI", temp.getStatus().getStatus()));
+                responses.add(new LogbookResponse(temp.getId(), temp.getDate(), "BELUM DINILAI", temp.getStatus().getStatus(), temp.getProjectName()));
         }
         return responses;
     }
@@ -251,38 +275,34 @@ public class MonitoringService implements IMonitoringService {
         List<SelfAssessmentAspect> aspect = selfAssessmentAspectRepository.findAllActiveAspect();
         List<SelfAssessmentAspectResponse> response = new ArrayList<>();
         for(SelfAssessmentAspect temp:aspect){
-            response.add(new SelfAssessmentAspectResponse(temp.getId(), temp.getName(), temp.getDescription()));
+            response.add(new SelfAssessmentAspectResponse(temp.getId(), temp.getName(), temp.getDescription(), temp.getStatus().getStatus()));
         }
         return response;
     }
 
     @Override
     public CreateId createSelfAssessment(SelfAssessmentRequest request, Integer participantId) {
-        try {
-            SelfAssessment selfAssessment = new SelfAssessment();
-            selfAssessment.setParticipantId(participantId);
-            selfAssessment.setStartDate(request.getStartDate());
-            selfAssessment.setFinishDate(request.getFinishDate());
-            SelfAssessment sa = selfAssessmentRepository.save(selfAssessment);
+        SelfAssessment selfAssessment = new SelfAssessment();
+        selfAssessment.setParticipantId(participantId);
+        selfAssessment.setStartDate(request.getStartDate());
+        selfAssessment.setFinishDate(request.getFinishDate());
+        SelfAssessment sa = selfAssessmentRepository.save(selfAssessment);
 
-            List<SelfAssessmentAspect> aspectList = selfAssessmentAspectRepository.findAllActiveAspect();
-            List<SelfAssessmentGrade> gradeList = new ArrayList<>();
-            for (SelfAssessmentAspect aspect : aspectList) {
-                for(AssessmentGradeRequest grade: request.getGrade()) {
-                    if (aspect.getId() == grade.getAspectId()){
-                        if(grade.getGrade() == null)
-                            gradeList.add(new SelfAssessmentGrade(null, sa, aspect, 0, grade.getDescription()));
-                        else
-                            gradeList.add(new SelfAssessmentGrade(null, sa, aspect, grade.getGrade(), grade.getDescription()));
-                        break;
-                    }
+        List<SelfAssessmentAspect> aspectList = selfAssessmentAspectRepository.findAllActiveAspect();
+        List<SelfAssessmentGrade> gradeList = new ArrayList<>();
+        for (SelfAssessmentAspect aspect : aspectList) {
+            for(AssessmentGradeRequest grade: request.getGrade()) {
+                if (aspect.getId() == grade.getAspectId()){
+                    if(grade.getGrade() == null)
+                        gradeList.add(new SelfAssessmentGrade(null, sa, aspect, 0, grade.getDescription()));
+                    else
+                        gradeList.add(new SelfAssessmentGrade(null, sa, aspect, grade.getGrade(), grade.getDescription()));
+                    break;
                 }
             }
-            selfAssessmentGradeRepository.saveAll(gradeList);
-            return new CreateId(sa.getId());
-        } catch (Exception e){
-            throw new IllegalStateException(e);
         }
+        selfAssessmentGradeRepository.saveAll(gradeList);
+        return new CreateId(sa.getId());
     }
 
     @Override
@@ -291,13 +311,23 @@ public class MonitoringService implements IMonitoringService {
         List<SelfAssessmentGrade> grades = selfAssessmentGradeRepository.findBySelfAssessmentId(id);
         List<SelfAssessmentGradeDetailResponse> aspectList = new ArrayList<>();
         for(SelfAssessmentGrade temp: grades){
-            aspectList.add(new SelfAssessmentGradeDetailResponse(
-                    temp.getSelfAssessmentAspect().getId(),
-                    temp.getId(),
-                    temp.getSelfAssessmentAspect().getName(),
-                    temp.getGrade(),
-                    temp.getDescription())
-            );
+            if(temp.getGrade()!=null) {
+                aspectList.add(new SelfAssessmentGradeDetailResponse(
+                        temp.getSelfAssessmentAspect().getId(),
+                        temp.getId(),
+                        temp.getSelfAssessmentAspect().getName(),
+                        temp.getGrade(),
+                        temp.getDescription())
+                );
+            }else{
+                aspectList.add(new SelfAssessmentGradeDetailResponse(
+                        temp.getSelfAssessmentAspect().getId(),
+                        temp.getId(),
+                        temp.getSelfAssessmentAspect().getName(),
+                        0,
+                        temp.getDescription())
+                );
+            }
         }
         SelfAssessmentDetailResponse selfAssessmentDetailResponse = new SelfAssessmentDetailResponse(
             selfAssessment.getParticipantId(),
@@ -461,7 +491,7 @@ public class MonitoringService implements IMonitoringService {
         final Set<DayOfWeek> businessDays = Set.of(MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY);
 
         //get jumlah total logbook yang seharusnya dikumpulkan menggunakan tanggal di deadline
-        Deadline logbookDeadline = deadlineRepository.findByName("logbook");
+        Deadline logbookDeadline = deadlineRepository.findByName("'%logbook%'");
         int totalLogbook = (int) logbookDeadline.getStartAssignmentDate().datesUntil(logbookDeadline.getFinishAssignmentDate()).filter((t -> businessDays.contains(t.getDayOfWeek()))).count();
         int submittedLogbook = logbookRepository.countByParticipantId(participantId);
         int missingLogbook = totalLogbook - submittedLogbook;
@@ -481,7 +511,7 @@ public class MonitoringService implements IMonitoringService {
 
         //TODO: get all self assessment, make percentage
         //get jumlah total self assessment yang seharusnya dikumpulkan menggunakan tanggal di deadline
-        Deadline selfAssessmentDeadline = deadlineRepository.findByName("self assessment");
+        Deadline selfAssessmentDeadline = deadlineRepository.findByName("'%self assessment%'");
         int totalSelfAssessment = (int) selfAssessmentDeadline.getStartAssignmentDate().datesUntil(selfAssessmentDeadline.getFinishAssignmentDate()).filter((t -> businessDays.contains(t.getDayOfWeek()))).count();
         int submittedSelfAssessment = selfAssessmentRepository.countByParticipantId(participantId);
         int missingSelfAssessment = totalSelfAssessment - submittedSelfAssessment;
@@ -497,10 +527,15 @@ public class MonitoringService implements IMonitoringService {
             getPercentage(nilai.get(ENilai.BAIK), totalLogbook),
             getPercentage(nilai.get(ENilai.CUKUP), totalLogbook),
             getPercentage(nilai.get(ENilai.KURANG), totalLogbook),
-            getPercentage(submittedSelfAssessment, totalLogbook),
-            getPercentage(missingSelfAssessment, totalLogbook)
+            getPercentage(submittedSelfAssessment, totalSelfAssessment),
+            getPercentage(missingSelfAssessment, totalSelfAssessment)
         );
         return response;
+    }
+
+    public Percentage getPercentage(int count, int total){
+        float percent = (count/total)*100;
+        return new Percentage(count, percent + "%");
     }
 
     @Override
@@ -536,12 +571,6 @@ public class MonitoringService implements IMonitoringService {
         }
         return response;
     }
-
-    public Percentage getPercentage(int count, int total){
-        float percent = (count/total)*100;
-        return new Percentage(count, percent + "%");
-    }
-
 
     @Override
     public CreateId createLaporan(LaporanCreateRequest laporanCreateRequest, Integer participantId) {
@@ -596,7 +625,7 @@ public class MonitoringService implements IMonitoringService {
 
     @Override
     public Integer getPhase() {
-        Deadline deadline = deadlineRepository.findLogbookPhaseNow(LocalDate.now());
+        Deadline deadline = deadlineRepository.findLaporanPhaseNow(LocalDate.now());
         return Integer.valueOf(deadline.getName().charAt(deadline.getName().length() - 1));
     }
 
@@ -762,6 +791,22 @@ public class MonitoringService implements IMonitoringService {
     @Override
     public DashboardParticipant getDashboardDataParticipant(int participantId) {
         DashboardParticipant response = new DashboardParticipant();
+        final Set<DayOfWeek> businessDays = Set.of(MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY);
+        Deadline logbook = deadlineRepository.findByName("'%logbook%'");
+        int totalLogbook = (int) logbook.getStartAssignmentDate().datesUntil(logbook.getFinishAssignmentDate()).filter((t -> businessDays.contains(t.getDayOfWeek()))).count();
+        response.setLogbookSubmitted(logbookRepository.countByParticipantId(participantId));
+        response.setLogbookMissing(totalLogbook- response.getLogbookSubmitted());
+
+        Deadline selfAssessment = deadlineRepository.findByName("'%self assessment%'");
+        int totalSelfAssessment = (int) selfAssessment.getStartAssignmentDate().datesUntil(selfAssessment.getFinishAssignmentDate()).filter((t -> businessDays.contains(t.getDayOfWeek()))).count();
+        response.setSelfAssessmentSubmitted(selfAssessmentRepository.countByParticipantId(participantId));
+        response.setSelfAssessmentMissing(response.getSelfAssessmentSubmitted());
+
+        String laporan = deadlineRepository.findLaporanPhaseNow(LocalDate.now()).getName();
+        int totalLaporan = laporan.charAt(laporan.length()-1);
+        response.setLaporanSubmitted(laporanRepository.countByParticipantId(participantId));
+        response.setLaporanMissing(response.getSelfAssessmentSubmitted() - totalLaporan);
+        response.setRppSubmitted(rppRepository.countByParticipantId(participantId));
 
         return response;
     }
@@ -769,12 +814,30 @@ public class MonitoringService implements IMonitoringService {
     @Override
     public DashboardLecturer getDashboardDataLecturer(int lecturerId) {
         DashboardLecturer response = new DashboardLecturer();
+        Deadline logbook = deadlineRepository.findByName("'%logbook%'");
+
         return response;
     }
 
     @Override
-    public DashboardCommittee getDashboardDataCommittee(int committeeId) {
+    public DashboardCommittee getDashboardDataCommittee(int prodi) {
         DashboardCommittee response = new DashboardCommittee();
+        final Set<DayOfWeek> businessDays = Set.of(MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY);
+        Deadline logbook = deadlineRepository.findByName("'%logbook%'");
+        int totalLogbook = (int) logbook.getStartAssignmentDate().datesUntil(logbook.getFinishAssignmentDate()).filter((t -> businessDays.contains(t.getDayOfWeek()))).count();
+//        response.setLogbookSubmitted(logbookRepository.countByParticipantId(participantId));
+//        response.setLogbookMissing(totalLogbook- response.getLogbookSubmitted());
+//
+//        Deadline selfAssessment = deadlineRepository.findByName("'%self assessment%'");
+//        int totalSelfAssessment = (int) selfAssessment.getStartAssignmentDate().datesUntil(selfAssessment.getFinishAssignmentDate()).filter((t -> businessDays.contains(t.getDayOfWeek()))).count();
+//        response.setSelfAssessmentSubmitted(selfAssessmentRepository.countByParticipantId(participantId));
+//        response.setSelfAssessmentMissing(response.getSelfAssessmentSubmitted());
+//
+//        String laporan = deadlineRepository.findLaporanPhaseNow(LocalDate.now()).getName();
+//        int totalLaporan = laporan.charAt(laporan.length()-1);
+//        response.setLaporanSubmitted(laporanRepository.countByParticipantId(participantId));
+//        response.setLaporanMissing(response.getSelfAssessmentSubmitted() - totalLaporan);
+//        response.setRppSubmitted(rppRepository.countByParticipantId(participantId));
         return response;
     }
 

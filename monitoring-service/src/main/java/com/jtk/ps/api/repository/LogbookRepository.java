@@ -37,4 +37,6 @@ public interface LogbookRepository extends JpaRepository<Logbook, Integer> {
     Integer countStatusOnTime(@Param("participant_id") int participantId);
     @Query(value = "select count(*) from logbook l where l.participant_id = :participant_id",nativeQuery = true)
     Integer countByParticipantId(@Param("participant_id") int participantId);
+    @Query(value = "select count(*) from logbook l where l.date >= :start and l.date <= :end",nativeQuery = true)
+    Integer countAllForCommittee(@Param("start") LocalDate start, @Param("end") LocalDate end);
 }

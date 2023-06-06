@@ -20,4 +20,10 @@ public interface LaporanRepository extends JpaRepository<Laporan, Integer>{
     List<Laporan> findByParticipantId(int participantId);
     @Query(value = "select if(count(*)>0, 'true', 'false') from laporan where participant_id = :participant_id and phase = :phase", nativeQuery = true)
     Boolean isExist(@Param("participant_id") int participantId, @Param("phase")  int phase);
+    @Query(value = "select count(*) from laporan l where l.participant_id = :participant_id",nativeQuery = true)
+    Integer countByParticipantId(@Param("participant_id") int participantId);
+    @Query(value = "select count(*) from laporan l where l.participant_id = :date",nativeQuery = true)
+    Integer countByDate(@Param("date") int participantId);
+    @Query(value = "select count(*) from laporan l where l.upload_date >= :start and l.upload_date <= :end",nativeQuery = true)
+    Integer countAllForCommittee(@Param("start") LocalDate start, @Param("end") LocalDate end);
 }

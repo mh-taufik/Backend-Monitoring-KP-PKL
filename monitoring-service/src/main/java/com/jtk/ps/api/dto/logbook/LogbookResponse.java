@@ -1,5 +1,6 @@
 package com.jtk.ps.api.dto.logbook;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.jtk.ps.api.model.ENilai;
 import com.jtk.ps.api.model.Status;
 import lombok.AllArgsConstructor;
@@ -10,6 +11,7 @@ import java.time.LocalDate;
 
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class LogbookResponse {
     private Integer id;
 
@@ -18,11 +20,6 @@ public class LogbookResponse {
     private String grade;
 
     private String status;
-
-    public LogbookResponse(Integer id, LocalDate date, String grade, String status) {
-        this.id = id;
-        this.date = date;
-        this.grade = grade;
-        this.status = status;
-    }
+    @JsonProperty("project_name")
+    private String projectName;
 }
