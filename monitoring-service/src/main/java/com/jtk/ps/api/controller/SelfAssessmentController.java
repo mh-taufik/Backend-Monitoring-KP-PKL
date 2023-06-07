@@ -107,8 +107,12 @@ public class SelfAssessmentController {
 
     @GetMapping("/aspect/get")
     @PreAuthorize("hasAnyAuthority('COMMITTEE','PARTICIPANT','SUPERVISOR')")
-    public ResponseEntity<Object> getSelfAssessmentAspect(HttpServletRequest request) {
+    public ResponseEntity<Object> getSelfAssessmentAspect(@RequestParam("type") String type, HttpServletRequest request) {
         try {
+            if(type.equals("active")){
+                List<SelfAssessmentAspectResponse> response = monitoringService.getActiveSelfAssessmentAspect();
+                return ResponseHandler.generateResponse("Get Self Assessment Aspect succeed", HttpStatus.OK, response);
+            }
             List<SelfAssessmentAspectResponse> response = monitoringService.getSelfAssessmentAspect();
             return ResponseHandler.generateResponse("Get Self Assessment Aspect succeed", HttpStatus.OK, response);
         } catch (HttpClientErrorException ex){

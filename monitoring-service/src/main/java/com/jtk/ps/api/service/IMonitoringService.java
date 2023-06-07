@@ -54,6 +54,7 @@ public interface IMonitoringService {
     void updateSelfAssessment(SelfAssessmentUpdateRequest request);
     void createSelfAssessmentAspect(SelfAssessmentAspectRequest request, int creator);
     void updateSelfAssessmentAspect(SelfAssessmentAspectRequest request, int creator);
+    List<SelfAssessmentAspectResponse> getActiveSelfAssessmentAspect();
     List<SelfAssessmentAspectResponse> getSelfAssessmentAspect();
 
     //Supervisor Grade

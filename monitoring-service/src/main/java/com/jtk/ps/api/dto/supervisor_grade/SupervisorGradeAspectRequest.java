@@ -13,4 +13,6 @@ public class SupervisorGradeAspectRequest {
     private String description;
     @JsonProperty("max_grade")
     private int maxGrade;
+    @JsonProperty("status")
+    private Integer status;
 }

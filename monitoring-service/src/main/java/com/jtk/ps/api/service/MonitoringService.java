@@ -18,6 +18,7 @@ import com.jtk.ps.api.util.Constant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -277,13 +278,14 @@ public class MonitoringService implements IMonitoringService {
 
     @Override
     public Boolean isLogbookExist(int participantId, LocalDate date) {
-        HttpHeaders headers = new HttpHeaders();
-        HttpEntity<String> req = new HttpEntity<>(headers);
-        ResponseEntity<ResponseList<LiburNasionalResponse>> response = restTemplate.exchange("https://api-harilibur.vercel.app/api?year="+date.getYear()+"&month="+date.getMonth(),
+        HttpEntity<String> req = new HttpEntity<>(new HttpHeaders());
+        RestTemplate template = new RestTemplate();
+        ResponseEntity<ResponseList<LiburNasionalResponse>> response = template.exchange(
+                "https://api-harilibur.vercel.app/api?year=" + date.getYear() + "&month=" + date.getMonth(),
                 HttpMethod.GET, req, new ParameterizedTypeReference<>() {});
-        List<LiburNasionalResponse> hariLibur = response.getBody().getData();
+        List<LiburNasionalResponse> hariLibur = Objects.requireNonNull(response.getBody().getData());
         for(LiburNasionalResponse temp:hariLibur){
-            if(date.isEqual(temp.getHolidayDate()) && temp.isNationalHoliday())
+            if(date.isEqual(temp.getHolidayDate()) && temp.getIsNationalHoliday())
                 throw new IllegalStateException("Hari ini hari libur "+temp.getHolidayName());
         }
 
@@ -318,6 +320,7 @@ public class MonitoringService implements IMonitoringService {
         logbookResponse.setTools(logbook.getTools());
         logbookResponse.setWorkResult(logbook.getWorkResult());
         logbookResponse.setDescription(logbook.getDescription());
+        logbookResponse.setStatus(logbook.getStatus());
         if(logbook.getEncounteredProblem() == null)
             logbookResponse.setEncounteredProblem("-");
         else
@@ -396,6 +399,11 @@ public class MonitoringService implements IMonitoringService {
         if(!logbook.getEncounteredProblem().isEmpty()){
             newLogbook.setEncounteredProblem(logbook.getEncounteredProblem());
         }
+        if(LocalDate.now().isAfter(newLogbook.getDate())){
+            newLogbook.setStatus(statusRepository.findById(4));
+        }else{
+            newLogbook.setStatus(statusRepository.findById(5));
+        }
 
         logbookRepository.save(newLogbook);
     }
@@ -403,7 +411,7 @@ public class MonitoringService implements IMonitoringService {
     @Override
     public void gradeLogbook(LogbookGradeRequest gradeRequest) {
         Logbook logbook = logbookRepository.findById(gradeRequest.getId());
-        if(logbook.getId() != null && logbook.getGrade() == null){
+        if(logbook.getId() != null && logbook.getGrade() == ENilai.BELUM_DINILAI){
             logbook.setGrade(gradeRequest.getGrade());
             logbookRepository.save(logbook);
         }
@@ -415,11 +423,21 @@ public class MonitoringService implements IMonitoringService {
     }
 
     @Override
-    public List<SelfAssessmentAspectResponse> getSelfAssessmentAspect() {
+    public List<SelfAssessmentAspectResponse> getActiveSelfAssessmentAspect() {
         List<SelfAssessmentAspect> aspect = selfAssessmentAspectRepository.findAllActiveAspect();
         List<SelfAssessmentAspectResponse> response = new ArrayList<>();
         for(SelfAssessmentAspect temp:aspect){
-            response.add(new SelfAssessmentAspectResponse(temp.getId(), temp.getName(), temp.getDescription(), temp.getStatus().getStatus()));
+            response.add(new SelfAssessmentAspectResponse(temp.getId(), temp.getName(), temp.getStartAssessmentDate(), temp.getDescription(), temp.getStatus().getStatus()));
+        }
+        return response;
+    }
+
+    @Override
+    public List<SelfAssessmentAspectResponse> getSelfAssessmentAspect() {
+        List<SelfAssessmentAspect> aspect = selfAssessmentAspectRepository.findAll();
+        List<SelfAssessmentAspectResponse> response = new ArrayList<>();
+        for(SelfAssessmentAspect temp:aspect){
+            response.add(new SelfAssessmentAspectResponse(temp.getId(), temp.getName(), temp.getStartAssessmentDate(), temp.getDescription(), temp.getStatus().getStatus()));
         }
         return response;
     }
@@ -555,7 +573,7 @@ public class MonitoringService implements IMonitoringService {
         aspect.setStartAssessmentDate(request.getStartAssessmentDate());
         aspect.setEditedBy(creator);
         aspect.setLastEditedDate(LocalDate.now());
-        aspect.setStatus(statusRepository.findById(6));
+        aspect.setStatus(statusRepository.findById((int)request.getStatus()));
         selfAssessmentAspectRepository.save(aspect);
     }
 
@@ -568,7 +586,7 @@ public class MonitoringService implements IMonitoringService {
         aspect.setStartAssessmentDate(request.getStartAssessmentDate());
         aspect.setEditedBy(creator);
         aspect.setLastEditedDate(LocalDate.now());
-        aspect.setStatus(statusRepository.findById(6));
+        aspect.setStatus(statusRepository.findById((int)request.getStatus()));
         selfAssessmentAspectRepository.save(aspect);
     }
 
@@ -689,7 +707,7 @@ public class MonitoringService implements IMonitoringService {
         aspect.setDescription(request.getDescription());
         aspect.setEditedBy(creator);
         aspect.setLastEditDate(LocalDate.now());
-        aspect.setStatus(statusRepository.findById(6));
+        aspect.setStatus(statusRepository.findById((int)request.getStatus()));
         supervisorGradeAspectRepository.save(aspect);
     }
 
@@ -701,7 +719,7 @@ public class MonitoringService implements IMonitoringService {
         aspect.setDescription(request.getDescription());
         aspect.setEditedBy(creator);
         aspect.setLastEditDate(LocalDate.now());
-        aspect.setStatus(statusRepository.findById(6));
+        aspect.setStatus(statusRepository.findById((int)request.getStatus()));
         supervisorGradeAspectRepository.save(aspect);
     }
 
@@ -800,10 +818,14 @@ public class MonitoringService implements IMonitoringService {
     public void updateSupervisorMapping(List<SupervisorMappingRequest> supervisorMappingRequest, String cookie, int creatorId) {
         for(SupervisorMappingRequest request:supervisorMappingRequest) {
             List<SupervisorMapping> mapping = supervisorMappingRepository.findByCompanyId(request.getCompanyId());
+            List<SupervisorMapping> map = new ArrayList<>();
             for(SupervisorMapping temp:mapping){
                 temp.setDate(LocalDate.now());
+                temp.setCreateBy(creatorId);
                 temp.setLecturerId(request.getLecturerId());
+                map.add(temp);
             }
+            supervisorMappingRepository.saveAll(map);
         }
     }
 

@@ -24,4 +24,7 @@ public class SelfAssessmentAspectRequest {
 
     @JsonProperty("start_assessment_date")
     private LocalDate startAssessmentDate;
+
+    @JsonProperty("status")
+    private Integer status;
 }
