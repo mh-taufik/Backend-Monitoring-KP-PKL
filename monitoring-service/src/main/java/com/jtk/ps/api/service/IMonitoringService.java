@@ -77,10 +77,13 @@ public interface IMonitoringService {
     //Supervisor mapping
     void createSupervisorMapping(List<SupervisorMappingRequest> supervisorMappingRequest, String cookie, int creatorId);
     void updateSupervisorMapping(List<SupervisorMappingRequest> supervisorMappingRequest, String cookie, int creatorId);
-    List<HashMap<Integer, String>> getUserList(String token);
-    List<SupervisorMappingResponse> getSupervisorMapping(String accessToken, int prodi);
-    List<SupervisorMappingLecturerResponse> getSupervisorMappingByLecturer(String accessToken, int lecturerId);
-    SupervisorMappingResponse getSupervisorMappingByParticipant(String accessToken, int participantId);
+    List<HashMap<Integer, String>> getUserList(String cookie, Integer year, String type);
+    List<SupervisorMappingResponse> getSupervisorMapping(String cookie);
+    List<SupervisorMappingResponse> getSupervisorMappingByYear(String cookie, int year);
+    List<SupervisorMappingResponse> getSupervisorMappingCommittee(String cookie, int prodi);
+    List<SupervisorMappingLecturerResponse> getSupervisorMappingLecturer(String cookie, int lecturerId);
+    SupervisorMappingResponse getSupervisorMappingByParticipant(String cookie, int participantId);
+    Boolean isFinalSupervisorMapping(String cookie, int prodi);
 
     //Deadline
     void createDeadline(DeadlineCreateRequest request);

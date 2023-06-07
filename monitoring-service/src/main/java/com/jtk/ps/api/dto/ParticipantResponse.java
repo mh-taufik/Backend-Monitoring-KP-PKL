@@ -9,8 +9,33 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ParticipantResponse {
-    @JsonProperty(value = "id")
-    private Integer id;
+    @JsonProperty("id_participant")
+    private Integer idParticipant;
+
+    private Integer nim;
 
     private String name;
+
+    @JsonProperty("IPK")
+    private Double ipk;
+
+    @JsonProperty("work_system")
+    private String workSystem;
+
+    private int year;
+
+    @JsonProperty("status_cv")
+    private Boolean statusCv;
+
+    @JsonProperty("status_interest")
+    private Boolean statusInterest;
+
+    @JsonProperty("id_account")
+    private int idAccount;
+
+    @JsonProperty("id_cv")
+    private int idCv;
+
+    @JsonProperty("id_prodi")
+    private int idProdi;
 }

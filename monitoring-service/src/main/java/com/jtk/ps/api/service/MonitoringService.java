@@ -721,18 +721,17 @@ public class MonitoringService implements IMonitoringService {
 
     @Override
     public void updateSupervisorMapping(List<SupervisorMappingRequest> supervisorMappingRequest, String cookie, int creatorId) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(Constant.PayloadResponseConstant.COOKIE, cookie);
-        HttpEntity<String> req = new HttpEntity<>(headers);
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
         for(SupervisorMappingRequest request:supervisorMappingRequest) {
-            supervisorMappingRepository.updateByCompanyId(request.getLecturerId(), request.getCompanyId(), creatorId);
+            List<SupervisorMapping> mapping = supervisorMappingRepository.findByCompanyId(request.getCompanyId());
+            for(SupervisorMapping temp:mapping){
+                temp.setDate(LocalDate.now());
+                temp.setLecturerId(request.getLecturerId());
+            }
         }
     }
 
     @Override
-    public List<HashMap<Integer, String>> getUserList(String cookie){
+    public List<HashMap<Integer, String>> getUserList(String cookie, Integer year, String type){
         HttpHeaders headers = new HttpHeaders();
         headers.add(Constant.PayloadResponseConstant.COOKIE, cookie);
         HttpEntity<String> req = new HttpEntity<>(headers);
@@ -740,14 +739,36 @@ public class MonitoringService implements IMonitoringService {
 
        //get participant
         HashMap<Integer, String> participantList = new HashMap<>();
-        ResponseEntity<ResponseList<ParticipantResponse>> participantRes = restTemplate.exchange("http://participant-service/participant/get-all?type=dropdown",
-                HttpMethod.GET, req, new ParameterizedTypeReference<>() {
-                });
-        List<ParticipantResponse> participantResponseList = Objects.requireNonNull(participantRes.getBody()).getData();
-        for (ParticipantResponse participant : participantResponseList) {
-            participantList.put(participant.getId(), participant.getName());
+//        List<ParticipantResponse> participantResponseList = new ArrayList<>();
+
+        if(year != null){
+            ResponseEntity<ResponseList<ParticipantResponse>> participantRes = restTemplate.exchange("http://participant-service/participant/get-all?year="+year,
+                    HttpMethod.GET, req, new ParameterizedTypeReference<>() {
+                    });
+            List<ParticipantResponse> participantResponseList = Objects.requireNonNull(participantRes.getBody()).getData();
+            for (ParticipantResponse participant : participantResponseList) {
+                participantList.put(participant.getIdParticipant(), participant.getName());
+            }
+            user.add(participantList);
+        } else if(type.equals("simple") && year.equals(null)){
+            ResponseEntity<ResponseList<ParticipantDropdownResponse>> participantRes = restTemplate.exchange("http://participant-service/participant/get-all?type=dropdown",
+                    HttpMethod.GET, req, new ParameterizedTypeReference<>() {
+                    });
+            List<ParticipantDropdownResponse> participantResponseList = Objects.requireNonNull(participantRes.getBody()).getData();
+            for (ParticipantDropdownResponse participant : participantResponseList) {
+                participantList.put(participant.getId(), participant.getName());
+            }
+            user.add(participantList);
+        } else if(type.equals("full") && year.equals(null)){
+            ResponseEntity<ResponseList<ParticipantResponse>> participantRes = restTemplate.exchange("http://participant-service/participant/get-all",
+                    HttpMethod.GET, req, new ParameterizedTypeReference<>() {
+                    });
+            List<ParticipantResponse> participantResponseList = Objects.requireNonNull(participantRes.getBody()).getData();
+            for (ParticipantResponse participant : participantResponseList) {
+                participantList.put(participant.getIdParticipant(), participant.getName());
+            }
+            user.add(participantList);
         }
-        user.add(participantList);
 
         //get company
         HashMap<Integer, String> companyList = new HashMap<>();
@@ -775,9 +796,9 @@ public class MonitoringService implements IMonitoringService {
     }
 
     @Override
-    public List<SupervisorMappingResponse> getSupervisorMapping(String cookie, int prodi) {
-        List<SupervisorMapping> mapping = supervisorMappingRepository.findAllGroupByCompanyId(prodi);
-        List<HashMap<Integer, String>> user = getUserList(cookie);
+    public List<SupervisorMappingResponse> getSupervisorMapping(String cookie) {
+        List<SupervisorMapping> mapping = supervisorMappingRepository.findAll();
+        List<HashMap<Integer, String>> user = getUserList(cookie, null, "full");
         HashMap<Integer, String> participantList = user.get(0);
         HashMap<Integer, String> companyList = user.get(1);
         HashMap<Integer, String> lecturerList = user.get(2);
@@ -799,9 +820,57 @@ public class MonitoringService implements IMonitoringService {
     }
 
     @Override
-    public List<SupervisorMappingLecturerResponse> getSupervisorMappingByLecturer(String cookie, int lecturerId) {
+    public List<SupervisorMappingResponse> getSupervisorMappingByYear(String cookie, int year) {
+        List<SupervisorMapping> mapping = supervisorMappingRepository.findByYear(year);
+        List<HashMap<Integer, String>> user = getUserList(cookie, year, "full");
+        HashMap<Integer, String> participantList = user.get(0);
+        HashMap<Integer, String> companyList = user.get(1);
+        HashMap<Integer, String> lecturerList = user.get(2);
+
+        List<SupervisorMappingResponse> response = new ArrayList<>();
+        for(SupervisorMapping map:mapping){
+            List<SupervisorMapping> temp = supervisorMappingRepository.findByCompanyId(map.getCompanyId());
+            List<Participant> participants = new ArrayList<>();
+            for(SupervisorMapping temp2 : temp){
+                participants.add(new Participant(temp2.getParticipantId(), participantList.get(temp2.getParticipantId())));
+            }
+            response.add(new SupervisorMappingResponse(
+                    map.getCompanyId(), companyList.get(map.getCompanyId()),
+                    map.getLecturerId(), lecturerList.get(map.getLecturerId()),
+                    map.getProdiId(), map.getDate(), participants)
+            );
+        }
+        return response;
+    }
+
+    @Override
+    public List<SupervisorMappingResponse> getSupervisorMappingCommittee(String cookie, int prodi) {
+        List<SupervisorMapping> mapping = supervisorMappingRepository.findByProdiGroupByCompanyId(prodi);
+        List<HashMap<Integer, String>> user = getUserList(cookie, null, "simple");
+        HashMap<Integer, String> participantList = user.get(0);
+        HashMap<Integer, String> companyList = user.get(1);
+        HashMap<Integer, String> lecturerList = user.get(2);
+
+        List<SupervisorMappingResponse> response = new ArrayList<>();
+        for(SupervisorMapping map:mapping){
+            List<SupervisorMapping> temp = supervisorMappingRepository.findByCompanyId(map.getCompanyId());
+            List<Participant> participants = new ArrayList<>();
+            for(SupervisorMapping temp2 : temp){
+                participants.add(new Participant(temp2.getParticipantId(), participantList.get(temp2.getParticipantId())));
+            }
+            response.add(new SupervisorMappingResponse(
+                    map.getCompanyId(), companyList.get(map.getCompanyId()),
+                    map.getLecturerId(), lecturerList.get(map.getLecturerId()),
+                    map.getProdiId(), map.getDate(), participants)
+            );
+        }
+        return response;
+    }
+
+    @Override
+    public List<SupervisorMappingLecturerResponse> getSupervisorMappingLecturer(String cookie, int lecturerId) {
         List<SupervisorMapping> mapping = supervisorMappingRepository.findByLecturerIdGroupByCompanyId(lecturerId);
-        List<HashMap<Integer, String>> user = getUserList(cookie);
+        List<HashMap<Integer, String>> user = getUserList(cookie, null, "simple");
         HashMap<Integer, String> participantList = user.get(0);
         HashMap<Integer, String> companyList = user.get(1);
         HashMap<Integer, String> lecturerList = user.get(2);
@@ -823,8 +892,42 @@ public class MonitoringService implements IMonitoringService {
     }
 
     @Override
-    public SupervisorMappingResponse getSupervisorMappingByParticipant(String accessToken, int participantId) {
-        return null;
+    public SupervisorMappingResponse getSupervisorMappingByParticipant(String cookie, int participantId) {
+        SupervisorMapping mapping = supervisorMappingRepository.findByParticipantId(participantId);
+        List<HashMap<Integer, String>> user = getUserList(cookie, null, "simple");
+        HashMap<Integer, String> participantList = user.get(0);
+        HashMap<Integer, String> companyList = user.get(1);
+        HashMap<Integer, String> lecturerList = user.get(2);
+
+        List<SupervisorMapping> temp = supervisorMappingRepository.findByCompanyId(mapping.getCompanyId());
+        List<Participant> participants = new ArrayList<>();
+        for(SupervisorMapping temp2 : temp){
+            participants.add(new Participant(temp2.getParticipantId(), participantList.get(temp2.getParticipantId())));
+        }
+        SupervisorMappingResponse response = new SupervisorMappingResponse(
+                mapping.getCompanyId(), companyList.get(mapping.getCompanyId()),
+                mapping.getLecturerId(), lecturerList.get(mapping.getLecturerId()),
+                mapping.getProdiId(), mapping.getDate(), participants
+        );
+
+        return response;
+    }
+
+    @Override
+    public Boolean isFinalSupervisorMapping(String cookie, int prodi) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(Constant.PayloadResponseConstant.COOKIE, cookie);
+        HttpEntity<String> req = new HttpEntity<>(headers);
+
+        ResponseEntity<ResponseList<ParticipantDropdownResponse>> participantRes = restTemplate.exchange("http://participant-service/participant/get-all?type=dropdown",
+                HttpMethod.GET, req, new ParameterizedTypeReference<>() {
+                });
+        List<ParticipantDropdownResponse> participantResponseList = Objects.requireNonNull(participantRes.getBody()).getData();
+
+        if(participantResponseList.size() == supervisorMappingRepository.countByYear(LocalDate.now().getYear(), prodi))
+            return true;
+        else
+            return false;
     }
 
     @Override

@@ -1,6 +1,5 @@
 package com.jtk.ps.api.repository;
 
-import com.jtk.ps.api.model.SupervisorGrade;
 import com.jtk.ps.api.model.SupervisorMapping;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -14,10 +13,12 @@ public interface SupervisorMappingRepository extends JpaRepository<SupervisorMap
     List<SupervisorMapping> findByLecturerId(int lecturerId);
     List<SupervisorMapping> findByProdiId(int prodiId);
     @Query(value = "select * from supervisor_mapping where prodi_id = :prodi group by company_id",nativeQuery = true)
-    List<SupervisorMapping> findAllGroupByCompanyId(@Param("prodi") int prodi);
+    List<SupervisorMapping> findByProdiGroupByCompanyId(@Param("prodi") int prodi);
     @Query(value = "select * from supervisor_mapping where lecturer_id = :lecturer group by company_id",nativeQuery = true)
     List<SupervisorMapping> findByLecturerIdGroupByCompanyId(@Param("lecturer") int lecturerId);
     List<SupervisorMapping> findByCompanyId(int companyId);
-    @Query(value = "update supervisor_mapping set lecturer_id = :lecturer, create_by = :creator where company_id = :company",nativeQuery = true)
-    List<SupervisorMapping> updateByCompanyId(@Param("lecturer") int lecturerId, @Param("company") int companyId, @Param("creator") int creatorId);
+    @Query(value = "select * from supervisor_mapping where year(date) = :year",nativeQuery = true)
+    List<SupervisorMapping> findByYear(int year);
+    @Query(value = "select count(*) from supervisor_mapping where year(date) = :year and prodi_id = :prodi",nativeQuery = true)
+    Integer countByYear(int year, int prodi);
 }
