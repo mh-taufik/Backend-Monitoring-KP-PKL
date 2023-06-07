@@ -1,8 +1,8 @@
 package com.jtk.ps.api.security;
 
 import com.jtk.ps.api.dto.PayloadJwt;
-import com.jtk.ps.api.util.Constant;
 import com.jtk.ps.api.dto.VerifyResponse;
+import com.jtk.ps.api.util.Constant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -138,4 +138,3 @@ public class AuthenticationFilter extends OncePerRequestFilter {
 
 
 }
-

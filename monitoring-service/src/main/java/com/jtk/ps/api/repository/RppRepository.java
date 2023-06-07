@@ -13,7 +13,7 @@ import java.util.List;
 
 @Repository
 public interface RppRepository extends JpaRepository<Rpp, Integer>{
-    @Query(value = "select * from Rpp where participant_id = :id", nativeQuery = true)
+    @Query(value = "select * from Rpp where participant_id = :id order by start_date asc ", nativeQuery = true)
     List<Rpp> findByParticipantId(@Param("id") int participantId);
     Rpp findById(int id);
     @Query(value = "select count(*) from rpp where participant_id = :participant_id",nativeQuery = true)

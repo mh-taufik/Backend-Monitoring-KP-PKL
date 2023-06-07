@@ -1,7 +1,6 @@
 package com.jtk.ps.api.dto.rpp;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.jtk.ps.api.model.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,4 +16,10 @@ public class RppUpdateRequest {
     private int rppId;
     @JsonProperty("finish_date")
     private LocalDate finishDate;
+    private List<MilestoneRequest> milestones;
+    private List<DeliverablesRequest> deliverables;
+    @JsonProperty("completion_schedules")
+    private List<CompletionScheduleRequest> completionSchedules;
+    @JsonProperty("weekly_achievement_plans")
+    private List<WeeklyAchievementPlanRequest> weeklyAchievementPlans;
 }

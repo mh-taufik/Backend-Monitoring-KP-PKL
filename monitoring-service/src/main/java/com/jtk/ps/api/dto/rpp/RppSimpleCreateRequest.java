@@ -5,11 +5,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Data
 @NoArgsConstructor
-public class RppCreateRequest {
+public class RppSimpleCreateRequest {
     @JsonProperty("work_title")
     private String workTitle;
     @JsonProperty("group_role")
@@ -20,10 +19,4 @@ public class RppCreateRequest {
     private LocalDate startDate;
     @JsonProperty("finish_date")
     private LocalDate finishDate;
-    private List<MilestoneRequest> milestones;
-    private List<DeliverablesRequest> deliverables;
-    @JsonProperty("completion_schedules")
-    private List<CompletionScheduleRequest> completionSchedules;
-    @JsonProperty("weekly_achievement_plans")
-    private List<WeeklyAchievementPlanRequest> weeklyAchievementPlans;
 }

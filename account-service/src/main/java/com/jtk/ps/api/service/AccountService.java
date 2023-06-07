@@ -308,7 +308,6 @@ public class AccountService implements UserDetailsService, IAccountService {
                 headers.setContentType(MediaType.APPLICATION_JSON);
                 headers.add(Constant.PayloadResponseConstant.COOKIE, cookie);
 
-
                 JSONArray jsonArray = new JSONArray();
                 jsonArray.put(account.getId());
 

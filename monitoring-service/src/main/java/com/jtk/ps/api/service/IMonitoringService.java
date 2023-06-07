@@ -28,14 +28,14 @@ public interface IMonitoringService {
     RppDetailResponse getRppDetail(int id);
     CreateId createRpp(RppCreateRequest rpp, Integer participantId);
     void updateRpp(RppUpdateRequest rpp);
-    void createMilestone(List<MilestoneRequest> request, int rppId);
-    void updateMilestone(List<MilestoneRequest> request, int rppId);
-    void createDeliverables(List<DeliverablesRequest> request, int rppId);
-    void updateDeliverables(List<DeliverablesRequest> request, int rppId);
-    void createCompletionSchedule(List<CompletionScheduleRequest> request, int rppId);
-    void updateCompletionSchedule(List<CompletionScheduleRequest> request, int rppId);
-    void createWeeklyAchievementPlan(List<WeeklyAchievementPlanRequest> request, int rppId);
-    void updateWeeklyAchievementPlan(List<WeeklyAchievementPlanRequest> request, int rppId);
+//    void createMilestone(List<MilestoneRequest> request, int rppId);
+//    void updateMilestone(List<MilestoneRequest> request, int rppId);
+//    void createDeliverables(List<DeliverablesRequest> request, int rppId);
+//    void updateDeliverables(List<DeliverablesRequest> request, int rppId);
+//    void createCompletionSchedule(List<CompletionScheduleRequest> request, int rppId);
+//    void updateCompletionSchedule(List<CompletionScheduleRequest> request, int rppId);
+//    void createWeeklyAchievementPlan(List<WeeklyAchievementPlanRequest> request, int rppId);
+//    void updateWeeklyAchievementPlan(List<WeeklyAchievementPlanRequest> request, int rppId);
 
     //Logbook
     Boolean isLogbookExist(int participantId, LocalDate date);

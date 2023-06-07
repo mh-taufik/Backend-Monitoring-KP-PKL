@@ -31,25 +31,30 @@ public class SupervisorMappingController {
             int prodi = (int) request.getAttribute(Constant.VerifyConstant.ID_PRODI);
             int id = (int) request.getAttribute(Constant.VerifyConstant.ID);
             Integer role = (Integer) request.getAttribute(Constant.VerifyConstant.ID_ROLE);
-            if(Objects.nonNull(year)){
+            if(year != null){
                 List<SupervisorMappingResponse> response = monitoringService.getSupervisorMappingByYear(cookie, year);
                 return ResponseHandler.generateResponse("Get Supervisor Mapping in " + year +" succeed", HttpStatus.OK, response);
-            }else if(Objects.equals(type, "full")){
-                List<SupervisorMappingResponse> response = monitoringService.getSupervisorMapping(cookie);
-                return ResponseHandler.generateResponse("Get All Supervisor Mapping succeed", HttpStatus.OK, response);
-            }else if(role == ERole.COMMITTEE.id){
-                List<SupervisorMappingResponse> response = monitoringService.getSupervisorMappingCommittee(cookie, prodi);
-                return ResponseHandler.generateResponse("Get Supervisor Mapping succeed", HttpStatus.OK, response);
-            }else if(role == ERole.SUPERVISOR.id){
-                List<SupervisorMappingLecturerResponse> response = monitoringService.getSupervisorMappingLecturer(cookie, id);
-                return ResponseHandler.generateResponse("Get Supervisor Mapping succeed", HttpStatus.OK, response);
-            }else if(role == ERole.PARTICIPANT.id){
-                SupervisorMappingResponse response = monitoringService.getSupervisorMappingByParticipant(cookie, id);
-                return ResponseHandler.generateResponse("Get Supervisor Mapping succeed", HttpStatus.OK, response);
-            }else{
+            }
+            if(Objects.equals(type, "full")){
                 List<SupervisorMappingResponse> response = monitoringService.getSupervisorMapping(cookie);
                 return ResponseHandler.generateResponse("Get All Supervisor Mapping succeed", HttpStatus.OK, response);
             }
+            if(role == ERole.COMMITTEE.id){
+                List<SupervisorMappingResponse> response = monitoringService.getSupervisorMappingCommittee(cookie, prodi);
+                return ResponseHandler.generateResponse("Get Supervisor Mapping succeed", HttpStatus.OK, response);
+            }
+            if(role == ERole.SUPERVISOR.id){
+                List<SupervisorMappingLecturerResponse> response = monitoringService.getSupervisorMappingLecturer(cookie, id);
+                return ResponseHandler.generateResponse("Get Supervisor Mapping succeed", HttpStatus.OK, response);
+            }
+            if(role == ERole.PARTICIPANT.id){
+                SupervisorMappingResponse response = monitoringService.getSupervisorMappingByParticipant(cookie, id);
+                return ResponseHandler.generateResponse("Get Supervisor Mapping succeed", HttpStatus.OK, response);
+            }
+
+            List<SupervisorMappingResponse> response = monitoringService.getSupervisorMapping(cookie);
+            return ResponseHandler.generateResponse("Get All Supervisor Mapping succeed", HttpStatus.OK, response);
+
         } catch (HttpClientErrorException ex){
             return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
