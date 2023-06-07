@@ -30,20 +30,20 @@ public class SupervisorMappingController {
             String cookie = request.getHeader(Constant.PayloadResponseConstant.COOKIE);
             int prodi = (int) request.getAttribute(Constant.VerifyConstant.ID_PRODI);
             int id = (int) request.getAttribute(Constant.VerifyConstant.ID);
-            ERole role = (ERole) request.getAttribute(Constant.VerifyConstant.ID_ROLE);
+            Integer role = (Integer) request.getAttribute(Constant.VerifyConstant.ID_ROLE);
             if(Objects.nonNull(year)){
                 List<SupervisorMappingResponse> response = monitoringService.getSupervisorMappingByYear(cookie, year);
                 return ResponseHandler.generateResponse("Get Supervisor Mapping in " + year +" succeed", HttpStatus.OK, response);
             }else if(Objects.equals(type, "full")){
                 List<SupervisorMappingResponse> response = monitoringService.getSupervisorMapping(cookie);
                 return ResponseHandler.generateResponse("Get All Supervisor Mapping succeed", HttpStatus.OK, response);
-            }else if(role == ERole.COMMITTEE){
+            }else if(role == ERole.COMMITTEE.id){
                 List<SupervisorMappingResponse> response = monitoringService.getSupervisorMappingCommittee(cookie, prodi);
                 return ResponseHandler.generateResponse("Get Supervisor Mapping succeed", HttpStatus.OK, response);
-            }else if(role == ERole.SUPERVISOR){
+            }else if(role == ERole.SUPERVISOR.id){
                 List<SupervisorMappingLecturerResponse> response = monitoringService.getSupervisorMappingLecturer(cookie, id);
                 return ResponseHandler.generateResponse("Get Supervisor Mapping succeed", HttpStatus.OK, response);
-            }else if(role == ERole.PARTICIPANT){
+            }else if(role == ERole.PARTICIPANT.id){
                 SupervisorMappingResponse response = monitoringService.getSupervisorMappingByParticipant(cookie, id);
                 return ResponseHandler.generateResponse("Get Supervisor Mapping succeed", HttpStatus.OK, response);
             }else{
