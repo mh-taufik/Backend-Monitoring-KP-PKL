@@ -96,6 +96,9 @@ public class MonitoringService implements IMonitoringService {
     @Override
     public RppDetailResponse getRppDetail(int id) {
         Rpp rpp = rppRepository.findById(id);
+        if(rpp == null){
+            throw new IllegalStateException("Rpp tidak ditemukan");
+        }
         RppDetailResponse rppDetail = new RppDetailResponse(
                 rpp,
                 milestoneRepository.findByRpp(rpp),
@@ -145,6 +148,9 @@ public class MonitoringService implements IMonitoringService {
     @Override
     public void updateRpp(RppUpdateRequest rppUpdate) {
         Rpp rpp = rppRepository.findById(rppUpdate.getRppId());
+        if(rpp == null){
+            throw new IllegalStateException("Rpp tidak ditemukan");
+        }
         LocalDate sunday = LocalDate.now().with(next(SUNDAY));
         if(rppUpdate.getFinishDate().isAfter(sunday))
             rpp.setFinishDate(rppUpdate.getFinishDate());
@@ -411,6 +417,9 @@ public class MonitoringService implements IMonitoringService {
     @Override
     public void gradeLogbook(LogbookGradeRequest gradeRequest) {
         Logbook logbook = logbookRepository.findById(gradeRequest.getId());
+        if(logbook == null){
+            throw new IllegalStateException("logbook tidak ditemukan");
+        }
         if(logbook.getId() != null && logbook.getGrade() == ENilai.BELUM_DINILAI){
             logbook.setGrade(gradeRequest.getGrade());
             logbookRepository.save(logbook);
@@ -470,6 +479,9 @@ public class MonitoringService implements IMonitoringService {
     @Override
     public SelfAssessmentDetailResponse getSelfAssessmentDetail(int id) {
         SelfAssessment selfAssessment = selfAssessmentRepository.findById(id);
+        if(selfAssessment == null){
+            throw new IllegalStateException("Self Assessment tidak ditemukan");
+        }
         List<SelfAssessmentGrade> grades = selfAssessmentGradeRepository.findBySelfAssessmentId(id);
         List<SelfAssessmentGradeDetailResponse> aspectList = new ArrayList<>();
         for(SelfAssessmentGrade temp: grades){
@@ -622,6 +634,9 @@ public class MonitoringService implements IMonitoringService {
     @Override
     public SupervisorGradeDetailResponse getSupervisorGradeDetail(int id) {
         SupervisorGrade supervisorGrade = supervisorGradeRepository.findById(id);
+        if(supervisorGrade == null){
+            throw new IllegalStateException("Penilaian tidak ditemukan");
+        }
         List<SupervisorGradeResult> result = supervisorGradeResultRepository.findBySupervisorGradeId(id);
         List<Grade> grades = new ArrayList<>();
         for(SupervisorGradeResult temp: result){
@@ -714,13 +729,15 @@ public class MonitoringService implements IMonitoringService {
     @Override
     public void updateSupervisorGradeAspect(SupervisorGradeAspectRequest request, int creator) {
         SupervisorGradeAspect aspect = new SupervisorGradeAspect();
-        aspect.setId(request.getId());
-        aspect.setMaxGrade(request.getMaxGrade());
-        aspect.setDescription(request.getDescription());
-        aspect.setEditedBy(creator);
-        aspect.setLastEditDate(LocalDate.now());
-        aspect.setName(request.getName());
-        supervisorGradeAspectRepository.save(aspect);
+        if(request != null){
+            aspect.setId(request.getId());
+            aspect.setMaxGrade(request.getMaxGrade());
+            aspect.setDescription(request.getDescription());
+            aspect.setEditedBy(creator);
+            aspect.setLastEditDate(LocalDate.now());
+            aspect.setName(request.getName());
+            supervisorGradeAspectRepository.save(aspect);
+        }
     }
 
     @Override
@@ -750,12 +767,12 @@ public class MonitoringService implements IMonitoringService {
 
     @Override
     public void updateLaporan(LaporanUpdateRequest laporanUpdateRequest) {
+        Laporan laporan = laporanRepository.findById((int)laporanUpdateRequest.getId());
         if(laporanUpdateRequest.getId() == null || laporanUpdateRequest.getId() == 0){
             throw new IllegalStateException("cant edit, id cant be null or 0");
         }
-        Laporan laporan = laporanRepository.findById((int)laporanUpdateRequest.getId());
         if(laporan == null){
-            throw new IllegalStateException("cant edit, id cant be null or 0");
+            throw new IllegalStateException("laporan tidak ditemukan");
         }
 
         laporan.setUriName(laporanUpdateRequest.getUri());
@@ -770,7 +787,7 @@ public class MonitoringService implements IMonitoringService {
         if(laporan.isPresent()){
             return new LaporanResponse(laporan.get());
         }else{
-            return null;
+            throw new IllegalStateException("laporan tidak ditemukan");
         }
     }
 
