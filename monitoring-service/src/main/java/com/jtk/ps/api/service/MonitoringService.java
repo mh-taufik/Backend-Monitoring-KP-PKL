@@ -18,7 +18,6 @@ import com.jtk.ps.api.util.Constant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -146,10 +145,13 @@ public class MonitoringService implements IMonitoringService {
     }
 
     @Override
-    public void updateRpp(RppUpdateRequest rppUpdate) {
+    public void updateRpp(RppUpdateRequest rppUpdate, Integer participantId) {
         Rpp rpp = rppRepository.findById(rppUpdate.getRppId());
         if(rpp == null){
             throw new IllegalStateException("Rpp tidak ditemukan");
+        }
+        if(rpp.getParticipantId() != participantId){
+            throw new IllegalStateException("Rpp tidak dapat diedit");
         }
         LocalDate sunday = LocalDate.now().with(next(SUNDAY));
         if(rppUpdate.getFinishDate().isAfter(sunday))
@@ -373,53 +375,47 @@ public class MonitoringService implements IMonitoringService {
     }
 
     @Override
-    public void updateLogbook(LogbookUpdateRequest logbook) {
+    public void updateLogbook(LogbookUpdateRequest logbook, Integer participantId) {
         if(logbookRepository.isChecked(logbook.getId())) {
             throw new IllegalStateException("Logbook already been graded, cant be edit anymore");
         }
         Logbook newLogbook = logbookRepository.findById((int)logbook.getId());
-        if(!logbook.getDescription().isEmpty()){
+        if(newLogbook.getParticipantId() != participantId)
+            throw new IllegalStateException("Logbook tidak dapat diakses");
+        if(!logbook.getDescription().isEmpty())
             newLogbook.setDescription(logbook.getDescription());
-        }
-        if(!logbook.getProjectName().isEmpty()){
+        if(!logbook.getProjectName().isEmpty())
             newLogbook.setProjectName(logbook.getProjectName());
-        }
-        if(!logbook.getProjectManager().isEmpty()){
+        if(!logbook.getProjectManager().isEmpty())
             newLogbook.setProjectManager(logbook.getProjectManager());
-        }
-        if(!logbook.getTechnicalLeader().isEmpty()){
+        if(!logbook.getTechnicalLeader().isEmpty())
             newLogbook.setTechnicalLeader(logbook.getTechnicalLeader());
-        }
-        if(!logbook.getTask().isEmpty()){
+        if(!logbook.getTask().isEmpty())
             newLogbook.setTask(logbook.getTask());
-        }
-        if(!logbook.getTimeAndActivity().isEmpty()){
+        if(!logbook.getTimeAndActivity().isEmpty())
             newLogbook.setTimeAndActivity(logbook.getTimeAndActivity());
-        }
-        if(!logbook.getTools().isEmpty()){
+        if(!logbook.getTools().isEmpty())
             newLogbook.setTools(logbook.getTools());
-        }
-        if(!logbook.getWorkResult().isEmpty()){
+        if(!logbook.getWorkResult().isEmpty())
             newLogbook.setWorkResult(logbook.getWorkResult());
-        }
-        if(!logbook.getEncounteredProblem().isEmpty()){
+        if(!logbook.getEncounteredProblem().isEmpty())
             newLogbook.setEncounteredProblem(logbook.getEncounteredProblem());
-        }
-        if(LocalDate.now().isAfter(newLogbook.getDate())){
+
+        if(LocalDate.now().isAfter(newLogbook.getDate()))
             newLogbook.setStatus(statusRepository.findById(4));
-        }else{
+        else
             newLogbook.setStatus(statusRepository.findById(5));
-        }
 
         logbookRepository.save(newLogbook);
     }
 
     @Override
-    public void gradeLogbook(LogbookGradeRequest gradeRequest) {
+    public void gradeLogbook(LogbookGradeRequest gradeRequest, int lecturer) {
         Logbook logbook = logbookRepository.findById(gradeRequest.getId());
-        if(logbook == null){
+        if(logbook == null)
             throw new IllegalStateException("logbook tidak ditemukan");
-        }
+        if(supervisorMappingRepository.findLecturerId(logbook.getParticipantId()) != lecturer)
+            throw new IllegalStateException("Logbook tidak dapat diakses");
         if(logbook.getId() != null && logbook.getGrade() == ENilai.BELUM_DINILAI){
             logbook.setGrade(gradeRequest.getGrade());
             logbookRepository.save(logbook);
@@ -479,9 +475,9 @@ public class MonitoringService implements IMonitoringService {
     @Override
     public SelfAssessmentDetailResponse getSelfAssessmentDetail(int id) {
         SelfAssessment selfAssessment = selfAssessmentRepository.findById(id);
-        if(selfAssessment == null){
+        if(selfAssessment == null)
             throw new IllegalStateException("Self Assessment tidak ditemukan");
-        }
+
         List<SelfAssessmentGrade> grades = selfAssessmentGradeRepository.findBySelfAssessmentId(id);
         List<SelfAssessmentGradeDetailResponse> aspectList = new ArrayList<>();
         for(SelfAssessmentGrade temp: grades){
@@ -552,7 +548,11 @@ public class MonitoringService implements IMonitoringService {
     }
 
     @Override
-    public void updateSelfAssessment(SelfAssessmentUpdateRequest request) {
+    public void updateSelfAssessment(SelfAssessmentUpdateRequest request, Integer participantId) {
+        SelfAssessment temp = selfAssessmentRepository.findById((int)request.getId());
+        if(temp.getParticipantId() != participantId)
+            throw new IllegalStateException("Self Assessment tidak dapat diakses");
+
         SelfAssessment selfAssessment = new SelfAssessment();
         selfAssessment.setId(request.getId());
         selfAssessment.setParticipantId(request.getParticipantId());
@@ -766,7 +766,7 @@ public class MonitoringService implements IMonitoringService {
     }
 
     @Override
-    public void updateLaporan(LaporanUpdateRequest laporanUpdateRequest) {
+    public void updateLaporan(LaporanUpdateRequest laporanUpdateRequest, Integer participantId) {
         Laporan laporan = laporanRepository.findById((int)laporanUpdateRequest.getId());
         if(laporanUpdateRequest.getId() == null || laporanUpdateRequest.getId() == 0){
             throw new IllegalStateException("cant edit, id cant be null or 0");
@@ -1014,11 +1014,8 @@ public class MonitoringService implements IMonitoringService {
         HashMap<Integer, String> companyList = user.get(1);
         HashMap<Integer, String> lecturerList = user.get(2);
 
-        List<SupervisorMapping> temp = supervisorMappingRepository.findByCompanyId(mapping.getCompanyId());
         List<Participant> participants = new ArrayList<>();
-        for(SupervisorMapping temp2 : temp){
-            participants.add(new Participant(temp2.getParticipantId(), participantList.get(temp2.getParticipantId())));
-        }
+        participants.add(new Participant(mapping.getParticipantId(), participantList.get(mapping.getParticipantId())));
         SupervisorMappingResponse response = new SupervisorMappingResponse(
                 mapping.getCompanyId(), companyList.get(mapping.getCompanyId()),
                 mapping.getLecturerId(), lecturerList.get(mapping.getLecturerId()),

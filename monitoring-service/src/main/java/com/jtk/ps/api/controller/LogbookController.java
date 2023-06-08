@@ -42,7 +42,8 @@ public class LogbookController {
     @PreAuthorize("hasAnyAuthority('PARTICIPANT')")
     public ResponseEntity<Object> updateLogbook(@RequestBody LogbookUpdateRequest logbookUpdateRequest, HttpServletRequest request) {
         try {
-            monitoringService.updateLogbook(logbookUpdateRequest);
+            Integer participantId = (Integer) request.getAttribute(Constant.VerifyConstant.ID);
+            monitoringService.updateLogbook(logbookUpdateRequest, participantId);
             return ResponseHandler.generateResponse("Update Logbook succeed", HttpStatus.OK, new CreateId());
         } catch (HttpClientErrorException ex){
             return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
@@ -54,10 +55,11 @@ public class LogbookController {
 
 
     @PutMapping("/grade/{id_logbook}")
-    @PreAuthorize("hasAnyAuthority('PARTICIPANT')")
+    @PreAuthorize("hasAnyAuthority('SUPERVISOR')")
     public ResponseEntity<Object> gradeLogbook(@RequestBody LogbookGradeRequest logbookGradeRequest, HttpServletRequest request) {
         try {
-            monitoringService.gradeLogbook(logbookGradeRequest);
+            Integer lecturer = (Integer) request.getAttribute(Constant.VerifyConstant.ID);
+            monitoringService.gradeLogbook(logbookGradeRequest, lecturer);
             return ResponseHandler.generateResponse("Save Grade Logbook succeed", HttpStatus.OK);
         } catch (HttpClientErrorException ex){
             return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);

@@ -68,7 +68,8 @@ public class LaporanController {
     @PreAuthorize("hasAnyAuthority('PARTICIPANT')")
     public ResponseEntity<Object> updateLaporan(@RequestBody LaporanUpdateRequest laporanUpdateRequest, HttpServletRequest request){
         try {
-            monitoringService.updateLaporan(laporanUpdateRequest);
+            Integer participantId = (Integer) request.getAttribute(Constant.VerifyConstant.ID);
+            monitoringService.updateLaporan(laporanUpdateRequest, participantId);
             return ResponseHandler.generateResponse("Update Laporan succeed", HttpStatus.OK);
         } catch (Exception e) {
             return ResponseHandler.generateResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);

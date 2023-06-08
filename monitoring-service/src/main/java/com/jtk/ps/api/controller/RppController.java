@@ -39,7 +39,8 @@ public class RppController {
     @PreAuthorize("hasAnyAuthority('PARTICIPANT')")
     public ResponseEntity<Object> updateRpp(@RequestBody RppUpdateRequest rppUpdateRequest, HttpServletRequest request) {
         try {
-            monitoringService.updateRpp(rppUpdateRequest);
+            Integer participantId = (Integer) request.getAttribute(Constant.VerifyConstant.ID);
+            monitoringService.updateRpp(rppUpdateRequest, participantId);
             return ResponseHandler.generateResponse("Update Rpp succeed", HttpStatus.OK);
         } catch (HttpClientErrorException ex){
             return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);

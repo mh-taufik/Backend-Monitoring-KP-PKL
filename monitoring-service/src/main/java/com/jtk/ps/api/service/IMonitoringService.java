@@ -27,7 +27,7 @@ public interface IMonitoringService {
     List<RppResponse> getRppList(int participantId);
     RppDetailResponse getRppDetail(int id);
     CreateId createRpp(RppCreateRequest rpp, Integer participantId);
-    void updateRpp(RppUpdateRequest rpp);
+    void updateRpp(RppUpdateRequest rpp, Integer participantId);
 //    void createMilestone(List<MilestoneRequest> request, int rppId);
 //    void updateMilestone(List<MilestoneRequest> request, int rppId);
 //    void createDeliverables(List<DeliverablesRequest> request, int rppId);
@@ -42,8 +42,8 @@ public interface IMonitoringService {
     List<LogbookResponse> getLogbookByParticipantId(int participantId);
     LogbookDetailResponse getLogbookDetail(int id);
     CreateId createLogbook(LogbookCreateRequest logbook, Integer participantId);
-    void updateLogbook(LogbookUpdateRequest logbook);
-    void gradeLogbook(LogbookGradeRequest gradeRequest);
+    void updateLogbook(LogbookUpdateRequest logbook, Integer participantId);
+    void gradeLogbook(LogbookGradeRequest gradeRequest, int lecturer);
 
     //Self Assessment
     Boolean isSelfAssessmentExist(int participantId, LocalDate date);
@@ -51,7 +51,7 @@ public interface IMonitoringService {
     SelfAssessmentDetailResponse getSelfAssessmentDetail(int id);
     List<SelfAssessmentResponse> getSelfAssessmentList(int idParticipant);
     List<SelfAssessmentGradeDetailResponse> getBestPerformance(int participantId);
-    void updateSelfAssessment(SelfAssessmentUpdateRequest request);
+    void updateSelfAssessment(SelfAssessmentUpdateRequest request, Integer participantId);
     void createSelfAssessmentAspect(SelfAssessmentAspectRequest request, int creator);
     void updateSelfAssessmentAspect(SelfAssessmentAspectRequest request, int creator);
     List<SelfAssessmentAspectResponse> getActiveSelfAssessmentAspect();
@@ -69,7 +69,7 @@ public interface IMonitoringService {
 
     //Laporan KP PKL
     CreateId createLaporan(LaporanCreateRequest laporanCreateRequest, Integer participantId);
-    void updateLaporan(LaporanUpdateRequest laporanUpdateRequest);
+    void updateLaporan(LaporanUpdateRequest laporanUpdateRequest, Integer participantId);
     LaporanResponse getLaporan(Integer id);
     List<LaporanResponse> getListLaporan(Integer participantId);
     Integer getPhase();

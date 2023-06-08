@@ -21,4 +21,6 @@ public interface SupervisorMappingRepository extends JpaRepository<SupervisorMap
     List<SupervisorMapping> findByYear(int year);
     @Query(value = "select count(*) from supervisor_mapping where year(date) = :year and prodi_id = :prodi",nativeQuery = true)
     Integer countByYear(int year, int prodi);
+    @Query(value = "select lecturer_id from supervisor_mapping where participant_id = :participant",nativeQuery = true)
+    Integer findLecturerId(int participant);
 }
