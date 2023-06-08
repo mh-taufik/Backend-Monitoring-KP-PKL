@@ -454,7 +454,7 @@ public class MonitoringService implements IMonitoringService {
         List<SelfAssessmentGrade> gradeList = new ArrayList<>();
         for (SelfAssessmentAspect aspect : aspectList) {
             for(AssessmentGradeRequest grade: request.getGrade()) {
-                if (aspect.getId() == grade.getAspectId()){
+                if (aspect.getId() == grade.getAspectId() && grade != null){
                     if(grade.getGrade() == null)
                         gradeList.add(new SelfAssessmentGrade(null, sa, aspect, 0, grade.getDescription()));
                     else
@@ -707,7 +707,7 @@ public class MonitoringService implements IMonitoringService {
         aspect.setDescription(request.getDescription());
         aspect.setEditedBy(creator);
         aspect.setLastEditDate(LocalDate.now());
-        aspect.setStatus(statusRepository.findById((int)request.getStatus()));
+        aspect.setName(request.getName());
         supervisorGradeAspectRepository.save(aspect);
     }
 
@@ -719,7 +719,7 @@ public class MonitoringService implements IMonitoringService {
         aspect.setDescription(request.getDescription());
         aspect.setEditedBy(creator);
         aspect.setLastEditDate(LocalDate.now());
-        aspect.setStatus(statusRepository.findById((int)request.getStatus()));
+        aspect.setName(request.getName());
         supervisorGradeAspectRepository.save(aspect);
     }
 
@@ -728,7 +728,7 @@ public class MonitoringService implements IMonitoringService {
         List<SupervisorGradeAspect> aspectList = supervisorGradeAspectRepository.findAll();
         List<SupervisorGradeAspectResponse> response = new ArrayList<>();
         for (SupervisorGradeAspect aspect:aspectList){
-            response.add(new SupervisorGradeAspectResponse(aspect.getId(), aspect.getDescription(), aspect.getMaxGrade(), aspect.getEditedBy(), aspect.getLastEditDate(), aspect.getStatus().getStatus()));
+            response.add(new SupervisorGradeAspectResponse(aspect.getId(), aspect.getDescription(), aspect.getMaxGrade(), aspect.getEditedBy(), aspect.getLastEditDate(), aspect.getName()));
         }
         return response;
     }

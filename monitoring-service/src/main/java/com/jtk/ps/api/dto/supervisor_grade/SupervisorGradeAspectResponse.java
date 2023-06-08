@@ -31,6 +31,6 @@ public class SupervisorGradeAspectResponse {
     @JsonProperty("last_edit_date")
     private LocalDate lastEditDate;
 
-    @JsonProperty("status")
-    private String status;
+    @JsonProperty("name")
+    private String name;
 }

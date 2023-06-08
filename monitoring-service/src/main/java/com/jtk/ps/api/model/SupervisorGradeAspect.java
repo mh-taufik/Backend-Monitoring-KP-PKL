@@ -28,9 +28,8 @@ public class SupervisorGradeAspect {
     @Column(name = "last_edit_date")
     private LocalDate lastEditDate;
 
-    @OneToOne
-    @JoinColumn(name = "status")
-    private Status status;
+    @Column(name = "name")
+    private String name;
 
     @OneToMany(mappedBy = "aspectGrade", cascade = CascadeType.ALL)
     @JsonManagedReference
