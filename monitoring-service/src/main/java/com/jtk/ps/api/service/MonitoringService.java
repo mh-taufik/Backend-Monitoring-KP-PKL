@@ -70,6 +70,8 @@ public class MonitoringService implements IMonitoringService {
     @Override
     public List<RppResponse> getRppList(int participantId) {
         List<Rpp> rppList = rppRepository.findByParticipantId(participantId);
+        if(rppList.size()==0)
+            throw new IllegalStateException("Rpp tidak ditemukan");
         List<RppResponse> responses = new ArrayList<>();
         for(Rpp temp:rppList){
             Rpp rpp = rppRepository.findById((int)temp.getId());
@@ -303,6 +305,8 @@ public class MonitoringService implements IMonitoringService {
     @Override
     public List<LogbookResponse> getLogbookByParticipantId(int participantId) {
         List<Logbook> logbookList = logbookRepository.findByParticipantIdOrderByDateAsc(participantId);
+        if(logbookList.size()==0)
+            throw new IllegalStateException("Logbook tidak ditemukan");
         List<LogbookResponse> responses = new ArrayList<>();
         for(Logbook temp:logbookList){
             if(temp.getGrade() != null)
@@ -512,6 +516,8 @@ public class MonitoringService implements IMonitoringService {
     @Override
     public List<SelfAssessmentResponse> getSelfAssessmentList(int idParticipant) {
         List<SelfAssessment> selfAssessments = selfAssessmentRepository.findByParticipantIdOrderByStartDateAsc(idParticipant);
+        if(selfAssessments.size() == 0)
+            throw new IllegalStateException("Self Assessment belum dibuat");
         List<SelfAssessmentResponse> responses = new ArrayList<>();
         for(SelfAssessment temp:selfAssessments){
             List<SelfAssessmentGrade> grades = selfAssessmentGradeRepository.findBySelfAssessmentId(temp.getId());
@@ -761,6 +767,7 @@ public class MonitoringService implements IMonitoringService {
         if(laporanRepository.findByParticipantIdAndPhaseOrderByPhaseAsc(participantId, laporanCreateRequest.getPhase()) == null){
             laporan.setId(null);
         }
+
         Laporan temp = laporanRepository.save(laporan);
         return new CreateId(temp.getId());
     }
