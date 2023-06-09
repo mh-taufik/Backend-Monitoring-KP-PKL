@@ -110,13 +110,12 @@ public class SelfAssessmentController {
     @PreAuthorize("hasAnyAuthority('COMMITTEE','PARTICIPANT','SUPERVISOR')")
     public ResponseEntity<Object> getSelfAssessmentAspect(@RequestParam(value = "type", required = false) String type, HttpServletRequest request) {
         try {
-            if(type.equals("active")){
+            if(type == "active"){
                 List<SelfAssessmentAspectResponse> response = monitoringService.getActiveSelfAssessmentAspect();
                 return ResponseHandler.generateResponse("Get Self Assessment Aspect succeed", HttpStatus.OK, response);
-            }else {
-                List<SelfAssessmentAspectResponse> response = monitoringService.getSelfAssessmentAspect();
-                return ResponseHandler.generateResponse("Get Self Assessment Aspect succeed", HttpStatus.OK, response);
             }
+            List<SelfAssessmentAspectResponse> response = monitoringService.getSelfAssessmentAspect();
+            return ResponseHandler.generateResponse("Get Self Assessment Aspect succeed", HttpStatus.OK, response);
         } catch (HttpClientErrorException ex){
             return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {

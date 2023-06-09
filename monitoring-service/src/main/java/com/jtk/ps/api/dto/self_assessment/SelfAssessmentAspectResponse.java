@@ -19,4 +19,6 @@ public class SelfAssessmentAspectResponse {
     private LocalDate startAssessmentDate;
     private String description;
     private String status;
+    @JsonProperty("day_range")
+    private int dayRange;
 }

@@ -12,8 +12,6 @@ import java.time.LocalDate;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@JsonFormat(shape = JsonFormat.Shape.ARRAY)
-@JsonPropertyOrder({ "holiday_date", "holiday_name", "is_national_holiday" })
 public class LiburNasionalResponse {
 	@JsonProperty("holiday_date")
 	private LocalDate holidayDate;
