@@ -555,7 +555,13 @@ public class MonitoringService implements IMonitoringService {
                         grade.getSelfAssessmentAspect().getName(),
                         grade.getGrade(),
                         grade.getDescription()));
-                break;
+            }else{
+                grades.add(new SelfAssessmentGradeDetailResponse(
+                        aspect.getId(),
+                        null,
+                        aspect.getName(),
+                        0,
+                        "-"));
             }
         }
         return grades;
