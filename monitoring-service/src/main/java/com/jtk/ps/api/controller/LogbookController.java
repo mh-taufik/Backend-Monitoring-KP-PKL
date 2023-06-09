@@ -54,11 +54,11 @@ public class LogbookController {
 
 
 
-    @PutMapping("/grade/{id_logbook}")
+    @PutMapping("/grade")
     @PreAuthorize("hasAnyAuthority('SUPERVISOR')")
     public ResponseEntity<Object> gradeLogbook(@RequestBody LogbookGradeRequest logbookGradeRequest, HttpServletRequest request) {
         try {
-            Integer lecturer = (Integer) request.getAttribute(Constant.VerifyConstant.ID);
+            Integer lecturer = Integer.parseInt(String.valueOf(request.getAttribute(Constant.VerifyConstant.SUB)));
             monitoringService.gradeLogbook(logbookGradeRequest, lecturer);
             return ResponseHandler.generateResponse("Save Grade Logbook succeed", HttpStatus.OK);
         } catch (HttpClientErrorException ex){

@@ -1,5 +1,6 @@
 package com.jtk.ps.api.controller;
 
+import com.jtk.ps.api.dto.AssociatedDocument;
 import com.jtk.ps.api.dto.DashboardCommittee;
 import com.jtk.ps.api.dto.DashboardLecturer;
 import com.jtk.ps.api.dto.DashboardParticipant;
@@ -40,6 +41,42 @@ public class MonitoringController {
                 DashboardCommittee response = monitoringService.getDashboardDataCommittee(id);
                 return ResponseHandler.generateResponse("get data dashboard succeed", HttpStatus.OK, response);
             }
+            return ResponseHandler.generateResponse("get data dashboard succeed", HttpStatus.I_AM_A_TEAPOT);
+        } catch (HttpClientErrorException ex){
+            return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return ResponseHandler.generateResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/associated/rpp")
+    public ResponseEntity<Object> getAssociatedRpp(@RequestParam("rpp_id") Integer rpp, @RequestParam("participant_id") Integer participant, HttpServletRequest request) {
+        try {
+            AssociatedDocument response = monitoringService.getAssociatedRpp(participant, rpp);
+            return ResponseHandler.generateResponse("get data dashboard succeed", HttpStatus.I_AM_A_TEAPOT);
+        } catch (HttpClientErrorException ex){
+            return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return ResponseHandler.generateResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/associated/logbook")
+    public ResponseEntity<Object> getAssociatedLogbook(@RequestParam("logbook_id") Integer logbook, @RequestParam("participant_id") Integer participant, HttpServletRequest request) {
+        try {
+            AssociatedDocument response = monitoringService.getAssociatedRpp(participant, logbook);
+            return ResponseHandler.generateResponse("get data dashboard succeed", HttpStatus.I_AM_A_TEAPOT);
+        } catch (HttpClientErrorException ex){
+            return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return ResponseHandler.generateResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/associated/self-assessment")
+    public ResponseEntity<Object> getAssociatedSelfAssessment(@RequestParam("self_assessment_id") Integer selfAssessment, @RequestParam("participant_id") Integer participant, HttpServletRequest request) {
+        try {
+            AssociatedDocument response = monitoringService.getAssociatedRpp(participant, selfAssessment);
             return ResponseHandler.generateResponse("get data dashboard succeed", HttpStatus.I_AM_A_TEAPOT);
         } catch (HttpClientErrorException ex){
             return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);

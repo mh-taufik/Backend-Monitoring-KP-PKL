@@ -12,13 +12,14 @@ import java.util.List;
 @Repository
 public interface LogbookRepository extends JpaRepository<Logbook, Integer> {
     Logbook findById(int id);
-//    @Query(value = "select * from Logbook a join a.status s where participant_id = :participant_id", nativeQuery = true)
     List<Logbook> findByParticipantIdOrderByDateAsc(int participantId);
+    @Query(value = "select * from Logbook where participant_id = :participant_id where date between :start and :end", nativeQuery = true)
+    List<Logbook> findByParticipantIdAndDateOrderByDateAsc(@Param("participant_id") int participantId, @Param("start") LocalDate start, @Param("end") LocalDate end);
 
     @Query(value = "select if(count(*)>0, 'true', 'false') from Logbook where participant_id = :participant_id and date = :date", nativeQuery = true)
     Boolean isExist(@Param("participant_id") int participantId, @Param("date")  LocalDate date);
 
-    @Query(value = "select if(count(*)>0, 'true', 'false') from Logbook where id = :id and grade is not null", nativeQuery = true)
+    @Query(value = "select if(count(*)>0, 'true', 'false') from Logbook where id = :id and grade != 0", nativeQuery = true)
     Boolean isChecked(@Param("id") int id);
 
     @Query(value = "select count(*) from logbook l where l.participant_id = :participant_id and l.grade = :grade",nativeQuery = true)
@@ -37,7 +38,7 @@ public interface LogbookRepository extends JpaRepository<Logbook, Integer> {
     Integer countStatusOnTime(@Param("participant_id") int participantId);
     @Query(value = "select count(*) from logbook l where l.participant_id = :participant_id",nativeQuery = true)
     Integer countByParticipantId(@Param("participant_id") int participantId);
-    @Query(value = "select count(*) from logbook l where l.date >= :start and l.date <= :end",nativeQuery = true)
+    @Query(value = "select count(*) from logbook l where l.date between :start and :end",nativeQuery = true)
     Integer countAllForCommittee(@Param("start") LocalDate start, @Param("end") LocalDate end);
     @Query(value = "select count(*) from logbook l where l.participant_id in :participant_id",nativeQuery = true)
     Integer countAllInParticipantId(@Param("participant_id") List<Integer> participantId);

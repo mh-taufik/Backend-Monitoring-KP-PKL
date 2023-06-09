@@ -153,7 +153,7 @@ public class MonitoringService implements IMonitoringService {
         if(rpp == null){
             throw new IllegalStateException("Rpp tidak ditemukan");
         }
-        if(rpp.getParticipantId() != participantId){
+        if(rpp.getParticipantId().equals(participantId)){
             throw new IllegalStateException("Rpp tidak dapat diedit");
         }
         LocalDate sunday = LocalDate.now().with(next(SUNDAY));
@@ -182,110 +182,113 @@ public class MonitoringService implements IMonitoringService {
         }
     }
 
-//    @Override
-//    public void updateRpp(RppSimpleUpdateRequest rppUpdate) {
-//        Rpp rpp = rppRepository.findById(rppUpdate.getRppId());
-//        LocalDate sunday = LocalDate.now().with(next(SUNDAY));
-//        if(rppUpdate.getFinishDate().isAfter(sunday))
-//            rpp.setFinishDate(rppUpdate.getFinishDate());
-//        else
-//            throw new IllegalStateException("cant update rpp, date must be after this week");
-//    }
+    @Override
+    public void updateRpp(RppSimpleUpdateRequest rppUpdate, Integer participantId) {
+        Rpp rpp = rppRepository.findById(rppUpdate.getRppId());
+        LocalDate sunday = LocalDate.now().with(next(SUNDAY));
+        if(rpp.getParticipantId().equals(participantId)){
+            throw new IllegalStateException("Rpp tidak dapat diedit");
+        }
+        if(rppUpdate.getFinishDate().isAfter(sunday))
+            rpp.setFinishDate(rppUpdate.getFinishDate());
+        else
+            throw new IllegalStateException("cant update rpp, date must be after this week");
+    }
 
-//    @Override
-//    public CreateId createRpp(RppSimpleCreateRequest rpp, Integer participantId) {
-//        Rpp rppNew = new Rpp();
-//        rppNew.setParticipantId(participantId);
-//        rppNew.setWorkTitle(rpp.getWorkTitle());
-//        rppNew.setGroupRole(rpp.getGroupRole());
-//        rppNew.setTaskDescription(rpp.getTaskDescription());
-//        rppNew.setStartDate(rpp.getStartDate());
-//        rppNew.setFinishDate(rpp.getFinishDate());
-//        if((rpp.getStartDate().isBefore(LocalDate.now()) || rpp.getStartDate().isEqual(LocalDate.now())) && (rpp.getFinishDate().isAfter(LocalDate.now()) || rpp.getFinishDate().isEqual(LocalDate.now()))) {
-//            rppNew.setStatus(statusRepository.findById(9));
-//        }
-//        if(rpp.getFinishDate().isBefore(LocalDate.now())){
-//            rppNew.setStatus(statusRepository.findById(10));
-//        }
-//        if(rpp.getStartDate().isAfter(LocalDate.now())){
-//            rppNew.setStatus(statusRepository.findById(11));
-//        }
-//        Rpp temp = rppRepository.save(rppNew);
-//
-//        return new CreateId(temp.getId());
-//    }
+    @Override
+    public CreateId createRpp(RppSimpleCreateRequest rpp, Integer participantId) {
+        Rpp rppNew = new Rpp();
+        rppNew.setParticipantId(participantId);
+        rppNew.setWorkTitle(rpp.getWorkTitle());
+        rppNew.setGroupRole(rpp.getGroupRole());
+        rppNew.setTaskDescription(rpp.getTaskDescription());
+        rppNew.setStartDate(rpp.getStartDate());
+        rppNew.setFinishDate(rpp.getFinishDate());
+        if((rpp.getStartDate().isBefore(LocalDate.now()) || rpp.getStartDate().isEqual(LocalDate.now())) && (rpp.getFinishDate().isAfter(LocalDate.now()) || rpp.getFinishDate().isEqual(LocalDate.now()))) {
+            rppNew.setStatus(statusRepository.findById(9));
+        }
+        if(rpp.getFinishDate().isBefore(LocalDate.now())){
+            rppNew.setStatus(statusRepository.findById(10));
+        }
+        if(rpp.getStartDate().isAfter(LocalDate.now())){
+            rppNew.setStatus(statusRepository.findById(11));
+        }
+        Rpp temp = rppRepository.save(rppNew);
 
-//    @Override
-//    public void createMilestone(List<MilestoneRequest> request, int rppId) {
-//        Rpp rpp = rppRepository.findById(rppId);
-//        for(MilestoneRequest milestone:request){
-//            milestoneRepository.save(new Milestone(null, rpp, milestone.getDescription(), milestone.getStartDate(), milestone.getFinishDate()));
-//        }
-//    }
-//
-//    @Override
-//    public void updateMilestone(List<MilestoneRequest> request, int rppId) {
-//        LocalDate sunday = LocalDate.now().with(next(SUNDAY));
-//        Rpp rpp = rppRepository.findById(rppId);
-//        for(MilestoneRequest milestone: request){
-//            if(milestone.getStartDate().isAfter(sunday))
-//                milestoneRepository.save(new Milestone(null, rpp, milestone.getDescription(), milestone.getStartDate(), milestone.getFinishDate()));
-//        }
-//    }
-//
-//    @Override
-//    public void createDeliverables(List<DeliverablesRequest> request, int rppId) {
-//        Rpp rpp = rppRepository.findById(rppId);
-//        for(DeliverablesRequest deliverable:request){
-//            deliverablesRepository.save(new Deliverable(null, rpp, deliverable.getDeliverables(), deliverable.getDueDate()));
-//        }
-//    }
-//
-//    @Override
-//    public void updateDeliverables(List<DeliverablesRequest> request, int rppId) {
-//        LocalDate sunday = LocalDate.now().with(next(SUNDAY));
-//        Rpp rpp = rppRepository.findById(rppId);
-//        for(DeliverablesRequest deliverable:request){
-//            if(deliverable.getDueDate().isAfter(sunday))
-//                deliverablesRepository.save(new Deliverable(deliverable.getId(), rpp, deliverable.getDeliverables(), deliverable.getDueDate()));
-//        }
-//    }
-//
-//    @Override
-//    public void createCompletionSchedule(List<CompletionScheduleRequest> request, int rppId) {
-//        Rpp rpp = rppRepository.findById(rppId);
-//        for(CompletionScheduleRequest completionSchedule:request){
-//            completionScheduleRepository.save(new CompletionSchedule(null, rpp, completionSchedule.getTaskName(), completionSchedule.getTaskType(), completionSchedule.getStartDate(), completionSchedule.getFinishDate()));
-//        }
-//    }
-//
-//    @Override
-//    public void updateCompletionSchedule(List<CompletionScheduleRequest> request, int rppId) {
-//        LocalDate sunday = LocalDate.now().with(next(SUNDAY));
-//        Rpp rpp = rppRepository.findById(rppId);
-//        for(CompletionScheduleRequest completionSchedule:request){
-//            if(completionSchedule.getStartDate().isAfter(sunday))
-//                completionScheduleRepository.save(new CompletionSchedule(completionSchedule.getId(), rpp, completionSchedule.getTaskName(), completionSchedule.getTaskType(), completionSchedule.getStartDate(), completionSchedule.getFinishDate()));
-//        }
-//    }
-//
-//    @Override
-//    public void createWeeklyAchievementPlan(List<WeeklyAchievementPlanRequest> request, int rppId) {
-//        Rpp rpp = rppRepository.findById(rppId);
-//        for(WeeklyAchievementPlanRequest weeklyAchievementPlan:request){
-//            weeklyAchievementPlanRepository.save(new WeeklyAchievementPlan(null, rpp, weeklyAchievementPlan.getAchievementPlan(), weeklyAchievementPlan.getStartDate(), weeklyAchievementPlan.getFinishDate()));
-//        }
-//    }
-//
-//    @Override
-//    public void updateWeeklyAchievementPlan(List<WeeklyAchievementPlanRequest> request, int rppId) {
-//        LocalDate sunday = LocalDate.now().with(next(SUNDAY));
-//        Rpp rpp = rppRepository.findById(rppId);
-//        for(WeeklyAchievementPlanRequest weeklyAchievementPlan:request){
-//            if(weeklyAchievementPlan.getStartDate().isAfter(sunday))
-//                weeklyAchievementPlanRepository.save(new WeeklyAchievementPlan(weeklyAchievementPlan.getId(), rpp, weeklyAchievementPlan.getAchievementPlan(), weeklyAchievementPlan.getStartDate(), weeklyAchievementPlan.getFinishDate()));
-//        }
-//    }
+        return new CreateId(temp.getId());
+    }
+
+    @Override
+    public void createMilestone(List<MilestoneRequest> request, int rppId) {
+        Rpp rpp = rppRepository.findById(rppId);
+        for(MilestoneRequest milestone:request){
+            milestoneRepository.save(new Milestone(null, rpp, milestone.getDescription(), milestone.getStartDate(), milestone.getFinishDate()));
+        }
+    }
+
+    @Override
+    public void updateMilestone(List<MilestoneRequest> request, int rppId) {
+        LocalDate sunday = LocalDate.now().with(next(SUNDAY));
+        Rpp rpp = rppRepository.findById(rppId);
+        for(MilestoneRequest milestone: request){
+            if(milestone.getStartDate().isAfter(sunday))
+                milestoneRepository.save(new Milestone(null, rpp, milestone.getDescription(), milestone.getStartDate(), milestone.getFinishDate()));
+        }
+    }
+
+    @Override
+    public void createDeliverables(List<DeliverablesRequest> request, int rppId) {
+        Rpp rpp = rppRepository.findById(rppId);
+        for(DeliverablesRequest deliverable:request){
+            deliverablesRepository.save(new Deliverable(null, rpp, deliverable.getDeliverables(), deliverable.getDueDate()));
+        }
+    }
+
+    @Override
+    public void updateDeliverables(List<DeliverablesRequest> request, int rppId) {
+        LocalDate sunday = LocalDate.now().with(next(SUNDAY));
+        Rpp rpp = rppRepository.findById(rppId);
+        for(DeliverablesRequest deliverable:request){
+            if(deliverable.getDueDate().isAfter(sunday))
+                deliverablesRepository.save(new Deliverable(deliverable.getId(), rpp, deliverable.getDeliverables(), deliverable.getDueDate()));
+        }
+    }
+
+    @Override
+    public void createCompletionSchedule(List<CompletionScheduleRequest> request, int rppId) {
+        Rpp rpp = rppRepository.findById(rppId);
+        for(CompletionScheduleRequest completionSchedule:request){
+            completionScheduleRepository.save(new CompletionSchedule(null, rpp, completionSchedule.getTaskName(), completionSchedule.getTaskType(), completionSchedule.getStartDate(), completionSchedule.getFinishDate()));
+        }
+    }
+
+    @Override
+    public void updateCompletionSchedule(List<CompletionScheduleRequest> request, int rppId) {
+        LocalDate sunday = LocalDate.now().with(next(SUNDAY));
+        Rpp rpp = rppRepository.findById(rppId);
+        for(CompletionScheduleRequest completionSchedule:request){
+            if(completionSchedule.getStartDate().isAfter(sunday))
+                completionScheduleRepository.save(new CompletionSchedule(completionSchedule.getId(), rpp, completionSchedule.getTaskName(), completionSchedule.getTaskType(), completionSchedule.getStartDate(), completionSchedule.getFinishDate()));
+        }
+    }
+
+    @Override
+    public void createWeeklyAchievementPlan(List<WeeklyAchievementPlanRequest> request, int rppId) {
+        Rpp rpp = rppRepository.findById(rppId);
+        for(WeeklyAchievementPlanRequest weeklyAchievementPlan:request){
+            weeklyAchievementPlanRepository.save(new WeeklyAchievementPlan(null, rpp, weeklyAchievementPlan.getAchievementPlan(), weeklyAchievementPlan.getStartDate(), weeklyAchievementPlan.getFinishDate()));
+        }
+    }
+
+    @Override
+    public void updateWeeklyAchievementPlan(List<WeeklyAchievementPlanRequest> request, int rppId) {
+        LocalDate sunday = LocalDate.now().with(next(SUNDAY));
+        Rpp rpp = rppRepository.findById(rppId);
+        for(WeeklyAchievementPlanRequest weeklyAchievementPlan:request){
+            if(weeklyAchievementPlan.getStartDate().isAfter(sunday))
+                weeklyAchievementPlanRepository.save(new WeeklyAchievementPlan(weeklyAchievementPlan.getId(), rpp, weeklyAchievementPlan.getAchievementPlan(), weeklyAchievementPlan.getStartDate(), weeklyAchievementPlan.getFinishDate()));
+        }
+    }
 
     @Override
     public Boolean isLogbookExist(int participantId, LocalDate date) {
@@ -387,7 +390,7 @@ public class MonitoringService implements IMonitoringService {
             throw new IllegalStateException("Logbook already been graded, cant be edit anymore");
         }
         Logbook newLogbook = logbookRepository.findById((int)logbook.getId());
-        if(newLogbook.getParticipantId() != participantId)
+        if(!newLogbook.getParticipantId().equals(participantId))
             throw new IllegalStateException("Logbook tidak dapat diakses");
         if(!logbook.getDescription().isEmpty())
             newLogbook.setDescription(logbook.getDescription());
@@ -421,7 +424,7 @@ public class MonitoringService implements IMonitoringService {
         Logbook logbook = logbookRepository.findById(gradeRequest.getId());
         if(logbook == null)
             throw new IllegalStateException("logbook tidak ditemukan");
-        if(supervisorMappingRepository.findLecturerId(logbook.getParticipantId()) != lecturer)
+        if(!supervisorMappingRepository.findLecturerId(logbook.getParticipantId()).equals(lecturer))
             throw new IllegalStateException("Logbook tidak dapat diakses");
         if(logbook.getId() != null && logbook.getGrade() == ENilai.BELUM_DINILAI){
             logbook.setGrade(gradeRequest.getGrade());
@@ -1005,22 +1008,23 @@ public class MonitoringService implements IMonitoringService {
     }
 
     @Override
-    public List<SupervisorMappingLecturerResponse> getSupervisorMappingLecturer(String cookie, int lecturerId) {
+    public List<SupervisorMappingResponse> getSupervisorMappingLecturer(String cookie, int lecturerId) {
         List<SupervisorMapping> mapping = supervisorMappingRepository.findByLecturerIdGroupByCompanyId(lecturerId);
         List<HashMap<Integer, String>> user = getUserList(cookie, null, "simple");
         HashMap<Integer, String> participantList = user.get(0);
         HashMap<Integer, String> companyList = user.get(1);
         HashMap<Integer, String> lecturerList = user.get(2);
 
-        List<SupervisorMappingLecturerResponse> response = new ArrayList<>();
+        List<SupervisorMappingResponse> response = new ArrayList<>();
         for(SupervisorMapping map:mapping){
             List<SupervisorMapping> temp = supervisorMappingRepository.findByCompanyId(map.getCompanyId());
             List<Participant> participants = new ArrayList<>();
             for(SupervisorMapping temp2 : temp){
                 participants.add(new Participant(temp2.getParticipantId(), participantList.get(temp2.getParticipantId())));
             }
-            response.add(new SupervisorMappingLecturerResponse(
+            response.add(new SupervisorMappingResponse(
                     map.getCompanyId(), companyList.get(map.getCompanyId()),
+                    map.getLecturerId(), lecturerList.get(map.getLecturerId()),
                     map.getProdiId(), map.getDate(), participants)
             );
         }
@@ -1205,6 +1209,73 @@ public class MonitoringService implements IMonitoringService {
         response.setLaporanMissing(totalLaporan - response.getSelfAssessmentSubmitted());
         response.setRppSubmitted(rppRepository.countAllInParticipantId(participants));
         response.setRppMissing(participants.size() - response.getRppSubmitted());
+
+        return response;
+    }
+
+    @Override
+    public AssociatedDocument getAssociatedRpp(int participantId, int rppId) {
+        AssociatedDocument response = new AssociatedDocument();
+        response.setRpp(Collections.singletonList(getRppDetail(rppId)));
+
+        List<Logbook> logbook = logbookRepository.findByParticipantIdAndDateOrderByDateAsc(participantId, response.getRpp().get(0).getStartDate(), response.getRpp().get(0).getFinishDate());
+        List<LogbookDetailResponse> newLogbook = new ArrayList<>();
+        for(Logbook temp:logbook){
+            newLogbook.add(getLogbookDetail(temp.getId()));
+        }
+        response.setLogbook(newLogbook);
+
+        List<SelfAssessment> assessments = selfAssessmentRepository.findByParticipantIdAndDateOrderByDateAsc(participantId, response.getRpp().get(0).getStartDate(), response.getRpp().get(0).getFinishDate());
+        List<SelfAssessmentDetailResponse> newSelfAssessment = new ArrayList<>();
+        for(SelfAssessment temp2:assessments){
+            newSelfAssessment.add(getSelfAssessmentDetail(temp2.getId()));
+        }
+        response.setSelfAssessment(newSelfAssessment);
+
+        return response;
+    }
+
+    @Override
+    public AssociatedDocument getAssociatedLogbook(int participantId, int logbookId) {
+        AssociatedDocument response = new AssociatedDocument();
+        List<Logbook> logbook = new ArrayList<>();
+        logbook.add(logbookRepository.findById(logbookId));
+
+        List<RppDetailResponse> newRpp = new ArrayList<>();
+        List<Rpp> rpp = rppRepository.findByParticipantIdAndDateOrderByDateAsc(participantId, logbook.get(0).getDate(), logbook.get(0).getDate());
+        for(Rpp rpp1:rpp){
+            newRpp.add(getRppDetail(rpp1.getId()));
+        }
+        response.setRpp(newRpp);
+
+        List<SelfAssessment> assessment = selfAssessmentRepository.findByParticipantIdAndDateOrderByDateAsc(participantId, logbook.get(0).getDate(), logbook.get(0).getDate());
+        List<SelfAssessmentDetailResponse> newAssessment = new ArrayList<>();
+        for(SelfAssessment selfAssessment:assessment){
+            newAssessment.add(getSelfAssessmentDetail(selfAssessment.getId()));
+        }
+        response.setSelfAssessment(newAssessment);
+
+        return response;
+    }
+
+    @Override
+    public AssociatedDocument getAssociatedSelfAssessment(int participantId, int selfAsssessmentId) {
+        AssociatedDocument response = new AssociatedDocument();
+        response.setSelfAssessment(Collections.singletonList(getSelfAssessmentDetail(selfAsssessmentId)));
+
+        List<RppDetailResponse> newRpp = new ArrayList<>();
+        List<Rpp> rpp = rppRepository.findByParticipantIdAndDateOrderByDateAsc(participantId, response.getSelfAssessment().get(0).getStartDate(), response.getSelfAssessment().get(0).getFinishDate());
+        for(Rpp rpp1:rpp){
+            newRpp.add(getRppDetail(rpp1.getId()));
+        }
+        response.setRpp(newRpp);
+
+        List<Logbook> logbook = logbookRepository.findByParticipantIdAndDateOrderByDateAsc(participantId, response.getSelfAssessment().get(0).getStartDate(), response.getSelfAssessment().get(0).getFinishDate());
+        List<LogbookDetailResponse> newLogbook = new ArrayList<>();
+        for(Logbook temp:logbook){
+            newLogbook.add(getLogbookDetail(temp.getId()));
+        }
+        response.setLogbook(newLogbook);
 
         return response;
     }

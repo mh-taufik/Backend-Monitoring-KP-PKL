@@ -1,16 +1,12 @@
 package com.jtk.ps.api.service;
 
-import com.jtk.ps.api.dto.CreateId;
-import com.jtk.ps.api.dto.DashboardCommittee;
-import com.jtk.ps.api.dto.DashboardLecturer;
-import com.jtk.ps.api.dto.DashboardParticipant;
+import com.jtk.ps.api.dto.*;
 import com.jtk.ps.api.dto.deadline.DeadlineCreateRequest;
 import com.jtk.ps.api.dto.deadline.DeadlineResponse;
 import com.jtk.ps.api.dto.deadline.DeadlineUpdateRequest;
 import com.jtk.ps.api.dto.rpp.*;
 import com.jtk.ps.api.dto.self_assessment.*;
 import com.jtk.ps.api.dto.supervisor_grade.*;
-import com.jtk.ps.api.dto.supervisor_mapping.SupervisorMappingLecturerResponse;
 import com.jtk.ps.api.dto.supervisor_mapping.SupervisorMappingRequest;
 import com.jtk.ps.api.dto.supervisor_mapping.SupervisorMappingResponse;
 import com.jtk.ps.api.dto.laporan.LaporanCreateRequest;
@@ -27,15 +23,17 @@ public interface IMonitoringService {
     List<RppResponse> getRppList(int participantId);
     RppDetailResponse getRppDetail(int id);
     CreateId createRpp(RppCreateRequest rpp, Integer participantId);
-    void updateRpp(RppUpdateRequest rpp, Integer participantId);
-//    void createMilestone(List<MilestoneRequest> request, int rppId);
-//    void updateMilestone(List<MilestoneRequest> request, int rppId);
-//    void createDeliverables(List<DeliverablesRequest> request, int rppId);
-//    void updateDeliverables(List<DeliverablesRequest> request, int rppId);
-//    void createCompletionSchedule(List<CompletionScheduleRequest> request, int rppId);
-//    void updateCompletionSchedule(List<CompletionScheduleRequest> request, int rppId);
-//    void createWeeklyAchievementPlan(List<WeeklyAchievementPlanRequest> request, int rppId);
-//    void updateWeeklyAchievementPlan(List<WeeklyAchievementPlanRequest> request, int rppId);
+    void updateRpp(RppUpdateRequest rpp, Integer participantId);;
+    CreateId createRpp(RppSimpleCreateRequest rpp, Integer participantId);
+    void updateRpp(RppSimpleUpdateRequest rpp, Integer participantId);
+    void createMilestone(List<MilestoneRequest> request, int rppId);
+    void updateMilestone(List<MilestoneRequest> request, int rppId);
+    void createDeliverables(List<DeliverablesRequest> request, int rppId);
+    void updateDeliverables(List<DeliverablesRequest> request, int rppId);
+    void createCompletionSchedule(List<CompletionScheduleRequest> request, int rppId);
+    void updateCompletionSchedule(List<CompletionScheduleRequest> request, int rppId);
+    void createWeeklyAchievementPlan(List<WeeklyAchievementPlanRequest> request, int rppId);
+    void updateWeeklyAchievementPlan(List<WeeklyAchievementPlanRequest> request, int rppId);
 
     //Logbook
     Boolean isLogbookExist(int participantId, LocalDate date);
@@ -82,7 +80,7 @@ public interface IMonitoringService {
     List<SupervisorMappingResponse> getSupervisorMapping(String cookie);
     List<SupervisorMappingResponse> getSupervisorMappingByYear(String cookie, int year);
     List<SupervisorMappingResponse> getSupervisorMappingCommittee(String cookie, int prodi);
-    List<SupervisorMappingLecturerResponse> getSupervisorMappingLecturer(String cookie, int lecturerId);
+    List<SupervisorMappingResponse> getSupervisorMappingLecturer(String cookie, int lecturerId);
     SupervisorMappingResponse getSupervisorMappingByParticipant(String cookie, int participantId);
     Boolean isFinalSupervisorMapping(String cookie, int prodi);
 
@@ -96,6 +94,9 @@ public interface IMonitoringService {
     DashboardParticipant getDashboardDataParticipant(int participantId);
     DashboardLecturer getDashboardDataLecturer(int lecturerId);
     DashboardCommittee getDashboardDataCommittee(int prodiId);
+    AssociatedDocument getAssociatedRpp(int participantId, int rppId);
+    AssociatedDocument getAssociatedLogbook(int participantId, int logbookId);
+    AssociatedDocument getAssociatedSelfAssessment(int participantId, int selfAsssessmentId);
 
     //Reminder
     void sendReminderParticipantLogbook();
