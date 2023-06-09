@@ -94,9 +94,9 @@ public interface IMonitoringService {
     DashboardParticipant getDashboardDataParticipant(int participantId);
     DashboardLecturer getDashboardDataLecturer(int lecturerId);
     DashboardCommittee getDashboardDataCommittee(int prodiId);
-    AssociatedDocument getAssociatedRpp(int participantId, int rppId);
-    AssociatedDocument getAssociatedLogbook(int participantId, int logbookId);
-    AssociatedDocument getAssociatedSelfAssessment(int participantId, int selfAsssessmentId);
+    AssociatedDocumentRpp getAssociatedRpp(int participantId, int rppId);
+    AssociatedDocumentLogbook getAssociatedLogbook(int participantId, int logbookId);
+    AssociatedDocumentSelfAssessment getAssociatedSelfAssessment(int participantId, int selfAsssessmentId);
 
     //Reminder
     void sendReminderParticipantLogbook();

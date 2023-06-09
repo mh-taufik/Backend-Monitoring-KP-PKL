@@ -448,6 +448,11 @@ public class AccountService implements UserDetailsService, IAccountService {
     }
 
     @Override
+    public List<CommitteeResponse> getSupervisorByProdi(Integer prodiId) {
+        return accountRepository.fetchSupervisorResponseDataInnerJoinByProdi(prodiId);
+    }
+
+    @Override
     public CommitteeResponse getSupervisor(Integer id) {
         return accountRepository.fetchSupervisorResponseDataInnerJoin(id);
     }

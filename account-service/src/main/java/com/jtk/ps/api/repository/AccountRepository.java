@@ -41,4 +41,7 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
 
     @Query("SELECT new com.jtk.ps.api.dto.CommitteeResponse(b.id, a.name, a.email) FROM Account b INNER JOIN b.lecturer a WHERE b.role = 4 AND a.id = :id")
     CommitteeResponse fetchSupervisorResponseDataInnerJoin(@Param("id") int id);
+
+    @Query("SELECT new com.jtk.ps.api.dto.CommitteeResponse(b.id, a.name, a.email) FROM Account b INNER JOIN b.lecturer a WHERE b.role = 4 AND a.prodi = :prodi")
+    List<CommitteeResponse> fetchSupervisorResponseDataInnerJoinByProdi(@Param("prodi") int prodi);
 }

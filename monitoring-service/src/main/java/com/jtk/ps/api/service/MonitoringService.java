@@ -1214,63 +1214,59 @@ public class MonitoringService implements IMonitoringService {
     }
 
     @Override
-    public AssociatedDocument getAssociatedRpp(int participantId, int rppId) {
-        AssociatedDocument response = new AssociatedDocument();
-        response.setRpp(Collections.singletonList(getRppDetail(rppId)));
+    public AssociatedDocumentRpp getAssociatedRpp(int participantId, int rppId) {
+        AssociatedDocumentRpp response = new AssociatedDocumentRpp();
+        response.setRpp(getRppDetail(rppId));
 
-        List<Logbook> logbook = logbookRepository.findByParticipantIdAndDateOrderByDateAsc(participantId, response.getRpp().get(0).getStartDate(), response.getRpp().get(0).getFinishDate());
-        List<LogbookDetailResponse> newLogbook = new ArrayList<>();
-        for(Logbook temp:logbook){
-            newLogbook.add(getLogbookDetail(temp.getId()));
+        List<Logbook> logbook = logbookRepository.findByParticipantIdAndDateOrderByDateAsc(participantId, response.getRpp().getStartDate(), response.getRpp().getFinishDate());
+        if(logbook.size() != 0){
+            List<LogbookDetailResponse> newLogbook = new ArrayList<>();
+            for (Logbook temp : logbook) {
+                newLogbook.add(getLogbookDetail(temp.getId()));
+            }
+            response.setLogbook(newLogbook);
         }
-        response.setLogbook(newLogbook);
 
-        List<SelfAssessment> assessments = selfAssessmentRepository.findByParticipantIdAndDateOrderByDateAsc(participantId, response.getRpp().get(0).getStartDate(), response.getRpp().get(0).getFinishDate());
-        List<SelfAssessmentDetailResponse> newSelfAssessment = new ArrayList<>();
-        for(SelfAssessment temp2:assessments){
-            newSelfAssessment.add(getSelfAssessmentDetail(temp2.getId()));
+        List<SelfAssessment> assessments = selfAssessmentRepository.findByParticipantIdAndDateOrderByDateAsc(participantId, response.getRpp().getStartDate(), response.getRpp().getFinishDate());
+        if(assessments.size() != 0){
+            List<SelfAssessmentDetailResponse> newSelfAssessment = new ArrayList<>();
+            for (SelfAssessment temp2 : assessments) {
+                newSelfAssessment.add(getSelfAssessmentDetail(temp2.getId()));
+            }
+            response.setSelfAssessment(newSelfAssessment);
         }
-        response.setSelfAssessment(newSelfAssessment);
 
         return response;
     }
 
     @Override
-    public AssociatedDocument getAssociatedLogbook(int participantId, int logbookId) {
-        AssociatedDocument response = new AssociatedDocument();
-        List<Logbook> logbook = new ArrayList<>();
-        logbook.add(logbookRepository.findById(logbookId));
+    public AssociatedDocumentLogbook getAssociatedLogbook(int participantId, int logbookId) {
+        AssociatedDocumentLogbook response = new AssociatedDocumentLogbook();
+        Logbook logbook = logbookRepository.findById(logbookId);
 
-        List<RppDetailResponse> newRpp = new ArrayList<>();
-        List<Rpp> rpp = rppRepository.findByParticipantIdAndDateOrderByDateAsc(participantId, logbook.get(0).getDate(), logbook.get(0).getDate());
-        for(Rpp rpp1:rpp){
-            newRpp.add(getRppDetail(rpp1.getId()));
+        Optional<Rpp> rpp = rppRepository.findByParticipantIdAndDateOrderByDateAsc(participantId, logbook.getDate());
+        if(rpp.isPresent()) {
+            response.setRpp(getRppDetail(rpp.get().getId()));
         }
-        response.setRpp(newRpp);
 
-        List<SelfAssessment> assessment = selfAssessmentRepository.findByParticipantIdAndDateOrderByDateAsc(participantId, logbook.get(0).getDate(), logbook.get(0).getDate());
-        List<SelfAssessmentDetailResponse> newAssessment = new ArrayList<>();
-        for(SelfAssessment selfAssessment:assessment){
-            newAssessment.add(getSelfAssessmentDetail(selfAssessment.getId()));
-        }
-        response.setSelfAssessment(newAssessment);
+        Optional<SelfAssessment> assessment = selfAssessmentRepository.findByParticipantIdAndDateOrderByDateAscOne(participantId, logbook.getDate(), logbook.getDate());
+        if(assessment.isPresent())
+            response.setSelfAssessment(getSelfAssessmentDetail(assessment.get().getId()));
 
         return response;
     }
 
     @Override
-    public AssociatedDocument getAssociatedSelfAssessment(int participantId, int selfAsssessmentId) {
-        AssociatedDocument response = new AssociatedDocument();
-        response.setSelfAssessment(Collections.singletonList(getSelfAssessmentDetail(selfAsssessmentId)));
+    public AssociatedDocumentSelfAssessment getAssociatedSelfAssessment(int participantId, int selfAsssessmentId) {
+        AssociatedDocumentSelfAssessment response = new AssociatedDocumentSelfAssessment();
+        response.setSelfAssessment(getSelfAssessmentDetail(selfAsssessmentId));
 
-        List<RppDetailResponse> newRpp = new ArrayList<>();
-        List<Rpp> rpp = rppRepository.findByParticipantIdAndDateOrderByDateAsc(participantId, response.getSelfAssessment().get(0).getStartDate(), response.getSelfAssessment().get(0).getFinishDate());
-        for(Rpp rpp1:rpp){
-            newRpp.add(getRppDetail(rpp1.getId()));
+        Optional<Rpp> rpp = rppRepository.findByParticipantIdAndDateOrderByDateAsc(participantId, response.getSelfAssessment().getStartDate());
+        if(rpp.isPresent()) {
+            response.setRpp(getRppDetail(rpp.get().getId()));
         }
-        response.setRpp(newRpp);
 
-        List<Logbook> logbook = logbookRepository.findByParticipantIdAndDateOrderByDateAsc(participantId, response.getSelfAssessment().get(0).getStartDate(), response.getSelfAssessment().get(0).getFinishDate());
+        List<Logbook> logbook = logbookRepository.findByParticipantIdAndDateOrderByDateAsc(participantId, response.getSelfAssessment().getStartDate(), response.getSelfAssessment().getFinishDate());
         List<LogbookDetailResponse> newLogbook = new ArrayList<>();
         for(Logbook temp:logbook){
             newLogbook.add(getLogbookDetail(temp.getId()));

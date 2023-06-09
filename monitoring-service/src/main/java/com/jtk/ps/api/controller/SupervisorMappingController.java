@@ -68,8 +68,8 @@ public class SupervisorMappingController {
     public ResponseEntity<Object> createSupervisorMapping(@RequestBody List<SupervisorMappingRequest> supervisorMappingRequest, HttpServletRequest request){
         try {
             String cookie = request.getHeader(Constant.PayloadResponseConstant.COOKIE);
-            int prodi = (int) request.getAttribute(Constant.VerifyConstant.ID_PRODI);
-            monitoringService.createSupervisorMapping(supervisorMappingRequest, cookie, prodi);
+            int creatorId = Integer.parseInt(String.valueOf(request.getAttribute(Constant.VerifyConstant.SUB)));
+            monitoringService.createSupervisorMapping(supervisorMappingRequest, cookie, creatorId);
             return ResponseHandler.generateResponse("Create Supervisor Mapping succeed", HttpStatus.OK);
         } catch (Exception e) {
             return ResponseHandler.generateResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -81,8 +81,8 @@ public class SupervisorMappingController {
     public ResponseEntity<Object> updateSupervisorMapping(@RequestBody List<SupervisorMappingRequest> supervisorMappingRequest, HttpServletRequest request){
         try {
             String cookie = request.getHeader(Constant.PayloadResponseConstant.COOKIE);
-            int prodi = (int) request.getAttribute(Constant.VerifyConstant.ID_PRODI);
-            monitoringService.updateSupervisorMapping(supervisorMappingRequest, cookie, prodi);
+            int creatorId = Integer.parseInt(String.valueOf(request.getAttribute(Constant.VerifyConstant.SUB)));
+            monitoringService.updateSupervisorMapping(supervisorMappingRequest, cookie, creatorId);
             return ResponseHandler.generateResponse("Update Supervisor Mapping succeed", HttpStatus.OK);
         } catch (Exception e) {
             return ResponseHandler.generateResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
