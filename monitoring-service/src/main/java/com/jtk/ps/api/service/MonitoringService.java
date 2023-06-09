@@ -153,7 +153,7 @@ public class MonitoringService implements IMonitoringService {
         if(rpp == null){
             throw new IllegalStateException("Rpp tidak ditemukan");
         }
-        if(rpp.getParticipantId().equals(participantId)){
+        if(!rpp.getParticipantId().equals(participantId)){
             throw new IllegalStateException("Rpp tidak dapat diedit");
         }
         LocalDate sunday = LocalDate.now().with(next(SUNDAY));
@@ -186,7 +186,7 @@ public class MonitoringService implements IMonitoringService {
     public void updateRpp(RppSimpleUpdateRequest rppUpdate, Integer participantId) {
         Rpp rpp = rppRepository.findById(rppUpdate.getRppId());
         LocalDate sunday = LocalDate.now().with(next(SUNDAY));
-        if(rpp.getParticipantId().equals(participantId)){
+        if(!rpp.getParticipantId().equals(participantId)){
             throw new IllegalStateException("Rpp tidak dapat diedit");
         }
         if(rppUpdate.getFinishDate().isAfter(sunday))
