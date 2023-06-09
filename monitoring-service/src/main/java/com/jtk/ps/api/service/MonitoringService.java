@@ -544,16 +544,19 @@ public class MonitoringService implements IMonitoringService {
 
     @Override
     public List<SelfAssessmentGradeDetailResponse> getBestPerformance(int participantId) {
-        List<SelfAssessmentAspect> aspectList = selfAssessmentAspectRepository.findAllActiveAspect();
+        List<SelfAssessmentAspect> aspectList = selfAssessmentAspectRepository.findAll();
         List<SelfAssessmentGradeDetailResponse> grades = new ArrayList<>();
         for(SelfAssessmentAspect aspect:aspectList){
             SelfAssessmentGrade grade = selfAssessmentGradeRepository.findMaxGradeByParticipantIdAndAspectId(participantId, aspect.getId());
-            grades.add(new SelfAssessmentGradeDetailResponse(
-                    grade.getSelfAssessmentAspect().getId(),
-                    grade.getId(),
-                    grade.getSelfAssessmentAspect().getName(),
-                    grade.getGrade(),
-                    grade.getDescription()));
+            if(grade != null){
+                grades.add(new SelfAssessmentGradeDetailResponse(
+                        grade.getSelfAssessmentAspect().getId(),
+                        grade.getId(),
+                        grade.getSelfAssessmentAspect().getName(),
+                        grade.getGrade(),
+                        grade.getDescription()));
+                break;
+            }
         }
         return grades;
     }

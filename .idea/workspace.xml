@@ -7,13 +7,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d4c7c1a4-fecb-4126-864a-961220f9e7ef" name="Changes" comment="Fix Self Assessment">
+    <list default="true" id="d4c7c1a4-fecb-4126-864a-961220f9e7ef" name="Changes" comment="Fix Self Assessment response">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/controller/MonitoringController.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/controller/MonitoringController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/controller/SelfAssessmentController.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/controller/SelfAssessmentController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/dto/LiburNasionalResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/dto/LiburNasionalResponse.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/dto/self_assessment/SelfAssessmentAspectResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/dto/self_assessment/SelfAssessmentAspectResponse.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/repository/DeadlineRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/repository/DeadlineRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/service/MonitoringService.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/service/MonitoringService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -380,7 +375,14 @@
       <option name="project" value="LOCAL" />
       <updated>1686219345489</updated>
     </task>
-    <option name="localTasksCounter" value="20" />
+    <task id="LOCAL-00020" summary="Fix Self Assessment response">
+      <created>1686273833487</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1686273833487</updated>
+    </task>
+    <option name="localTasksCounter" value="21" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -410,34 +412,14 @@
     <MESSAGE value="Change SelfAssessmentController" />
     <MESSAGE value="Fix All Controller" />
     <MESSAGE value="Fix Self Assessment" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fix Self Assessment" />
+    <MESSAGE value="Fix Self Assessment response" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fix Self Assessment response" />
   </component>
   <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-method">
-          <url>file://$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/controller/MonitoringController.java</url>
-          <line>26</line>
-          <properties class="com.jtk.ps.api.controller.MonitoringController" method="getDashboardParticipant">
-            <option name="EMULATED" value="true" />
-            <option name="WATCH_EXIT" value="false" />
-          </properties>
-          <option name="timeStamp" value="20" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-method">
-          <url>file://$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/service/MonitoringService.java</url>
-          <line>1092</line>
-          <properties class="com.jtk.ps.api.service.MonitoringService" method="getDashboardDataParticipant">
-            <option name="EMULATED" value="true" />
-            <option name="WATCH_EXIT" value="false" />
-          </properties>
-          <option name="timeStamp" value="22" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
     <pin-to-top-manager>
       <pinned-members>
         <PinnedItemInfo parentTag="org.springframework.http.ResponseEntity" memberName="body" />
+        <PinnedItemInfo parentTag="java.lang.NullPointerException" memberName="cause" />
       </pinned-members>
     </pin-to-top-manager>
     <watches-manager>
