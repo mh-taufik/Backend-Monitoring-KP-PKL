@@ -22,7 +22,7 @@ public class MonitoringController {
     private IMonitoringService monitoringService;
 
     @GetMapping("/dashboard")
-    public ResponseEntity<Object> getDashboardParticipant(HttpServletRequest request) {
+    public ResponseEntity<Object> getDashboard(HttpServletRequest request) {
         try {
             Integer role = (Integer) request.getAttribute(Constant.VerifyConstant.ID_ROLE);
             if(role == ERole.PARTICIPANT.id) {

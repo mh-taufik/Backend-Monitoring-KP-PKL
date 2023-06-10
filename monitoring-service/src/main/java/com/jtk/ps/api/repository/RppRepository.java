@@ -17,8 +17,8 @@ public interface RppRepository extends JpaRepository<Rpp, Integer>{
     @Query(value = "select * from Rpp where participant_id = :id order by start_date asc ", nativeQuery = true)
     List<Rpp> findByParticipantId(@Param("id") int participantId);
     Rpp findById(int id);
-    @Query(value = "select * from rpp where participant_id = :participant_id and :start between start_date and finish_date", nativeQuery = true)
-    Optional<Rpp> findByParticipantIdAndDateOrderByDateAsc(@Param("participant_id") int participantId, @Param("start") LocalDate start);
+    @Query(value = "select id from rpp where participant_id = :participant_id and :start between start_date and finish_date", nativeQuery = true)
+    Optional<Integer> findByParticipantIdAndDateOrderByDateAsc(@Param("participant_id") int participantId, @Param("start") LocalDate start);
     @Query(value = "select count(*) from rpp where participant_id = :participant_id",nativeQuery = true)
     Integer countByParticipantId(@Param("participant_id") int participantId);
     @Query(value = "select count(*) from rpp where participant_id in (:participant_id) group by participant_id",nativeQuery = true)

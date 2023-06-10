@@ -3,13 +3,12 @@ package com.jtk.ps.api.dto;
 import com.jtk.ps.api.dto.logbook.LogbookDetailResponse;
 import com.jtk.ps.api.dto.rpp.RppDetailResponse;
 import com.jtk.ps.api.dto.self_assessment.SelfAssessmentDetailResponse;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class AssociatedDocumentRpp {

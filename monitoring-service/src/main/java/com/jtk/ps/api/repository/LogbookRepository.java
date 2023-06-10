@@ -13,8 +13,8 @@ import java.util.List;
 public interface LogbookRepository extends JpaRepository<Logbook, Integer> {
     Logbook findById(int id);
     List<Logbook> findByParticipantIdOrderByDateAsc(int participantId);
-    @Query(value = "select * from logbook where participant_id = :participant_id and date between :start and :end", nativeQuery = true)
-    List<Logbook> findByParticipantIdAndDateOrderByDateAsc(@Param("participant_id") int participantId, @Param("start") LocalDate start, @Param("end") LocalDate end);
+    @Query(value = "select id from logbook where participant_id = :participant_id and date between :start and :end", nativeQuery = true)
+    List<Integer> findByParticipantIdAndDateOrderByDateAsc(@Param("participant_id") int participantId, @Param("start") LocalDate start, @Param("end") LocalDate end);
 
     @Query(value = "select if(count(*)>0, 'true', 'false') from Logbook where participant_id = :participant_id and date = :date", nativeQuery = true)
     Boolean isExist(@Param("participant_id") int participantId, @Param("date")  LocalDate date);
