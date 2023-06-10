@@ -231,8 +231,8 @@ public class MonitoringService implements IMonitoringService {
         LocalDate sunday = LocalDate.now().with(next(SUNDAY));
         Rpp rpp = rppRepository.findById(rppId);
         for(MilestoneRequest milestone: request){
-            if(milestone.getStartDate().isAfter(sunday))
-                milestoneRepository.save(new Milestone(null, rpp, milestone.getDescription(), milestone.getStartDate(), milestone.getFinishDate()));
+            if(milestone.getStartDate().isAfter(sunday) &&  milestone.getId() != null)
+                milestoneRepository.save(new Milestone(milestone.getId(), rpp, milestone.getDescription(), milestone.getStartDate(), milestone.getFinishDate()));
         }
     }
 
@@ -249,7 +249,7 @@ public class MonitoringService implements IMonitoringService {
         LocalDate sunday = LocalDate.now().with(next(SUNDAY));
         Rpp rpp = rppRepository.findById(rppId);
         for(DeliverablesRequest deliverable:request){
-            if(deliverable.getDueDate().isAfter(sunday))
+            if(deliverable.getDueDate().isAfter(sunday) && deliverable.getId() != null)
                 deliverablesRepository.save(new Deliverable(deliverable.getId(), rpp, deliverable.getDeliverables(), deliverable.getDueDate()));
         }
     }
@@ -267,7 +267,7 @@ public class MonitoringService implements IMonitoringService {
         LocalDate sunday = LocalDate.now().with(next(SUNDAY));
         Rpp rpp = rppRepository.findById(rppId);
         for(CompletionScheduleRequest completionSchedule:request){
-            if(completionSchedule.getStartDate().isAfter(sunday))
+            if(completionSchedule.getStartDate().isAfter(sunday) && completionSchedule.getId() != null)
                 completionScheduleRepository.save(new CompletionSchedule(completionSchedule.getId(), rpp, completionSchedule.getTaskName(), completionSchedule.getTaskType(), completionSchedule.getStartDate(), completionSchedule.getFinishDate()));
         }
     }
@@ -285,7 +285,7 @@ public class MonitoringService implements IMonitoringService {
         LocalDate sunday = LocalDate.now().with(next(SUNDAY));
         Rpp rpp = rppRepository.findById(rppId);
         for(WeeklyAchievementPlanRequest weeklyAchievementPlan:request){
-            if(weeklyAchievementPlan.getStartDate().isAfter(sunday))
+            if(weeklyAchievementPlan.getStartDate().isAfter(sunday) && weeklyAchievementPlan.getId() != null)
                 weeklyAchievementPlanRepository.save(new WeeklyAchievementPlan(weeklyAchievementPlan.getId(), rpp, weeklyAchievementPlan.getAchievementPlan(), weeklyAchievementPlan.getStartDate(), weeklyAchievementPlan.getFinishDate()));
         }
     }
@@ -912,12 +912,12 @@ public class MonitoringService implements IMonitoringService {
 
         //get company
         HashMap<Integer, String> companyList = new HashMap<>();
-        ResponseEntity<ResponseList<CompanyResponse>> companyRes = restTemplate.exchange("http://company-service/company/get-all",
+        ResponseEntity<ResponseList<CompanyResponse>> companyRes = restTemplate.exchange("http://company-service/company/get-all?type=dropdown",
                 HttpMethod.GET, req, new ParameterizedTypeReference<>() {
                 });
         List<CompanyResponse> companyResponses = Objects.requireNonNull(companyRes.getBody()).getData();
         for (CompanyResponse company : companyResponses) {
-            companyList.put(company.getIdCompany(), company.getCompanyName());
+            companyList.put(company.getId(), company.getName());
         }
         user.add(companyList);
 

@@ -24,6 +24,19 @@ public class SupervisorMappingController {
     @Autowired
     private IMonitoringService monitoringService;
 
+    @GetMapping("/is-final")
+    public ResponseEntity<Object> isFinalSupervisorMapping(HttpServletRequest request) {
+        try {
+            String cookie = request.getHeader(Constant.PayloadResponseConstant.COOKIE);
+            int prodi = (int) request.getAttribute(Constant.VerifyConstant.ID_PRODI);
+            return ResponseHandler.generateResponse("get Final Status Mapping ", HttpStatus.BAD_REQUEST, monitoringService.isFinalSupervisorMapping(cookie, prodi));
+        } catch (HttpClientErrorException ex){
+            return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return ResponseHandler.generateResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @GetMapping("/get-all")
     public ResponseEntity<Object> getSupervisorMappingByProdi(@RequestParam(value = "year", required = false) Integer year, @RequestParam(value = "type", required = false) String type, HttpServletRequest request) {
         try {
