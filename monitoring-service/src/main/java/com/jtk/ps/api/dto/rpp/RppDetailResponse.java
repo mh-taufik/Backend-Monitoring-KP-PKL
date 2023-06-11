@@ -45,7 +45,7 @@ public class RppDetailResponse {
         this.deliverables = deliverables;
         this.weeklyAchievementPlans = weeklyAchievementPlans;
         this.completionSchedules = completionSchedules;
-        this.rppId = rppId;
+        this.rppId = rpp.getId();
     }
 
     public RppDetailResponse(int participantId, int rppId, String workTitle, String groupRole, String taskDescription, LocalDate startDate, LocalDate finishDate, Status status, List<Milestone> milestones, List<Deliverable> deliverables, List<CompletionSchedule> completionSchedules, List<WeeklyAchievementPlan> weeklyAchievementPlans) {
