@@ -7,10 +7,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d4c7c1a4-fecb-4126-864a-961220f9e7ef" name="Changes" comment="Fix RppUpdate">
+    <list default="true" id="d4c7c1a4-fecb-4126-864a-961220f9e7ef" name="Changes" comment="Fix SelfAssessmentRepository">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/dto/rpp/RppDetailResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/dto/rpp/RppDetailResponse.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/repository/SelfAssessmentRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/repository/SelfAssessmentRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/service/MonitoringService.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/service/MonitoringService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -460,7 +459,14 @@
       <option name="project" value="LOCAL" />
       <updated>1686488479769</updated>
     </task>
-    <option name="localTasksCounter" value="32" />
+    <task id="LOCAL-00032" summary="Fix SelfAssessmentRepository">
+      <created>1686496782515</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1686496782515</updated>
+    </task>
+    <option name="localTasksCounter" value="33" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -475,7 +481,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix mapping-service controller" />
     <MESSAGE value="fix monitoring-service controller" />
     <MESSAGE value="MonitoringService add to project" />
     <MESSAGE value="fix LogbookController" />
@@ -500,7 +505,8 @@
     <MESSAGE value="Fix SelfAssessmentController" />
     <MESSAGE value="Fix GradeLogbook" />
     <MESSAGE value="Fix RppUpdate" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fix RppUpdate" />
+    <MESSAGE value="Fix SelfAssessmentRepository" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fix SelfAssessmentRepository" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

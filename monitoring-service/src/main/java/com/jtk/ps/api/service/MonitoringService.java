@@ -463,7 +463,7 @@ public class MonitoringService implements IMonitoringService {
         Optional<Integer> supervisor = supervisorMappingRepository.findLecturerId(logbook.getParticipantId());
         if(supervisor.isPresent() && supervisor.get() != lecturer)
             throw new IllegalStateException("Logbook tidak dapat diakses");
-        if(logbook.getId() != null && logbook.getGrade() == ENilai.BELUM_DINILAI){
+        if(logbook.getId() != null){
             logbook.setGrade(gradeRequest.getGrade());
             logbookRepository.save(logbook);
         }
