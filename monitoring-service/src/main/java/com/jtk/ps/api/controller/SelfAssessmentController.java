@@ -43,7 +43,8 @@ public class SelfAssessmentController {
     public ResponseEntity<Object> updateSelfAssessment(@RequestBody SelfAssessmentUpdateRequest selfAssessmentUpdateRequest, HttpServletRequest request) {
         try {
             Integer id = (Integer) request.getAttribute(Constant.VerifyConstant.ID);
-            monitoringService.updateSelfAssessment(selfAssessmentUpdateRequest, id);
+            Integer role = (Integer) request.getAttribute(Constant.VerifyConstant.ID_ROLE);
+            monitoringService.updateSelfAssessment(selfAssessmentUpdateRequest, id, role);
             return ResponseHandler.generateResponse("Update SelfAssessment succeed", HttpStatus.OK);
         } catch (HttpClientErrorException ex){
             return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);

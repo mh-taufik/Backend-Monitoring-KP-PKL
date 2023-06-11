@@ -629,34 +629,50 @@ public class MonitoringService implements IMonitoringService {
     }
 
     @Override
-    public void updateSelfAssessment(SelfAssessmentUpdateRequest request, Integer participantId) {
-        SelfAssessment temp = selfAssessmentRepository.findById((int)request.getId());
-        if(temp.getParticipantId() != participantId)
-            throw new IllegalStateException("Self Assessment tidak dapat diakses");
-        if(temp.getFinishDate().isAfter(temp.getStartDate().with(TemporalAdjusters.next(DayOfWeek.SUNDAY))))
-            throw new IllegalStateException("Self Assessment melebihi batas deadline, tidak dapat diedit");
+    public void updateSelfAssessment(SelfAssessmentUpdateRequest request, Integer participantId, Integer role) {
+        SelfAssessment selfAssessment = selfAssessmentRepository.findById((int)request.getId());
+        if(role == ERole.PARTICIPANT.id){
+            if (selfAssessment.getParticipantId() != participantId)
+                throw new IllegalStateException("Self Assessment tidak dapat diakses");
+            if (selfAssessment.getFinishDate().isAfter(selfAssessment.getStartDate().with(TemporalAdjusters.next(DayOfWeek.SUNDAY))))
+                throw new IllegalStateException("Self Assessment melebihi batas deadline, tidak dapat diedit");
 
-        SelfAssessment selfAssessment = new SelfAssessment();
-        selfAssessment.setId(request.getId());
-        selfAssessment.setParticipantId(request.getParticipantId());
-        selfAssessment.setStartDate(request.getStartDate());
-        selfAssessment.setFinishDate(request.getFinishDate());
-        SelfAssessment sa = selfAssessmentRepository.save(selfAssessment);
+            selfAssessment.setId(request.getId());
+            selfAssessment.setParticipantId(request.getParticipantId());
+            selfAssessment.setStartDate(request.getStartDate());
+            selfAssessment.setFinishDate(request.getFinishDate());
+            SelfAssessment sa = selfAssessmentRepository.save(selfAssessment);
 
-        List<SelfAssessmentAspect> aspectList = selfAssessmentAspectRepository.findAllActiveAspect();
-        List<SelfAssessmentGrade> gradeList = new ArrayList<>();
-        for (SelfAssessmentAspect aspect : aspectList) {
-            for(AssessmentGradeRequest grade: request.getGrade()) {
-                if (aspect.getId() == grade.getAspectId()){
-                    if(grade.getGrade() == null)
-                        gradeList.add(new SelfAssessmentGrade(grade.getGradeId(), sa, aspect, 0, grade.getDescription()));
-                    else
-                        gradeList.add(new SelfAssessmentGrade(grade.getGradeId(), sa, aspect, grade.getGrade(), grade.getDescription()));
-                    break;
+            List<SelfAssessmentAspect> aspectList = selfAssessmentAspectRepository.findAll();
+            List<SelfAssessmentGrade> gradeList = new ArrayList<>();
+            for (SelfAssessmentAspect aspect : aspectList) {
+                for(AssessmentGradeRequest grade: request.getGrade()) {
+                    if (aspect.getId() == grade.getAspectId()){
+                        if(grade.getGrade() == null)
+                            gradeList.add(new SelfAssessmentGrade(grade.getGradeId(), sa, aspect, 0, grade.getDescription()));
+                        else
+                            gradeList.add(new SelfAssessmentGrade(grade.getGradeId(), sa, aspect, grade.getGrade(), grade.getDescription()));
+                        break;
+                    }
                 }
             }
+            selfAssessmentGradeRepository.saveAll(gradeList);
+        }else if(role == ERole.SUPERVISOR.id){
+            List<SelfAssessmentAspect> aspectList = selfAssessmentAspectRepository.findAll();
+            List<SelfAssessmentGrade> gradeList = new ArrayList<>();
+            for (SelfAssessmentAspect aspect : aspectList) {
+                for(AssessmentGradeRequest grade: request.getGrade()) {
+                    if (aspect.getId() == grade.getAspectId()){
+                        if(grade.getGrade() == null)
+                            gradeList.add(new SelfAssessmentGrade(grade.getGradeId(), selfAssessment, aspect, 0, grade.getDescription()));
+                        else
+                            gradeList.add(new SelfAssessmentGrade(grade.getGradeId(), selfAssessment, aspect, grade.getGrade(), grade.getDescription()));
+                        break;
+                    }
+                }
+            }
+            selfAssessmentGradeRepository.saveAll(gradeList);
         }
-        selfAssessmentGradeRepository.saveAll(gradeList);
     }
 
     @Override
@@ -1322,7 +1338,7 @@ public class MonitoringService implements IMonitoringService {
             response.setRpp(getRppDetail(rpp.get()));
         }
 
-        Optional<Integer> assessment = selfAssessmentRepository.findIdByParticipanAndDateOne(participantId, response.getLogbook().getDate(), response.getLogbook().getDate());
+        Optional<Integer> assessment = selfAssessmentRepository.findIdByParticipanAndDateOne(participantId, response.getLogbook().getDate());
         if(assessment.isPresent())
             response.setSelfAssessment(getSelfAssessmentDetail(assessment.get()));
 

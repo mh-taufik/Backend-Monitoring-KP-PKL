@@ -14,8 +14,8 @@ public interface SelfAssessmentRepository extends JpaRepository<SelfAssessment, 
     List<SelfAssessment> findByParticipantIdOrderByStartDateAsc(int participantId);
     @Query(value = "select id from self_assessment where participant_id = :participant_id and start_date between :start and :end and finish_date between :start and :end order by start_date asc", nativeQuery = true)
     List<Integer> findIdByParticipanAndDate(@Param("participant_id") int participantId, @Param("start") LocalDate start, @Param("end") LocalDate end);
-    @Query(value = "select id from self_assessment where participant_id = :participant_id and start_date between :start and :end and finish_date between :start and :end order by start_date asc limit 1", nativeQuery = true)
-    Optional<Integer> findIdByParticipanAndDateOne(@Param("participant_id") int participantId, @Param("start") LocalDate start, @Param("end") LocalDate end);
+    @Query(value = "select id from self_assessment where participant_id = :participant_id and :date between start_date and finish_date", nativeQuery = true)
+    Optional<Integer> findIdByParticipanAndDateOne(@Param("participant_id") int participantId, @Param("date") LocalDate date);
     @Query(value = "select if(count(*)>0, 'true', 'false') from self_assessment where participant_id = :participant_id and start_date = :date", nativeQuery = true)
     Boolean isExist(@Param("participant_id") int participantId, @Param("date") LocalDate date);
     @Query(value = "select count(*) from self_assessment where participant_id = :participant_id",nativeQuery = true)
