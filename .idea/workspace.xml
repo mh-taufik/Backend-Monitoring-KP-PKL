@@ -7,9 +7,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d4c7c1a4-fecb-4126-864a-961220f9e7ef" name="Changes" comment="Fix AssociatedDocument">
+    <list default="true" id="d4c7c1a4-fecb-4126-864a-961220f9e7ef" name="Changes" comment="Fix SelfAssessmentController">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/controller/SelfAssessmentController.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/controller/SelfAssessmentController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/repository/SupervisorMappingRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/repository/SupervisorMappingRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/service/MonitoringService.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/service/MonitoringService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -438,7 +439,14 @@
       <option name="project" value="LOCAL" />
       <updated>1686399800212</updated>
     </task>
-    <option name="localTasksCounter" value="29" />
+    <task id="LOCAL-00029" summary="Fix SelfAssessmentController">
+      <created>1686409378777</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1686409378777</updated>
+    </task>
+    <option name="localTasksCounter" value="30" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -476,7 +484,8 @@
     <MESSAGE value="Fix getSelfAssessmentAspect" />
     <MESSAGE value="Fix updateMilestone" />
     <MESSAGE value="Fix AssociatedDocument" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fix AssociatedDocument" />
+    <MESSAGE value="Fix SelfAssessmentController" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fix SelfAssessmentController" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

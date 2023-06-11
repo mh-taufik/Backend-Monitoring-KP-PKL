@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface SupervisorMappingRepository extends JpaRepository<SupervisorMapping, Integer> {
     SupervisorMapping findById(int id);
@@ -22,5 +23,5 @@ public interface SupervisorMappingRepository extends JpaRepository<SupervisorMap
     @Query(value = "select count(*) from supervisor_mapping where year(date) = :year and prodi_id = :prodi",nativeQuery = true)
     Integer countByYear(int year, int prodi);
     @Query(value = "select lecturer_id from supervisor_mapping where participant_id = :participant",nativeQuery = true)
-    Integer findLecturerId(int participant);
+    Optional<Integer> findLecturerId(int participant);
 }

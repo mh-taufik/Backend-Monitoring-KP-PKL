@@ -26,6 +26,7 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.time.DayOfWeek.*;
 import static java.time.temporal.TemporalAdjusters.next;
@@ -160,7 +161,7 @@ public class MonitoringService implements IMonitoringService {
         if(rppUpdate.getFinishDate().isAfter(sunday))
             rpp.setFinishDate(rppUpdate.getFinishDate());
         else
-            throw new IllegalStateException("cant update rpp, date must be after this week");
+            throw new IllegalStateException("tidak bisa mengedit rpp, tanggal harus lebih dari minggu ini");
 
         Rpp temp = rppRepository.save(rpp);
 
@@ -184,15 +185,17 @@ public class MonitoringService implements IMonitoringService {
 
     @Override
     public void updateRpp(RppSimpleUpdateRequest rppUpdate, Integer participantId) {
-        Rpp rpp = rppRepository.findById(rppUpdate.getRppId());
+        Optional<Rpp> rpp = rppRepository.findById((Integer)rppUpdate.getRppId());
+        if(rpp.isEmpty())
+            throw new IllegalStateException("Rpp tidak ditemukan");
         LocalDate sunday = LocalDate.now().with(next(SUNDAY));
-        if(!rpp.getParticipantId().equals(participantId)){
+        if(!rpp.get().getParticipantId().equals(participantId)){
             throw new IllegalStateException("Rpp tidak dapat diedit");
         }
         if(rppUpdate.getFinishDate().isAfter(sunday))
-            rpp.setFinishDate(rppUpdate.getFinishDate());
+            rpp.get().setFinishDate(rppUpdate.getFinishDate());
         else
-            throw new IllegalStateException("cant update rpp, date must be after this week");
+            throw new IllegalStateException("tidak bisa mengedit rpp, tanggal harus lebih dari minggu ini");
     }
 
     @Override
@@ -313,13 +316,44 @@ public class MonitoringService implements IMonitoringService {
         List<Logbook> logbookList = logbookRepository.findByParticipantIdOrderByDateAsc(participantId);
         if(logbookList.size()==0)
             throw new IllegalStateException("Logbook tidak ditemukan");
-        List<LogbookResponse> responses = new ArrayList<>();
-        for(Logbook temp:logbookList){
-            if(temp.getGrade() != null)
-                responses.add(new LogbookResponse(temp.getId(), temp.getDate(), temp.getGrade().name().replace("_", " "), temp.getStatus().getStatus(), temp.getProjectName()));
-            else
-                responses.add(new LogbookResponse(temp.getId(), temp.getDate(), "BELUM DINILAI", temp.getStatus().getStatus(), temp.getProjectName()));
+
+        final Set<DayOfWeek> businessDays = Set.of(MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY);
+        Deadline logbook = deadlineRepository.findByNameLike("logbook");
+        long totalLogbook = 0;
+        List<LocalDate> dateList = new ArrayList<>();
+        if(LocalDate.now().isAfter(logbook.getFinishAssignmentDate())){
+            totalLogbook = logbook.getStartAssignmentDate().datesUntil(logbook.getFinishAssignmentDate().plusDays(1)).filter((t -> businessDays.contains(t.getDayOfWeek()))).count();
+            dateList = logbook.getStartAssignmentDate().datesUntil(logbook.getFinishAssignmentDate().plusDays(1)).filter((t -> businessDays.contains(t.getDayOfWeek()))).collect(Collectors.toList());
+        }else{
+            totalLogbook = logbook.getStartAssignmentDate().datesUntil(LocalDate.now().plusDays(1)).filter((t -> businessDays.contains(t.getDayOfWeek()))).count();
+            dateList = logbook.getStartAssignmentDate().datesUntil(LocalDate.now().plusDays(1)).filter((t -> businessDays.contains(t.getDayOfWeek()))).collect(Collectors.toList());
         }
+
+        List<LogbookResponse> responses = new ArrayList<>();
+        for (Logbook temp : logbookList) {
+            if (temp.getGrade() != null) {
+                responses.add(new LogbookResponse(temp.getId(), temp.getDate(), temp.getGrade().name().replace("_", " "), temp.getStatus().getStatus(), temp.getProjectName()));
+                dateList.remove(temp.getDate());
+            }else{
+                responses.add(new LogbookResponse(temp.getId(), temp.getDate(), "BELUM DINILAI", temp.getStatus().getStatus(), temp.getProjectName()));
+                dateList.remove(temp.getDate());
+            }
+        }
+
+        if(logbookList.size() != totalLogbook){
+            Status status = statusRepository.findById(12);
+            for(LocalDate date: dateList){
+                responses.add(new LogbookResponse(null, date, "BELUM DINILAI", status.getStatus(), null));
+            }
+        }
+
+        Collections.sort(responses, new Comparator<LogbookResponse>() {
+            @Override
+            public int compare(LogbookResponse o1, LogbookResponse o2) {
+                return o1.getDate().compareTo(o2.getDate());
+            }
+        });
+
         return responses;
     }
 
@@ -353,10 +387,10 @@ public class MonitoringService implements IMonitoringService {
     @Override
     public CreateId createLogbook(LogbookCreateRequest logbook, Integer participantId) {
         if(logbookRepository.isExist(participantId, logbook.getDate())) {
-            throw new IllegalStateException("Logbook already created on this date, please update it instead");
+            throw new IllegalStateException("Logbook pada tanggal ini sudah ada, lakukan update");
         }
         if(logbook.getDate().isAfter(LocalDate.now())) {
-            throw new IllegalStateException("pengumpulan belum dibuka logbook untuk tanggal "+logbook.getDate());
+            throw new IllegalStateException("Pengumpulan belum dibuka logbook untuk tanggal "+logbook.getDate());
         }
         Logbook newLogbook = new Logbook(
                 null,
@@ -387,7 +421,7 @@ public class MonitoringService implements IMonitoringService {
     @Override
     public void updateLogbook(LogbookUpdateRequest logbook, Integer participantId) {
         if(logbookRepository.isChecked(logbook.getId())) {
-            throw new IllegalStateException("Logbook already been graded, cant be edit anymore");
+            throw new IllegalStateException("Logbook sudah dinilai, tidak dapat diedit");
         }
         Logbook newLogbook = logbookRepository.findById((int)logbook.getId());
         if(!newLogbook.getParticipantId().equals(participantId))
@@ -424,7 +458,8 @@ public class MonitoringService implements IMonitoringService {
         Logbook logbook = logbookRepository.findById(gradeRequest.getId());
         if(logbook == null)
             throw new IllegalStateException("logbook tidak ditemukan");
-        if(!supervisorMappingRepository.findLecturerId(logbook.getParticipantId()).equals(lecturer))
+        Optional<Integer> supervisor = supervisorMappingRepository.findLecturerId(logbook.getParticipantId());
+        if(supervisor.isPresent() && supervisor.get() != lecturer)
             throw new IllegalStateException("Logbook tidak dapat diakses");
         if(logbook.getId() != null && logbook.getGrade() == ENilai.BELUM_DINILAI){
             logbook.setGrade(gradeRequest.getGrade());
@@ -527,6 +562,19 @@ public class MonitoringService implements IMonitoringService {
         if(selfAssessments.size() == 0)
             throw new IllegalStateException("Self Assessment belum dibuat");
         List<SelfAssessmentResponse> responses = new ArrayList<>();
+        List<LocalDate> dateList = new ArrayList<>();
+
+        final Set<DayOfWeek> businessDays = Set.of(MONDAY);
+        Deadline selfAssessment = deadlineRepository.findByNameLike("self assessment");
+        int totalSelfAssessment = 0;
+        if(LocalDate.now().isAfter(selfAssessment.getFinishAssignmentDate())){
+            totalSelfAssessment = selfAssessment.getFinishAssignmentDate().get(ChronoField.ALIGNED_WEEK_OF_YEAR) - selfAssessment.getStartAssignmentDate().get(ChronoField.ALIGNED_WEEK_OF_YEAR);
+            dateList = selfAssessment.getStartAssignmentDate().datesUntil(selfAssessment.getFinishAssignmentDate().plusDays(1)).filter((t -> businessDays.contains(t.getDayOfWeek()))).collect(Collectors.toList());
+        }else{
+            totalSelfAssessment = LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.SUNDAY)).get(ChronoField.ALIGNED_WEEK_OF_YEAR) - selfAssessment.getStartAssignmentDate().get(ChronoField.ALIGNED_WEEK_OF_YEAR);
+            dateList = selfAssessment.getStartAssignmentDate().datesUntil(LocalDate.now().plusDays(1)).filter((t -> businessDays.contains(t.getDayOfWeek()))).collect(Collectors.toList());
+        }
+
         for(SelfAssessment temp:selfAssessments){
             List<SelfAssessmentGrade> grades = selfAssessmentGradeRepository.findBySelfAssessmentId(temp.getId());
             List<SelfAssessmentGradeDetailResponse> grade = new ArrayList<>();
@@ -540,7 +588,15 @@ public class MonitoringService implements IMonitoringService {
                 );
             }
             responses.add(new SelfAssessmentResponse(temp.getParticipantId(), temp.getId(), temp.getStartDate(), temp.getFinishDate(), grade));
+            dateList.remove(temp.getStartDate());
         }
+
+        if(totalSelfAssessment != selfAssessments.size()){
+            for(LocalDate date: dateList){
+                responses.add(new SelfAssessmentResponse(idParticipant, null, date, date.plusDays(5), null));
+            }
+        }
+
         responses.add(new SelfAssessmentResponse(idParticipant, null, null, null, getBestPerformance(idParticipant)));
         return responses;
     }
@@ -575,6 +631,8 @@ public class MonitoringService implements IMonitoringService {
         SelfAssessment temp = selfAssessmentRepository.findById((int)request.getId());
         if(temp.getParticipantId() != participantId)
             throw new IllegalStateException("Self Assessment tidak dapat diakses");
+        if(temp.getFinishDate().isAfter(temp.getStartDate().with(TemporalAdjusters.next(DayOfWeek.SUNDAY))))
+            throw new IllegalStateException("Self Assessment melebihi batas deadline, tidak dapat diedit");
 
         SelfAssessment selfAssessment = new SelfAssessment();
         selfAssessment.setId(request.getId());
@@ -691,7 +749,7 @@ public class MonitoringService implements IMonitoringService {
         final Set<DayOfWeek> businessDays = Set.of(MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY);
 
         //get jumlah total logbook yang seharusnya dikumpulkan menggunakan tanggal di deadline
-        Deadline logbookDeadline = deadlineRepository.findByNameLike("'%logbook%'");
+        Deadline logbookDeadline = deadlineRepository.findByNameLike("logbook");
         int totalLogbook = (int) logbookDeadline.getStartAssignmentDate().datesUntil(logbookDeadline.getFinishAssignmentDate()).filter((t -> businessDays.contains(t.getDayOfWeek()))).count();
         int submittedLogbook = logbookRepository.countByParticipantId(participantId);
         int missingLogbook = totalLogbook - submittedLogbook;
@@ -710,7 +768,7 @@ public class MonitoringService implements IMonitoringService {
         Integer notMatch = logbookRepository.countEncounteredProblemNotNull(participantId);
 
         //get jumlah total self assessment yang seharusnya dikumpulkan menggunakan tanggal di deadline
-        Deadline selfAssessmentDeadline = deadlineRepository.findByNameLike("'%self assessment%'");
+        Deadline selfAssessmentDeadline = deadlineRepository.findByNameLike("self assessment");
         int totalSelfAssessment = (int) selfAssessmentDeadline.getStartAssignmentDate().datesUntil(selfAssessmentDeadline.getFinishAssignmentDate()).filter((t -> businessDays.contains(t.getDayOfWeek()))).count();
         int submittedSelfAssessment = selfAssessmentRepository.countByParticipantId(participantId);
         int missingSelfAssessment = totalSelfAssessment - submittedSelfAssessment;
@@ -793,7 +851,7 @@ public class MonitoringService implements IMonitoringService {
     public void updateLaporan(LaporanUpdateRequest laporanUpdateRequest, Integer participantId) {
         Laporan laporan = laporanRepository.findById((int)laporanUpdateRequest.getId());
         if(laporanUpdateRequest.getId() == null || laporanUpdateRequest.getId() == 0){
-            throw new IllegalStateException("cant edit, id cant be null or 0");
+            throw new IllegalStateException("laporan tidak dapat diedit, id harus terisi");
         }
         if(laporan == null){
             throw new IllegalStateException("laporan tidak ditemukan");
@@ -955,7 +1013,18 @@ public class MonitoringService implements IMonitoringService {
                     map.getLecturerId(), lecturerList.get(map.getLecturerId()),
                     map.getProdiId(), map.getDate(), participants)
             );
+            companyList.remove(map.getCompanyId());
         }
+
+        if(!companyList.isEmpty()){
+            for(Integer key: companyList.keySet()){
+                response.add(new SupervisorMappingResponse(
+                        key, companyList.get(key),
+                        null, null, null, null, null)
+                );
+            }
+        }
+
         return response;
     }
 
