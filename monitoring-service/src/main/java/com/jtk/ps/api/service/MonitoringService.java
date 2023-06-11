@@ -196,6 +196,8 @@ public class MonitoringService implements IMonitoringService {
             rpp.get().setFinishDate(rppUpdate.getFinishDate());
         else
             throw new IllegalStateException("tidak bisa mengedit rpp, tanggal harus lebih dari minggu ini");
+
+        rppRepository.save(rpp.get());
     }
 
     @Override
