@@ -12,7 +12,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SupervisorGradeCreateRequest {
-    private LocalDate date;
     private Integer phase;
     @JsonProperty("participant_id")
     private Integer participantId;

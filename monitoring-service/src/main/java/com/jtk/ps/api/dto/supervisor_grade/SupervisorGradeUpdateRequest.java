@@ -13,7 +13,6 @@ import java.util.List;
 @AllArgsConstructor
 public class SupervisorGradeUpdateRequest {
     private Integer id;
-    private LocalDate date;
     private Integer phase;
     @JsonProperty("grade_list")
     private List<GradeRequest> gradeList;

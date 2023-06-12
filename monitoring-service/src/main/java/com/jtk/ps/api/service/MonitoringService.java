@@ -706,7 +706,7 @@ public class MonitoringService implements IMonitoringService {
         SupervisorGrade supervisorGrade = new SupervisorGrade();
         supervisorGrade.setSupervisorId(request.getSupervisorId());
         supervisorGrade.setParticipantId(request.getParticipantId());
-        supervisorGrade.setDate(request.getDate());
+        supervisorGrade.setDate(LocalDate.now());
         supervisorGrade.setPhase(request.getPhase());
         SupervisorGrade temp = supervisorGradeRepository.save(supervisorGrade);
         for(GradeRequest grade:request.getGradeList()){
@@ -720,7 +720,7 @@ public class MonitoringService implements IMonitoringService {
     public void updateSupervisorGrade(SupervisorGradeUpdateRequest request) {
         SupervisorGrade supervisorGrade = supervisorGradeRepository.findById((int)request.getId());
         if(supervisorGrade != null){
-            supervisorGrade.setDate(request.getDate());
+            supervisorGrade.setDate(LocalDate.now());
             supervisorGrade.setPhase(request.getPhase());
             SupervisorGrade temp = supervisorGradeRepository.save(supervisorGrade);
             for (GradeRequest grade : request.getGradeList()) {
