@@ -56,7 +56,7 @@ public interface IMonitoringService {
     List<SelfAssessmentAspectResponse> getSelfAssessmentAspect();
 
     //Supervisor Grade
-    CreateId createSupervisorGrade(SupervisorGradeCreateRequest request);
+    CreateId createSupervisorGrade(SupervisorGradeCreateRequest request, int supervisorId);
     void updateSupervisorGrade(SupervisorGradeUpdateRequest request);
     SupervisorGradeDetailResponse getSupervisorGradeDetail(int id);
     List<SupervisorGradeResponse> getSupervisorGradeList(int participantId);
@@ -71,6 +71,7 @@ public interface IMonitoringService {
     LaporanResponse getLaporan(Integer id);
     List<LaporanResponse> getListLaporan(Integer participantId);
     Integer getPhase();
+    Boolean isFinalPhase();
     Boolean isLaporanExist(int participantId, int phase);
 
     //Supervisor mapping

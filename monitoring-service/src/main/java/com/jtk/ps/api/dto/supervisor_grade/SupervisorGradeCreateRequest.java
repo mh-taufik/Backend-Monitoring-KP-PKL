@@ -15,8 +15,6 @@ public class SupervisorGradeCreateRequest {
     private Integer phase;
     @JsonProperty("participant_id")
     private Integer participantId;
-    @JsonProperty("supervisor_id")
-    private Integer supervisorId;
     @JsonProperty("grade_list")
     private List<GradeRequest> gradeList;
 }

@@ -702,9 +702,12 @@ public class MonitoringService implements IMonitoringService {
     }
 
     @Override
-    public CreateId createSupervisorGrade(SupervisorGradeCreateRequest request) {
+    public CreateId createSupervisorGrade(SupervisorGradeCreateRequest request, int supervisorId) {
+        if(!laporanRepository.isExist(request.getParticipantId(), request.getPhase()))
+            throw new IllegalStateException("Mahasiswa belum mengumpulkan laporan pada tahap ini!");
         SupervisorGrade supervisorGrade = new SupervisorGrade();
-        supervisorGrade.setSupervisorId(request.getSupervisorId());
+        supervisorGrade.setId(null);
+        supervisorGrade.setSupervisorId(supervisorId);
         supervisorGrade.setParticipantId(request.getParticipantId());
         supervisorGrade.setDate(LocalDate.now());
         supervisorGrade.setPhase(request.getPhase());
@@ -903,9 +906,15 @@ public class MonitoringService implements IMonitoringService {
 
     @Override
     public Integer getPhase() {
-//        Deadline deadline = deadlineRepository.countLaporanPhaseNow(LocalDate.now());
-//        return Integer.valueOf(deadline.getName().charAt(deadline.getName().length() - 1));
-        return 0;
+        return deadlineRepository.countLaporanPhaseNow(LocalDate.now());
+    }
+
+    @Override
+    public Boolean isFinalPhase() {
+        Integer phase = deadlineRepository.countLaporanPhaseNow(LocalDate.now());
+        if(deadlineRepository.countLaporanPhase() == phase)
+            return true;
+        return false;
     }
 
     @Override

@@ -27,9 +27,8 @@ public class SupervisorGradeController {
     @PreAuthorize("hasAnyAuthority('SUPERVISOR')")
     public ResponseEntity<Object> saveSupervisorGrade(@RequestBody SupervisorGradeCreateRequest supervisorGradeCreateRequest, HttpServletRequest request) {
         try {
-            CreateId id = monitoringService.createSupervisorGrade(supervisorGradeCreateRequest);
             Integer supervisorId = Integer.parseInt(String.valueOf(request.getAttribute(Constant.VerifyConstant.SUB)));
-            supervisorGradeCreateRequest.setSupervisorId(supervisorId);
+            CreateId id = monitoringService.createSupervisorGrade(supervisorGradeCreateRequest, supervisorId);
             return ResponseHandler.generateResponse("Save SupervisorGrade succeed", HttpStatus.OK, id);
         } catch (HttpClientErrorException ex){
             return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);

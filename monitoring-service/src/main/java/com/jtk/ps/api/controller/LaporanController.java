@@ -88,6 +88,18 @@ public class LaporanController {
         }
     }
 
+    @GetMapping("/is-final-phase")
+    @PreAuthorize("hasAnyAuthority('COMMITTEE','PARTICIPANT','SUPERVISOR')")
+    public ResponseEntity<Object> isFinalPhase(HttpServletRequest request) {
+        try {
+            return ResponseHandler.generateResponse("Get Phase Laporan succeed", HttpStatus.OK, monitoringService.isFinalPhase());
+        } catch (HttpClientErrorException ex){
+            return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return ResponseHandler.generateResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @PostMapping("/check")
     @PreAuthorize("hasAnyAuthority('PARTICIPANT')")
     public ResponseEntity<Object> checkByDate(@RequestBody CheckLaporan check, HttpServletRequest request){
