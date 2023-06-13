@@ -22,10 +22,13 @@ public class MonitoringController {
     private IMonitoringService monitoringService;
 
     @GetMapping("/dashboard")
-    public ResponseEntity<Object> getDashboard(HttpServletRequest request) {
+    public ResponseEntity<Object> getDashboard(@RequestParam(value = "participant_id",required = false) Integer participantId,HttpServletRequest request) {
         try {
             Integer role = (Integer) request.getAttribute(Constant.VerifyConstant.ID_ROLE);
-            if(role == ERole.PARTICIPANT.id) {
+            if(participantId != null) {
+                DashboardParticipant response = monitoringService.getDashboardDataParticipant(participantId);
+                return ResponseHandler.generateResponse("get data dashboard participant succeed", HttpStatus.OK, response);
+            }else if(role == ERole.PARTICIPANT.id) {
                 Integer id = (Integer) request.getAttribute(Constant.VerifyConstant.ID);
                 DashboardParticipant response = monitoringService.getDashboardDataParticipant(id);
                 return ResponseHandler.generateResponse("get data dashboard participant succeed", HttpStatus.OK, response);
