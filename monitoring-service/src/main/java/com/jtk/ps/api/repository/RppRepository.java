@@ -21,6 +21,6 @@ public interface RppRepository extends JpaRepository<Rpp, Integer>{
     Optional<Integer> findByParticipantIdAndDateOrderByDateAsc(@Param("participant_id") int participantId, @Param("start") LocalDate start);
     @Query(value = "select count(*) from rpp where participant_id = :participant_id",nativeQuery = true)
     Integer countByParticipantId(@Param("participant_id") int participantId);
-    @Query(value = "select count(*) from rpp where participant_id in (:participant_id) group by participant_id",nativeQuery = true)
+    @Query(value = "select count(*) from (select * from rpp where participant_id in (:participant_id) group by participant_id) as a",nativeQuery = true)
     Integer countAllInParticipantId(@Param("participant_id") List<Integer> participantId);
 }
