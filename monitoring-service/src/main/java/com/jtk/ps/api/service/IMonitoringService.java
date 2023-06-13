@@ -94,7 +94,7 @@ public interface IMonitoringService {
     //Monitoring
     DashboardParticipant getDashboardDataParticipant(int participantId);
     DashboardLecturer getDashboardDataLecturer(int lecturerId);
-    DashboardCommittee getDashboardDataCommittee(int prodiId);
+    DashboardCommittee getDashboardDataCommittee(int prodiId, String cookie);
     AssociatedDocumentRpp getAssociatedRpp(int participantId, int rppId);
     AssociatedDocumentLogbook getAssociatedLogbook(int participantId, int logbookId);
     AssociatedDocumentSelfAssessment getAssociatedSelfAssessment(int participantId, int selfAsssessmentId);

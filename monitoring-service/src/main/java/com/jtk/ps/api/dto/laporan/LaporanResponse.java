@@ -17,6 +17,7 @@ public class LaporanResponse {
     @JsonProperty("upload_date")
     private LocalDate uploadDate;
     private Integer phase;
+    private Integer supervisorGrade;
 
     public LaporanResponse(Laporan laporan){
         this.id = laporan.getId();

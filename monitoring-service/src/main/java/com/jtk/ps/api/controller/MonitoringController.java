@@ -28,15 +28,16 @@ public class MonitoringController {
             if(role == ERole.PARTICIPANT.id) {
                 Integer id = (Integer) request.getAttribute(Constant.VerifyConstant.ID);
                 DashboardParticipant response = monitoringService.getDashboardDataParticipant(id);
-                return ResponseHandler.generateResponse("get data dashboard succeed", HttpStatus.OK, response);
+                return ResponseHandler.generateResponse("get data dashboard participant succeed", HttpStatus.OK, response);
             }else if(role == ERole.SUPERVISOR.id){
-                Integer id = (Integer) request.getAttribute(Constant.VerifyConstant.ID);
+                Integer id = Integer.valueOf(String.valueOf(request.getAttribute(Constant.VerifyConstant.SUB)));
                 DashboardLecturer response = monitoringService.getDashboardDataLecturer(id);
-                return ResponseHandler.generateResponse("get data dashboard succeed", HttpStatus.OK, response);
+                return ResponseHandler.generateResponse("get data dashboard supervisor succeed", HttpStatus.OK, response);
             }else if(role == ERole.COMMITTEE.id){
                 Integer id = (Integer) request.getAttribute(Constant.VerifyConstant.ID_PRODI);
-                DashboardCommittee response = monitoringService.getDashboardDataCommittee(id);
-                return ResponseHandler.generateResponse("get data dashboard succeed", HttpStatus.OK, response);
+                String cookie = request.getHeader(Constant.PayloadResponseConstant.COOKIE);
+                DashboardCommittee response = monitoringService.getDashboardDataCommittee(id, cookie);
+                return ResponseHandler.generateResponse("get data dashboard committee succeed", HttpStatus.OK, response);
             }
             return ResponseHandler.generateResponse("get data dashboard succeed", HttpStatus.I_AM_A_TEAPOT);
         } catch (HttpClientErrorException ex){

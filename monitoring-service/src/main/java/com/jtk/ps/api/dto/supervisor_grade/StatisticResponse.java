@@ -29,6 +29,8 @@ public class StatisticResponse {
     private Percentage logbookNilaiCukup;
     @JsonProperty("logbook_nilai_kurang")
     private Percentage logbookNilaiKurang;
+    @JsonProperty("logbook_nilai_belum_dinilai")
+    private Percentage logbookNilaiBelumDinilai;
     @JsonProperty("self_assessment_submitted")
     private Percentage selfAssessmentSubmitted;
     @JsonProperty("self_assessment_missing")

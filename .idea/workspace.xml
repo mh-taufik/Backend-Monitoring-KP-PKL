@@ -9,11 +9,12 @@
   <component name="ChangeListManager">
     <list default="true" id="d4c7c1a4-fecb-4126-864a-961220f9e7ef" name="Changes" comment="Fix createSupervisorGrade">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/controller/LaporanController.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/controller/LaporanController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/controller/DeadlineController.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/controller/DeadlineController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/controller/MonitoringController.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/controller/MonitoringController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/controller/SupervisorGradeController.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/controller/SupervisorGradeController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/dto/supervisor_grade/SupervisorGradeCreateRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/dto/supervisor_grade/SupervisorGradeCreateRequest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/model/SupervisorGrade.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/model/SupervisorGrade.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/repository/DeadlineRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/repository/DeadlineRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/dto/laporan/LaporanResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/dto/laporan/LaporanResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/dto/supervisor_grade/StatisticResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/dto/supervisor_grade/StatisticResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/repository/SupervisorGradeRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/repository/SupervisorGradeRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/service/IMonitoringService.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/service/IMonitoringService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/service/MonitoringService.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/service/MonitoringService.java" afterDir="false" />
     </list>
@@ -532,20 +533,21 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="java-method">
-          <url>file://$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/controller/SelfAssessmentController.java</url>
-          <line>111</line>
-          <properties class="com.jtk.ps.api.controller.SelfAssessmentController" method="getSelfAssessmentAspect">
+          <url>file://$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/service/MonitoringService.java</url>
+          <line>767</line>
+          <properties class="com.jtk.ps.api.service.MonitoringService" method="getMonitoringStatistic">
+            <option name="EMULATED" value="true" />
             <option name="WATCH_EXIT" value="false" />
           </properties>
-          <option name="timeStamp" value="14" />
+          <option name="timeStamp" value="18" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-method">
           <url>file://$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/controller/SupervisorGradeController.java</url>
-          <line>27</line>
-          <properties class="com.jtk.ps.api.controller.SupervisorGradeController" method="saveSupervisorGrade">
+          <line>80</line>
+          <properties class="com.jtk.ps.api.controller.SupervisorGradeController" method="get">
             <option name="WATCH_EXIT" value="false" />
           </properties>
-          <option name="timeStamp" value="15" />
+          <option name="timeStamp" value="20" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

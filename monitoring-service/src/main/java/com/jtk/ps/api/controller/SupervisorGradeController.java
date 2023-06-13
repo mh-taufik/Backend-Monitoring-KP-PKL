@@ -50,7 +50,7 @@ public class SupervisorGradeController {
         }
     }
 
-    @GetMapping("/{id_supervisor_grade}")
+    @GetMapping("/get/{id_supervisor_grade}")
     @PreAuthorize("hasAnyAuthority('COMMITTEE','PARTICIPANT','SUPERVISOR')")
     public ResponseEntity<Object> getSupervisorGrade(@PathVariable("id_supervisor_grade") Integer idSupervisorGrade, HttpServletRequest request) {
         try {
@@ -63,7 +63,7 @@ public class SupervisorGradeController {
         }
     }
 
-    @GetMapping("/{id_participant}")
+    @GetMapping("/get-all/{id_participant}")
     @PreAuthorize("hasAnyAuthority('COMMITTEE','PARTICIPANT','SUPERVISOR')")
     public ResponseEntity<Object> getSupervisorGradeList(@PathVariable("id_participant") Integer idParticipant, HttpServletRequest request) {
         try {
