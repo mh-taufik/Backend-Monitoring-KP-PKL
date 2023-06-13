@@ -499,6 +499,8 @@ public class MonitoringService implements IMonitoringService {
 
     @Override
     public CreateId createSelfAssessment(SelfAssessmentRequest request, Integer participantId) {
+        if(selfAssessmentRepository.isExist(participantId, request.getStartDate()))
+            throw new IllegalStateException("Self Assessment sudah terbuat, silahkan update");
         SelfAssessment selfAssessment = new SelfAssessment();
         selfAssessment.setParticipantId(participantId);
         selfAssessment.setStartDate(request.getStartDate());
@@ -771,12 +773,12 @@ public class MonitoringService implements IMonitoringService {
     }
 
     @Override
-    public CreateId createSupervisorGrade(SupervisorGradeCreateRequest request, int supervisorId) {
+    public CreateId createSupervisorGrade(SupervisorGradeCreateRequest request) {
         if(!laporanRepository.isExist(request.getParticipantId(), request.getPhase()))
             throw new IllegalStateException("Mahasiswa belum mengumpulkan laporan pada tahap ini!");
         SupervisorGrade supervisorGrade = new SupervisorGrade();
         supervisorGrade.setId(null);
-        supervisorGrade.setSupervisorId(supervisorId);
+        supervisorGrade.setSupervisorId(0);
         supervisorGrade.setParticipantId(request.getParticipantId());
         supervisorGrade.setDate(LocalDate.now());
         supervisorGrade.setPhase(request.getPhase());
@@ -789,7 +791,7 @@ public class MonitoringService implements IMonitoringService {
     }
 
     @Override
-    public void updateSupervisorGrade(SupervisorGradeUpdateRequest request) {
+    public void updateSupervisorGrade(SupervisorGradeUpdateRequest request, int supervisorId) {
         SupervisorGrade supervisorGrade = supervisorGradeRepository.findById((int)request.getId());
         if(supervisorGrade != null){
             supervisorGrade.setDate(LocalDate.now());
@@ -946,6 +948,14 @@ public class MonitoringService implements IMonitoringService {
         }
 
         Laporan temp = laporanRepository.save(laporan);
+
+        List<SupervisorGradeAspect> aspectList = supervisorGradeAspectRepository.findAll();
+        List<GradeRequest> requests = new ArrayList<>();
+        for(SupervisorGradeAspect aspect:aspectList){
+            requests.add(new GradeRequest(aspect.getId(), 0));
+        }
+        createSupervisorGrade(new SupervisorGradeCreateRequest(temp.getPhase(), temp.getParticipant(), requests));
+
         return new CreateId(temp.getId());
     }
 

@@ -12,4 +12,5 @@ public interface SelfAssessmentAspectRepository extends JpaRepository<SelfAssess
 
     @Query(value = "select * from self_assessment_aspect where status = 6",nativeQuery = true)
     List<SelfAssessmentAspect> findAllActiveAspect();
+
 }

@@ -58,8 +58,8 @@ public interface IMonitoringService {
     List<SelfAssessmentAspectResponse> getSelfAssessmentAspect();
 
     //Supervisor Grade
-    CreateId createSupervisorGrade(SupervisorGradeCreateRequest request, int supervisorId);
-    void updateSupervisorGrade(SupervisorGradeUpdateRequest request);
+    CreateId createSupervisorGrade(SupervisorGradeCreateRequest request);
+    void updateSupervisorGrade(SupervisorGradeUpdateRequest request, int supervisorId);
     SupervisorGradeDetailResponse getSupervisorGradeDetail(int id);
     List<SupervisorGradeResponse> getSupervisorGradeList(int participantId);
     StatisticResponse getMonitoringStatistic(int participantId);

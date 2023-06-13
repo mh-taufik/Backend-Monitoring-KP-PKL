@@ -7,11 +7,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d4c7c1a4-fecb-4126-864a-961220f9e7ef" name="Changes" comment="Fix getMonitoringStatistic">
-      <change afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/dto/self_assessment/SelfAssessmentFinalGradeResponse.java" afterDir="false" />
+    <list default="true" id="d4c7c1a4-fecb-4126-864a-961220f9e7ef" name="Changes" comment="Add getFinalSelfAssessmentGrade and Fix getSupervisorMappingCommittee">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/controller/SelfAssessmentController.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/controller/SelfAssessmentController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/repository/SelfAssessmentGradeRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/repository/SelfAssessmentGradeRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/controller/SupervisorGradeController.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/controller/SupervisorGradeController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/repository/SelfAssessmentAspectRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/repository/SelfAssessmentAspectRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/service/IMonitoringService.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/service/IMonitoringService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/service/MonitoringService.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/service/MonitoringService.java" afterDir="false" />
     </list>
@@ -512,7 +511,14 @@
       <option name="project" value="LOCAL" />
       <updated>1686649276850</updated>
     </task>
-    <option name="localTasksCounter" value="39" />
+    <task id="LOCAL-00039" summary="Add getFinalSelfAssessmentGrade and Fix getSupervisorMappingCommittee">
+      <created>1686653795651</created>
+      <option name="number" value="00039" />
+      <option name="presentableId" value="LOCAL-00039" />
+      <option name="project" value="LOCAL" />
+      <updated>1686653795651</updated>
+    </task>
+    <option name="localTasksCounter" value="40" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -527,7 +533,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix bug" />
     <MESSAGE value="fix bug SupervisorMappingController" />
     <MESSAGE value="Change RppController" />
     <MESSAGE value="Change Logbook and mapping" />
@@ -552,7 +557,8 @@
     <MESSAGE value="Fix RppRepository" />
     <MESSAGE value="Fix getDashboard" />
     <MESSAGE value="Fix getMonitoringStatistic" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fix getMonitoringStatistic" />
+    <MESSAGE value="Add getFinalSelfAssessmentGrade and Fix getSupervisorMappingCommittee" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add getFinalSelfAssessmentGrade and Fix getSupervisorMappingCommittee" />
   </component>
   <component name="XDebuggerManager">
     <pin-to-top-manager>
