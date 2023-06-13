@@ -825,7 +825,7 @@ public class MonitoringService implements IMonitoringService {
 
     public Percentage getPercentage(int count, int total){
         float percent = (count * 100f) / total;
-        return new Percentage(count, percent+"%");
+        return new Percentage(count, Math.round(percent));
     }
 
     @Override

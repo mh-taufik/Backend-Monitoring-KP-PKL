@@ -9,5 +9,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Percentage {
     private int count;
-    private String percent;
+    private int percent;
 }
