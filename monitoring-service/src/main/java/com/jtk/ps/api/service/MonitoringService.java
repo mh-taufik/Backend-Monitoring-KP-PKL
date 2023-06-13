@@ -93,6 +93,7 @@ public class MonitoringService implements IMonitoringService {
                 responses.add(new RppResponse(temp.getId(), temp.getWorkTitle(), temp.getStartDate(), temp.getFinishDate(), rpp.getStatus().getStatus()));
             }
         }
+
         return responses;
     }
 
@@ -589,6 +590,12 @@ public class MonitoringService implements IMonitoringService {
                         temp2.getDescription())
                 );
             }
+            Collections.sort(responses, new Comparator<SelfAssessmentResponse>() {
+                @Override
+                public int compare(SelfAssessmentResponse o1, SelfAssessmentResponse o2) {
+                    return o1.getStartDate().compareTo(o2.getStartDate());
+                }
+            });
             responses.add(new SelfAssessmentResponse(temp.getParticipantId(), temp.getId(), temp.getStartDate(), temp.getFinishDate(), grade));
             dateList.remove(temp.getStartDate());
         }
@@ -625,7 +632,69 @@ public class MonitoringService implements IMonitoringService {
                         "-"));
             }
         }
+        Collections.sort(grades, new Comparator<SelfAssessmentGradeDetailResponse>() {
+            @Override
+            public int compare(SelfAssessmentGradeDetailResponse o1, SelfAssessmentGradeDetailResponse o2) {
+                return o1.getAspectId().compareTo(o2.getAspectId());
+            }
+        });
         return grades;
+    }
+
+    @Override
+    public List<SelfAssessmentGradeDetailResponse> getAverage(int participantId) {
+        List<SelfAssessmentAspect> aspectList = selfAssessmentAspectRepository.findAll();
+        List<SelfAssessmentGradeDetailResponse> grades = new ArrayList<>();
+        for(SelfAssessmentAspect aspect:aspectList){
+            SelfAssessmentGrade grade = selfAssessmentGradeRepository.findAvgGradeByParticipantIdAndAspectId(participantId, aspect.getId());
+            if(grade != null){
+                grades.add(new SelfAssessmentGradeDetailResponse(
+                        grade.getSelfAssessmentAspect().getId(),
+                        grade.getId(),
+                        grade.getSelfAssessmentAspect().getName(),
+                        Math.round(grade.getGrade()),
+                        grade.getDescription()));
+            }else{
+                grades.add(new SelfAssessmentGradeDetailResponse(
+                        aspect.getId(),
+                        null,
+                        aspect.getName(),
+                        0,
+                        "-"));
+            }
+        }
+
+        Collections.sort(grades, new Comparator<SelfAssessmentGradeDetailResponse>() {
+            @Override
+            public int compare(SelfAssessmentGradeDetailResponse o1, SelfAssessmentGradeDetailResponse o2) {
+                return o1.getAspectId().compareTo(o2.getAspectId());
+            }
+        });
+        return grades;
+    }
+
+    @Override
+    public SelfAssessmentFinalGradeResponse getFinalSelfAssessment(int participantId) {
+        List<SelfAssessmentGradeDetailResponse> maxGrade = getBestPerformance(participantId);
+        List<SelfAssessmentGradeDetailResponse> avgGrade = getAverage(participantId);
+        List<SelfAssessmentGradeDetailResponse> finalGrade = new ArrayList<>();
+        for(SelfAssessmentGradeDetailResponse temp:maxGrade){
+            for(SelfAssessmentGradeDetailResponse temp2:avgGrade){
+                if(temp.getAspectId().equals(temp2.getAspectId())){
+                    finalGrade.add(new SelfAssessmentGradeDetailResponse(temp2.getAspectId(), null, null, Math.round((temp.getGrade()*60f/100f)+(temp2.getGrade()*40f/100f)), null));
+                    break;
+                }
+            }
+        }
+
+        Collections.sort(finalGrade, new Comparator<SelfAssessmentGradeDetailResponse>() {
+            @Override
+            public int compare(SelfAssessmentGradeDetailResponse o1, SelfAssessmentGradeDetailResponse o2) {
+                return o1.getAspectId().compareTo(o2.getAspectId());
+            }
+        });
+        SelfAssessmentFinalGradeResponse response = new SelfAssessmentFinalGradeResponse(maxGrade, avgGrade, finalGrade);
+        return response;
     }
 
     @Override
@@ -1057,15 +1126,6 @@ public class MonitoringService implements IMonitoringService {
             companyList.remove(map.getCompanyId());
         }
 
-        if(!companyList.isEmpty()){
-            for(Integer key: companyList.keySet()){
-                response.add(new SupervisorMappingResponse(
-                        key, companyList.get(key),
-                        null, null, null, null, null)
-                );
-            }
-        }
-
         return response;
     }
 
@@ -1113,7 +1173,18 @@ public class MonitoringService implements IMonitoringService {
                     map.getLecturerId(), lecturerList.get(map.getLecturerId()),
                     map.getProdiId(), map.getDate(), participants)
             );
+            companyList.remove(map.getCompanyId());
         }
+
+        if(!companyList.isEmpty()){
+            for(Integer key: companyList.keySet()){
+                response.add(new SupervisorMappingResponse(
+                        key, companyList.get(key),
+                        null, null, null, null, null)
+                );
+            }
+        }
+
         return response;
     }
 

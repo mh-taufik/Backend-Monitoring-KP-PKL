@@ -78,6 +78,18 @@ public class SelfAssessmentController {
             return ResponseHandler.generateResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    @GetMapping("/get-final-grade/{id_participant}")
+    @PreAuthorize("hasAnyAuthority('COMMITTEE','PARTICIPANT','SUPERVISOR')")
+    public ResponseEntity<Object> getFinalSelfAssessmentGrade(@PathVariable("id_participant") Integer idParticipant, HttpServletRequest request) {
+        try {
+            SelfAssessmentFinalGradeResponse response = monitoringService.getFinalSelfAssessment(idParticipant);
+            return ResponseHandler.generateResponse("Get Final Self Assessment succeed", HttpStatus.OK, response);
+        } catch (HttpClientErrorException ex){
+            return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return ResponseHandler.generateResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
     @PostMapping("/aspect/create")
     @PreAuthorize("hasAnyAuthority('COMMITTEE')")

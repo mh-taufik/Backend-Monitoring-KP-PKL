@@ -49,6 +49,8 @@ public interface IMonitoringService {
     SelfAssessmentDetailResponse getSelfAssessmentDetail(int id);
     List<SelfAssessmentResponse> getSelfAssessmentList(int idParticipant);
     List<SelfAssessmentGradeDetailResponse> getBestPerformance(int participantId);
+    List<SelfAssessmentGradeDetailResponse> getAverage(int participantId);
+    SelfAssessmentFinalGradeResponse getFinalSelfAssessment(int participantId);
     void updateSelfAssessment(SelfAssessmentUpdateRequest request, Integer participantId, Integer role);
     void createSelfAssessmentAspect(SelfAssessmentAspectRequest request, int creator);
     void updateSelfAssessmentAspect(SelfAssessmentAspectRequest request, int creator);
