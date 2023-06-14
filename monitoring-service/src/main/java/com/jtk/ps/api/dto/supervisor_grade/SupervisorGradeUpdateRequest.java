@@ -15,5 +15,5 @@ public class SupervisorGradeUpdateRequest {
     private Integer id;
     private Integer phase;
     @JsonProperty("grade_list")
-    private List<GradeRequest> gradeList;
+    private List<GradeUpdateRequest> gradeList;
 }

@@ -797,9 +797,12 @@ public class MonitoringService implements IMonitoringService {
             supervisorGrade.setDate(LocalDate.now());
             supervisorGrade.setPhase(request.getPhase());
             SupervisorGrade temp = supervisorGradeRepository.save(supervisorGrade);
-            for (GradeRequest grade : request.getGradeList()) {
-                SupervisorGradeAspect aspect = supervisorGradeAspectRepository.findById((int) grade.getAspectId());
-                supervisorGradeResultRepository.save(new SupervisorGradeResult(null, temp, aspect, grade.getGrade(), aspect.getMaxGrade()));
+            for (GradeUpdateRequest grade : request.getGradeList()) {
+                Optional<SupervisorGradeResult> result = supervisorGradeResultRepository.findById(grade.getGradeId());
+                if(result.isPresent()){
+                    result.get().setGrade(grade.getGrade());
+                    supervisorGradeResultRepository.save(result.get());
+                }
             }
         }
     }
@@ -813,7 +816,7 @@ public class MonitoringService implements IMonitoringService {
         List<SupervisorGradeResult> result = supervisorGradeResultRepository.findBySupervisorGradeId(id);
         List<Grade> grades = new ArrayList<>();
         for(SupervisorGradeResult temp: result){
-            grades.add(new Grade(temp.getId(), temp.getAspectGrade().getDescription(), temp.getGrade()));
+            grades.add(new Grade(temp.getAspectGrade().getId(), temp.getAspectGrade().getDescription(), temp.getId(), temp.getGrade()));
         }
         SupervisorGradeDetailResponse response = new SupervisorGradeDetailResponse(
                 supervisorGrade.getId(),

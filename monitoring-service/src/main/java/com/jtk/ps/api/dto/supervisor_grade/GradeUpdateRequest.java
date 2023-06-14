@@ -8,10 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Grade {
-    @JsonProperty("aspect_id")
-    private Integer aspectId;
-    private String aspect;
+public class GradeUpdateRequest {
     @JsonProperty("grade_id")
     private Integer gradeId;
     private Integer grade;
