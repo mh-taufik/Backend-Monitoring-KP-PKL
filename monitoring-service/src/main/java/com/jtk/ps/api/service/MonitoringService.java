@@ -574,10 +574,10 @@ public class MonitoringService implements IMonitoringService {
         int totalSelfAssessment = 0;
         if(LocalDate.now().isAfter(selfAssessment.getFinishAssignmentDate())){
             totalSelfAssessment = selfAssessment.getFinishAssignmentDate().get(ChronoField.ALIGNED_WEEK_OF_YEAR) - selfAssessment.getStartAssignmentDate().get(ChronoField.ALIGNED_WEEK_OF_YEAR);
-            dateList = selfAssessment.getStartAssignmentDate().datesUntil(selfAssessment.getFinishAssignmentDate().plusDays(1)).filter((t -> businessDays.contains(t.getDayOfWeek()))).collect(Collectors.toList());
+            dateList = selfAssessment.getStartAssignmentDate().datesUntil(selfAssessment.getFinishAssignmentDate()).filter((t -> businessDays.contains(t.getDayOfWeek()))).collect(Collectors.toList());
         }else{
             totalSelfAssessment = LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.SUNDAY)).get(ChronoField.ALIGNED_WEEK_OF_YEAR) - selfAssessment.getStartAssignmentDate().get(ChronoField.ALIGNED_WEEK_OF_YEAR);
-            dateList = selfAssessment.getStartAssignmentDate().datesUntil(LocalDate.now().plusDays(1)).filter((t -> businessDays.contains(t.getDayOfWeek()))).collect(Collectors.toList());
+            dateList = selfAssessment.getStartAssignmentDate().datesUntil(LocalDate.now()).filter((t -> businessDays.contains(t.getDayOfWeek()))).collect(Collectors.toList());
         }
 
         for(SelfAssessment temp:selfAssessments){
