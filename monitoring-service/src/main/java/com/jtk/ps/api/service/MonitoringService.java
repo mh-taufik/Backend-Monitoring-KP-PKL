@@ -604,7 +604,7 @@ public class MonitoringService implements IMonitoringService {
 
         if(totalSelfAssessment != selfAssessments.size()){
             for(LocalDate date: dateList){
-                responses.add(new SelfAssessmentResponse(idParticipant, null, date, date.plusDays(5), null));
+                responses.add(new SelfAssessmentResponse(idParticipant, null, date, date.plusDays(4), null));
             }
         }
 
