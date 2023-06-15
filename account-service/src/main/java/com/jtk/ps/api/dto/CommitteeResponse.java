@@ -14,6 +14,4 @@ public class CommitteeResponse {
     private Integer idLecturer;
 
     private String name;
-
-    private String email;
 }

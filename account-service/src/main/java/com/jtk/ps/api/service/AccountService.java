@@ -99,16 +99,14 @@ public class AccountService implements UserDetailsService, IAccountService {
         readAccountsResponse.setParticipant(accountResponses);
 
         // Get all account Lecturer by prodi
-        if(jwtTokenUtil.getRoleFromToken(token) == ERole.COMMITTEE.id){
+        if(jwtTokenUtil.getRoleFromToken(token) == ERole.COMMITTEE.id || jwtTokenUtil.getRoleFromToken(token) == ERole.SUPERVISOR.id){
             EProdi prodi = jwtTokenUtil.getProdiFromToken(token);
             readAccountsResponse.setLecturer(accountRepository.getAllAccountForCommittee(prodi));
-        }else if(jwtTokenUtil.getRoleFromToken(token) == ERole.SUPERVISOR.id) {
-            EProdi prodi = jwtTokenUtil.getProdiFromToken(token);
-            readAccountsResponse.setLecturer(accountRepository.getAllAccountForSupervisor(prodi));
         }else{
             EProdi prodi = jwtTokenUtil.getProdiFromToken(token);
             readAccountsResponse.setLecturer(accountRepository.getAllAccountForHeadStudyProgram(prodi));
         }
+
 
         // Get all account Company
         ResponseEntity<ResponseList<CompanyResponse>> res = restTemplate.exchange("http://company-service/company/get-all",
@@ -158,7 +156,7 @@ public class AccountService implements UserDetailsService, IAccountService {
         String cookie = "accessToken=" + newAccessToken.get().getTokenValue() + ";refreshToken=" + newRefreshToken.get().getTokenValue();
 
         if (account.getRole() == ERole.COMMITTEE || account.getRole() == ERole.HEAD_STUDY_PROGRAM || account.getRole() == ERole.SUPERVISOR) {
-            Optional<Lecturer> lecturer = Optional.ofNullable(accountRepository.findById(account.getId()).get().getLecturer());
+            Optional<Lecturer> lecturer = lecturerRepository.findByAccountId(account.getId());
 
             lecturer.ifPresent(value -> {
                 claims.put(Constant.PayloadResponseConstant.NAME, value.getName());
@@ -169,7 +167,7 @@ public class AccountService implements UserDetailsService, IAccountService {
             });
 
             if (lecturer.isEmpty()) {
-                throw new IllegalStateException("COMMITTEE OR HEAD OF STUDY PROGRAM OR SUPERVISOR NOT HAVE DATA NAME");
+                throw new IllegalStateException("COMMITTEE OR HEAD OF STUDY PROGRAM NOT HAVE DATA NAME");
             }
         } else if (account.getRole() == ERole.PARTICIPANT) {
                 HttpHeaders headers = new HttpHeaders();
@@ -276,12 +274,12 @@ public class AccountService implements UserDetailsService, IAccountService {
             String cookie = "accessToken=" + newAccessToken.getTokenValue() + ";refreshToken=" + newRefreshToken.getTokenValue();
 
             if(account.getRole() == ERole.COMMITTEE || account.getRole() == ERole.HEAD_STUDY_PROGRAM || account.getRole() == ERole.SUPERVISOR){
-                Optional<Lecturer> lecturer = Optional.ofNullable(accountRepository.findById(account.getId()).get().getLecturer());
+                Optional<Lecturer> lecturer = lecturerRepository.findByAccountId(account.getId());
 
                 if(lecturer.isPresent()){
                     newAccessToken = (jwtTokenUtil.generateAccessToken(user, lecturer.get().getProdi().id, lecturer.get().getId(), lecturer.get().getName()));
                 }else{
-                    throw new IllegalStateException("COMMITTEE OR HEAD OF STUDY PROGRAM OR SUPERVISOR NOT HAVE DATA NAME");
+                    throw new IllegalStateException("COMMITTEE OR SUPERVISOR OR HEAD OF STUDY PROGRAM NOT HAVE DATA NAME");
                 }
             }else if(account.getRole() == ERole.COMPANY){
                 HttpHeaders headers = new HttpHeaders();
@@ -348,22 +346,22 @@ public class AccountService implements UserDetailsService, IAccountService {
         account.setRole(ERole.valueOfId(registerRequest.getIdRole()));
         account.setUsername(registerRequest.getUsername());
         account.setPassword(bCryptPasswordEncoder.encode(registerRequest.getPassword()));
+        Account newAccount = accountRepository.save(account);
         try {
             int idProdi = jwtTokenUtil.getProdiFromToken(accessToken).id;
             if(account.getRole() == ERole.COMMITTEE || account.getRole() == ERole.HEAD_STUDY_PROGRAM || account.getRole() == ERole.SUPERVISOR){
                 if (registerRequest.getName() != null) {
                     Lecturer lecturer = new Lecturer();
+                    lecturer.setAccount(newAccount);
                     lecturer.setName(registerRequest.getName());
                     lecturer.setProdi(EProdi.valueOfId(idProdi));
                     lecturerRepository.save(lecturer);
-                    account.setLecturer(lecturer);
                 }
             }
         } catch (Exception e) {
             accountRepository.delete(account);
             throw new IllegalStateException("Cookie invalid");
         }
-        Account newAccount = accountRepository.save(account);
         return newAccount;
     }
 
@@ -397,7 +395,7 @@ public class AccountService implements UserDetailsService, IAccountService {
 
         account.ifPresent(accountValue -> {
             if (!updateAccountRequest.getName().isEmpty()) {
-                Optional<Lecturer> lecturer = Optional.ofNullable(account.get().getLecturer());
+                Optional<Lecturer> lecturer = lecturerRepository.findByAccountId(accountValue.getId());
                 lecturer.ifPresent(lecturerValue -> {
                     lecturerValue.setName(updateAccountRequest.getName());
                     lecturerRepository.save(lecturerValue);
@@ -412,8 +410,8 @@ public class AccountService implements UserDetailsService, IAccountService {
 
     @Override
     public void deleteAccount(Account account, String cookie) {
-        if (account.getRole().id == ERole.COMMITTEE.id || account.getRole().id == ERole.HEAD_STUDY_PROGRAM.id || account.getRole().id ==ERole.SUPERVISOR.id) {
-            Optional<Lecturer> lecturer = Optional.ofNullable(accountRepository.findById(account.getId()).get().getLecturer());
+        if (account.getRole().id == 0 || account.getRole().id == 3 || account.getRole().id == 4) {
+            Optional<Lecturer> lecturer = lecturerRepository.findByAccountId(account.getId());
 
             if(lecturer.isPresent()){
                 HttpHeaders headers = new HttpHeaders();
@@ -445,11 +443,6 @@ public class AccountService implements UserDetailsService, IAccountService {
     @Override
     public List<CommitteeResponse> getSupervisor() {
         return accountRepository.fetchSupervisorResponseDataInnerJoin();
-    }
-
-    @Override
-    public List<CommitteeResponse> getSupervisorByProdi(Integer prodiId) {
-        return accountRepository.fetchSupervisorResponseDataInnerJoinByProdi(prodiId);
     }
 
     @Override

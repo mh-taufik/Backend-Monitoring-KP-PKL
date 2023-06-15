@@ -100,10 +100,4 @@ public interface IMonitoringService {
     AssociatedDocumentRpp getAssociatedRpp(int participantId, int rppId);
     AssociatedDocumentLogbook getAssociatedLogbook(int participantId, int logbookId);
     AssociatedDocumentSelfAssessment getAssociatedSelfAssessment(int participantId, int selfAsssessmentId);
-
-    //Reminder
-    void sendReminderParticipantLogbook();
-    void sendReminderParticipantRpp();
-    void sendReminderParticipantSelfAssessment();
-    void sendReminderSupervisorGrade();
 }

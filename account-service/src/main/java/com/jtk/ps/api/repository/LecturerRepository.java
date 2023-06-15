@@ -7,5 +7,5 @@ import java.util.Optional;
 public interface LecturerRepository extends JpaRepository<Lecturer, String> {
     Optional<Lecturer> findById(int id);
 
-//    Optional<Lecturer> findByAccountId(Integer accountId);
+    Optional<Lecturer> findByAccountId(Integer accountId);
 }

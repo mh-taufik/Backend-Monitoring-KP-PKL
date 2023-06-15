@@ -1483,24 +1483,4 @@ public class MonitoringService implements IMonitoringService {
         return response;
     }
 
-    @Override
-    public void sendReminderParticipantLogbook() {
-
-    }
-
-    @Override
-    public void sendReminderParticipantRpp() {
-
-    }
-
-    @Override
-    public void sendReminderParticipantSelfAssessment() {
-
-    }
-
-    @Override
-    public void sendReminderSupervisorGrade() {
-
-    }
-
 }

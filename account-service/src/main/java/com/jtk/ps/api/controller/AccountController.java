@@ -29,8 +29,9 @@ import javax.validation.Valid;
 public class AccountController {
     @Autowired
     private IAccountService service;
+
     @GetMapping(value = "/get-all")
-    @PreAuthorize("hasAnyAuthority('COMMITTEE', 'HEAD_STUDY_PROGRAM', 'SUPERVISOR')")
+    @PreAuthorize("hasAnyAuthority('COMMITTEE', 'HEAD_STUDY_PROGRAM')")
     public ResponseEntity<Object> getAccounts(@ApiParam(hidden = true) @CookieValue(name = "accessToken", required = false) String accessToken, HttpServletRequest request) {
         try {
             String token = (String) request.getAttribute("accessToken");
@@ -142,7 +143,7 @@ public class AccountController {
     }
 
     @PostMapping("/committee-change-password")
-    @PreAuthorize("hasAnyAuthority('COMMITTEE', 'HEAD_STUDY_PROGRAM', 'SUPERVISOR')")
+    @PreAuthorize("hasAnyAuthority('COMMITTEE', 'HEAD_STUDY_PROGRAM')")
     public ResponseEntity<Object> committeeChangePassword(@RequestBody @Valid CommitteePasswordRequest committeePasswordRequest) {
         if (!committeePasswordRequest.getNewPassword().equals(committeePasswordRequest.getConfirmNewPassword())) {
             return ResponseHandler.generateResponse("New password is not the same as the confirmation of new password", HttpStatus.BAD_REQUEST);
@@ -196,17 +197,15 @@ public class AccountController {
     }
 
     @GetMapping("/get-supervisor")
-    public ResponseEntity<Object>  getSupervisorById(@RequestParam(value = "id", required = false) Integer id, @RequestParam(value = "prodi_id", required = false) Integer prodiId) {
+    public ResponseEntity<Object>  getSupervisorById(@RequestParam(value = "id", required = false) Integer id) {
         try {
             if(id == null) {
                 return ResponseHandler.generateResponse("Get all supervisor succeed", HttpStatus.OK, service.getSupervisor());
-            }
-            if(id == prodiId) {
-                return ResponseHandler.generateResponse("Get all supervisor succeed", HttpStatus.OK, service.getSupervisorByProdi(prodiId));
             }
             return ResponseHandler.generateResponse("Get supervisor succeed", HttpStatus.OK, service.getSupervisor(id));
         } catch (Exception e) {
             return ResponseHandler.generateResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
+
 }
