@@ -15,4 +15,6 @@ public class SupervisorGradeResponse {
     private Integer id;
     private LocalDate date;
     private Integer phase;
+    @JsonProperty("grade_list")
+    private List<Grade> gradeList;
 }

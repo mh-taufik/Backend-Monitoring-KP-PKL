@@ -24,9 +24,9 @@ public interface LogbookRepository extends JpaRepository<Logbook, Integer> {
 
     @Query(value = "select count(*) from logbook l where l.participant_id = :participant_id and l.grade = :grade",nativeQuery = true)
     Integer countByParticipantIdAndGrade(@Param("participant_id") int participantId, @Param("grade") int grade);
-    @Query(value = "select count(*) from logbook l where l.participant_id = :participant_id and l.grade is null",nativeQuery = true)
+    @Query(value = "select count(*) from logbook l where l.participant_id = :participant_id and l.grade = 0",nativeQuery = true)
     Integer countGradeNull(@Param("participant_id") int participantId);
-    @Query(value = "select count(*) from logbook l where l.participant_id = :participant_id and l.grade is not null",nativeQuery = true)
+    @Query(value = "select count(*) from logbook l where l.participant_id = :participant_id and l.grade != 0",nativeQuery = true)
     Integer countGradeNotNull(@Param("participant_id") int participantId);
     @Query(value = "select count(*) from logbook l where l.participant_id = :participant_id and l.encountered_problem is null",nativeQuery = true)
     Integer countEncounteredProblemNull(@Param("participant_id") int participantId);

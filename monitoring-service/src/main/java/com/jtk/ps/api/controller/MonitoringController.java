@@ -104,4 +104,16 @@ public class MonitoringController {
             return ResponseHandler.generateResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @GetMapping("/document-grade")
+    public ResponseEntity<Object> getDocumentGradeStats(@RequestParam("participant_id") Integer participant, HttpServletRequest request) {
+        try {
+            DocumentGradeStat response = monitoringService.getDocumentGradeStat(participant);
+            return ResponseHandler.generateResponse("get associated data succeed", HttpStatus.OK, response);
+        } catch (HttpClientErrorException ex) {
+            return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return ResponseHandler.generateResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

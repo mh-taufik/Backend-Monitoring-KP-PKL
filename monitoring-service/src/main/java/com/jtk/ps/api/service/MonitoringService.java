@@ -833,7 +833,12 @@ public class MonitoringService implements IMonitoringService {
         List<SupervisorGrade> supervisorGrade = supervisorGradeRepository.findByParticipantId(participantId);
         List<SupervisorGradeResponse> response = new ArrayList<>();
         for(SupervisorGrade temp:supervisorGrade){
-            response.add(new SupervisorGradeResponse(temp.getId(), temp.getDate(), temp.getPhase()));
+            List<SupervisorGradeResult> result = supervisorGradeResultRepository.findBySupervisorGradeId(temp.getId());
+            List<Grade> grades = new ArrayList<>();
+            for(SupervisorGradeResult grade: result){
+                grades.add(new Grade(grade.getAspectGrade().getId(), grade.getAspectGrade().getDescription(), grade.getId(), grade.getGrade()));
+            }
+            response.add(new SupervisorGradeResponse(temp.getId(), temp.getDate(), temp.getPhase(), grades));
         }
         return response;
     }
@@ -1480,6 +1485,16 @@ public class MonitoringService implements IMonitoringService {
         }
         response.setLogbook(newLogbook);
 
+        return response;
+    }
+
+    @Override
+    public DocumentGradeStat getDocumentGradeStat(int participantId) {
+        DocumentGradeStat response = new DocumentGradeStat();
+        response.setLogbookGraded(logbookRepository.countGradeNotNull(participantId));
+        response.setLogbookUngraded(logbookRepository.countGradeNull(participantId));
+        response.setLaporanGraded(supervisorGradeResultRepository.countTotalGraded(participantId));
+        response.setLaporanUngraded(getPhase() - response.getLaporanGraded());
         return response;
     }
 

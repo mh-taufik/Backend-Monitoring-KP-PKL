@@ -14,7 +14,6 @@ public interface LaporanRepository extends JpaRepository<Laporan, Integer>{
     Laporan findById(int id);
     List<Laporan> findByParticipantIdAndPhaseOrderByPhaseAsc(int id, int phase);
 
-//    @Query(value = "select id, uri_name, upload_date, phase from Laporan where participant_id = :id", nativeQuery = true)
     List<Laporan> findByParticipantId(int participantId);
     @Query(value = "select if(count(*)>0, 'true', 'false') from laporan where participant_id = :participant_id and phase = :phase", nativeQuery = true)
     Boolean isExist(@Param("participant_id") int participantId, @Param("phase")  int phase);
@@ -26,4 +25,5 @@ public interface LaporanRepository extends JpaRepository<Laporan, Integer>{
     Integer countAllForCommittee(@Param("start") LocalDate start, @Param("end") LocalDate end);
     @Query(value = "select count(*) from laporan l where l.participant_id in :participant_id",nativeQuery = true)
     Integer countAllInParticipantId(@Param("participant_id") List<Integer> participantId);
+
 }
