@@ -15,12 +15,16 @@ import com.jtk.ps.api.dto.rpp.*;
 import com.jtk.ps.api.model.*;
 import com.jtk.ps.api.repository.*;
 import com.jtk.ps.api.util.Constant;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.ChronoField;
@@ -507,7 +511,7 @@ public class MonitoringService implements IMonitoringService {
         selfAssessment.setFinishDate(request.getFinishDate());
         SelfAssessment sa = selfAssessmentRepository.save(selfAssessment);
 
-        List<SelfAssessmentAspect> aspectList = selfAssessmentAspectRepository.findAllActiveAspect();
+        List<SelfAssessmentAspect> aspectList = selfAssessmentAspectRepository.findAll();
         List<SelfAssessmentGrade> gradeList = new ArrayList<>();
         for (SelfAssessmentAspect aspect : aspectList) {
             for(AssessmentGradeRequest grade: request.getGrade()) {
@@ -518,6 +522,7 @@ public class MonitoringService implements IMonitoringService {
                         gradeList.add(new SelfAssessmentGrade(null, sa, aspect, grade.getGrade(), grade.getDescription()));
                     break;
                 }
+                gradeList.add(new SelfAssessmentGrade(null, sa, aspect, 0, "-"));
             }
         }
         selfAssessmentGradeRepository.saveAll(gradeList);
@@ -1000,7 +1005,8 @@ public class MonitoringService implements IMonitoringService {
         List<Laporan> laporanList = laporanRepository.findByParticipantId(participantId);
         List<LaporanResponse> responses = new ArrayList<>();
         for(Laporan temp:laporanList) {
-            responses.add(new LaporanResponse(temp.getId(), temp.getUriName(), temp.getUploadDate(), temp.getPhase(), null));
+            Optional<SupervisorGrade> supervisorGrade = supervisorGradeRepository.findByParticipantIdAndPhase(temp.getParticipant(), temp.getPhase());
+            responses.add(new LaporanResponse(temp.getId(), temp.getUriName(), temp.getUploadDate(), temp.getPhase(), supervisorGrade.get().getId()));
         }
         return responses;
     }
@@ -1498,4 +1504,16 @@ public class MonitoringService implements IMonitoringService {
         return response;
     }
 
+    @Override
+    public Elements getHariLiburFromDate(LocalDate date) {
+        int year = date.getYear();
+        int month = date.getMonthValue();
+        try {
+            Document doc= Jsoup.connect("http://kalenderbali.com/hari-penting/?bl="+month+"&th="+year).get();
+            Elements hariLibur =  doc.select("div#right-sidebar").select("div.foresmall");
+            return hariLibur;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

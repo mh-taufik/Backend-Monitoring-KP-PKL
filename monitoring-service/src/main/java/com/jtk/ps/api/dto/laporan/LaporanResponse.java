@@ -17,6 +17,7 @@ public class LaporanResponse {
     @JsonProperty("upload_date")
     private LocalDate uploadDate;
     private Integer phase;
+    @JsonProperty("supervisor_grade")
     private Integer supervisorGrade;
 
     public LaporanResponse(Laporan laporan){

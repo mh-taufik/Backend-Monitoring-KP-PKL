@@ -5,13 +5,16 @@ import com.jtk.ps.api.model.ERole;
 import com.jtk.ps.api.service.IMonitoringService;
 import com.jtk.ps.api.util.Constant;
 import com.jtk.ps.api.util.ResponseHandler;
+import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 
 import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -86,6 +89,17 @@ public class MonitoringController {
         }
     }
 
+    @GetMapping("/libur")
+    public ResponseEntity<Object> libur(@RequestParam("date") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate date, HttpServletRequest request) {
+        try {
+            Elements response = monitoringService.getHariLiburFromDate(date);
+            return ResponseHandler.generateResponse("get succeed", HttpStatus.OK, response);
+        } catch (HttpClientErrorException ex){
+            return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return ResponseHandler.generateResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
     @GetMapping("/get")
     public ResponseEntity<Object> verify(HttpServletRequest request) {

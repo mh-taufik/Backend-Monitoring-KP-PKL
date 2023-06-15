@@ -13,6 +13,7 @@ import com.jtk.ps.api.dto.laporan.LaporanCreateRequest;
 import com.jtk.ps.api.dto.laporan.LaporanResponse;
 import com.jtk.ps.api.dto.laporan.LaporanUpdateRequest;
 import com.jtk.ps.api.dto.logbook.*;
+import org.jsoup.select.Elements;
 
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -101,4 +102,5 @@ public interface IMonitoringService {
     AssociatedDocumentLogbook getAssociatedLogbook(int participantId, int logbookId);
     AssociatedDocumentSelfAssessment getAssociatedSelfAssessment(int participantId, int selfAsssessmentId);
     DocumentGradeStat getDocumentGradeStat(int participantId);
+    Elements getHariLiburFromDate(LocalDate date);
 }
