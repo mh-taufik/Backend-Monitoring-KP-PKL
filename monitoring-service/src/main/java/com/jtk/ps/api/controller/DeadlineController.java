@@ -37,6 +37,18 @@ public class DeadlineController {
         }
     }
 
+    @GetMapping("/get-all/laporan")
+    public ResponseEntity<Object> getDeadlineLaporan(HttpServletRequest request) {
+        try {
+            List<DeadlineResponse> response = monitoringService.getDeadlineLaporan();
+            return ResponseHandler.generateResponse("Get List Deadline succeed", HttpStatus.OK, response);
+        } catch (HttpClientErrorException ex){
+            return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return ResponseHandler.generateResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @PostMapping("/create")
     @PreAuthorize("hasAnyAuthority('COMMITTEE')")
     public ResponseEntity<Object> createDeadline(@RequestBody DeadlineCreateRequest deadlineCreateRequest, HttpServletRequest request){

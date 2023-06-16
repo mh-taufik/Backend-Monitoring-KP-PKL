@@ -91,6 +91,7 @@ public interface IMonitoringService {
     void createDeadline(DeadlineCreateRequest request);
     void updateDeadline(DeadlineUpdateRequest request);
     DeadlineResponse getDeadline(int id);
+    List<DeadlineResponse> getDeadlineLaporan();
     List<DeadlineResponse> getDeadline();
 
     //Monitoring

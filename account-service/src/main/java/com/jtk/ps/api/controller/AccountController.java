@@ -2,6 +2,7 @@ package com.jtk.ps.api.controller;
 
 import com.jtk.ps.api.dto.*;
 import com.jtk.ps.api.model.Account;
+import com.jtk.ps.api.model.EProdi;
 import com.jtk.ps.api.service.IAccountService;
 import com.jtk.ps.api.util.Constant;
 import com.jtk.ps.api.util.ResponseHandler;
@@ -197,12 +198,15 @@ public class AccountController {
     }
 
     @GetMapping("/get-supervisor")
-    public ResponseEntity<Object>  getSupervisorById(@RequestParam(value = "id", required = false) Integer id) {
+    public ResponseEntity<Object>  getSupervisorById(@RequestParam(value = "id", required = false) Integer id, @RequestParam(value = "prodi", required = false) EProdi prodi) {
         try {
-            if(id == null) {
-                return ResponseHandler.generateResponse("Get all supervisor succeed", HttpStatus.OK, service.getSupervisor());
+            if(id != null) {
+                return ResponseHandler.generateResponse("Get supervisor succeed", HttpStatus.OK, service.getSupervisor(id));
             }
-            return ResponseHandler.generateResponse("Get supervisor succeed", HttpStatus.OK, service.getSupervisor(id));
+            if(prodi != null) {
+                return ResponseHandler.generateResponse("Get all supervisor by prodi succeed", HttpStatus.OK, service.getSupervisorByProdi(prodi));
+            }
+            return ResponseHandler.generateResponse("Get all supervisor succeed", HttpStatus.OK, service.getSupervisor());
         } catch (Exception e) {
             return ResponseHandler.generateResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
         }

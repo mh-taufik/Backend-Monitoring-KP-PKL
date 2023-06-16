@@ -1297,6 +1297,16 @@ public class MonitoringService implements IMonitoringService {
     }
 
     @Override
+    public List<DeadlineResponse> getDeadlineLaporan() {
+        List<Deadline> deadline = deadlineRepository.findAllByNameLike("Laporan");
+        List<DeadlineResponse> response = new ArrayList<>();
+        for(Deadline temp:deadline){
+            response.add(new DeadlineResponse(temp.getId(), temp.getName(), temp.getDayRange(), temp.getStartAssignmentDate(), temp.getFinishAssignmentDate()));
+        }
+        return response;
+    }
+
+    @Override
     public List<DeadlineResponse> getDeadline() {
         List<Deadline> deadline = deadlineRepository.findAll();
         List<DeadlineResponse> response = new ArrayList<>();

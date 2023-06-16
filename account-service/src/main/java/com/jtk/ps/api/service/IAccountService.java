@@ -2,6 +2,7 @@ package com.jtk.ps.api.service;
 
 import com.jtk.ps.api.dto.*;
 import com.jtk.ps.api.model.Account;
+import com.jtk.ps.api.model.EProdi;
 import org.springframework.http.HttpHeaders;
 
 import java.util.List;
@@ -34,6 +35,8 @@ public interface IAccountService {
     CommitteeResponse getCommittee(Integer id);
 
     List<CommitteeResponse> getSupervisor();
+
+    List<CommitteeResponse> getSupervisorByProdi(EProdi prodi);
 
     CommitteeResponse getSupervisor(Integer id);
 
