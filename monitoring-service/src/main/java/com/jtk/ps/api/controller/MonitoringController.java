@@ -16,6 +16,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 @RestController
@@ -36,7 +37,7 @@ public class MonitoringController {
                 DashboardParticipant response = monitoringService.getDashboardDataParticipant(id);
                 return ResponseHandler.generateResponse("get data dashboard participant succeed", HttpStatus.OK, response);
             }else if(role == ERole.SUPERVISOR.id){
-                Integer id = Integer.valueOf(String.valueOf(request.getAttribute(Constant.VerifyConstant.SUB)));
+                Integer id = (Integer) request.getAttribute(Constant.VerifyConstant.ID);
                 DashboardLecturer response = monitoringService.getDashboardDataLecturer(id);
                 return ResponseHandler.generateResponse("get data dashboard supervisor succeed", HttpStatus.OK, response);
             }else if(role == ERole.COMMITTEE.id){
@@ -89,10 +90,10 @@ public class MonitoringController {
         }
     }
 
-    @GetMapping("/libur")
-    public ResponseEntity<Object> libur(@RequestParam("date") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate date, HttpServletRequest request) {
+    @GetMapping("/get-hari-libur")
+    public ResponseEntity<Object> getHariLiburInMonth(@RequestParam("date") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate date, HttpServletRequest request) {
         try {
-            Elements response = monitoringService.getHariLiburFromDate(date);
+            HashMap<LocalDate, String> response = monitoringService.getHariLiburFromDate(date);
             return ResponseHandler.generateResponse("get succeed", HttpStatus.OK, response);
         } catch (HttpClientErrorException ex){
             return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);

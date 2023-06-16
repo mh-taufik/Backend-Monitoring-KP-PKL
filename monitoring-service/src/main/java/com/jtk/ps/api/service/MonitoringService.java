@@ -17,7 +17,7 @@ import com.jtk.ps.api.repository.*;
 import com.jtk.ps.api.util.Constant;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
+import org.jsoup.nodes.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
@@ -27,6 +27,7 @@ import org.springframework.web.client.RestTemplate;
 import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
@@ -302,18 +303,13 @@ public class MonitoringService implements IMonitoringService {
 
     @Override
     public Boolean isLogbookExist(int participantId, LocalDate date) {
-        HttpEntity<String> req = new HttpEntity<>(new HttpHeaders());
-        RestTemplate template = new RestTemplate();
-        ResponseEntity<List<LiburNasionalResponse>> response = template.exchange(
-                "https://api-harilibur.vercel.app/api?year=" + date.getYear() + "&month=" + date.getMonth(),
-                HttpMethod.GET, req, new ParameterizedTypeReference<>() {});
-        List<LiburNasionalResponse> hariLibur = Objects.requireNonNull(response.getBody());
-        for(LiburNasionalResponse temp:hariLibur){
-            if(date == temp.getHolidayDate() && temp.getIsNationalHoliday())
-                throw new IllegalStateException("Hari ini hari libur "+temp.getHolidayName());
+        HashMap<LocalDate, String> hariLibur = getHariLiburFromDate(LocalDate.now());
+        if(hariLibur.containsKey(date)) {
+            throw new IllegalStateException("Hari ini merupakan " + hariLibur.get(date));
         }
-        if(date.getDayOfWeek().name() == SUNDAY.name() || date.getDayOfWeek().name() == SATURDAY.name())
+        if(date.getDayOfWeek().name() == SUNDAY.name() || date.getDayOfWeek().name() == SATURDAY.name()) {
             throw new IllegalStateException("Hari ini termasuk weekend, tidak menerima logbook");
+        }
 
         return logbookRepository.isExist(participantId, date);
     }
@@ -888,6 +884,7 @@ public class MonitoringService implements IMonitoringService {
         }
         int submittedSelfAssessment = selfAssessmentRepository.countByParticipantId(participantId);
         int missingSelfAssessment = totalSelfAssessment - submittedSelfAssessment;
+        int apresiasiPerusahaanSelfAssessment = selfAssessmentRepository.countApresiasiPerusahaanNotNull(participantId);
 
         StatisticResponse response = new StatisticResponse(
             getPercentage(submittedLogbook, totalLogbook),
@@ -902,7 +899,8 @@ public class MonitoringService implements IMonitoringService {
             getPercentage(nilai.get(ENilai.KURANG), totalLogbook),
             getPercentage(nilai.get(ENilai.BELUM_DINILAI) + missingLogbook, totalLogbook),
             getPercentage(submittedSelfAssessment, totalSelfAssessment),
-            getPercentage(missingSelfAssessment, totalSelfAssessment)
+            getPercentage(missingSelfAssessment, totalSelfAssessment),
+            getPercentage(apresiasiPerusahaanSelfAssessment, totalSelfAssessment)
         );
         return response;
     }
@@ -1505,13 +1503,35 @@ public class MonitoringService implements IMonitoringService {
     }
 
     @Override
-    public Elements getHariLiburFromDate(LocalDate date) {
+    public HashMap<LocalDate, String> getHariLiburFromDate(LocalDate date) {
         int year = date.getYear();
         int month = date.getMonthValue();
         try {
             Document doc= Jsoup.connect("http://kalenderbali.com/hari-penting/?bl="+month+"&th="+year).get();
-            Elements hariLibur =  doc.select("div#right-sidebar").select("div.foresmall");
-            return hariLibur;
+            Element hariLibur =  doc.select("div#right-sidebar").select("div.foresmall").first();
+            String[] split = hariLibur.toString().split("\\n <br>-");
+            HashMap<LocalDate, String> result = new HashMap<>();
+            Boolean finish = false;
+            for(int i=1;i<split.length;i++){
+                String[] temp = split[i].split("[ .]");
+                LocalDate dateRes = LocalDate.of(Integer.valueOf(temp[3]), EMonth.valueOf(temp[2]).id, Integer.valueOf(temp[1]));
+                String descRes = "";
+                for(int j=5;j<temp.length;j++){
+                    if(temp[j].contains("\n")){
+                        descRes += temp[j].replace("\n","");
+                        finish = true;
+                        break;
+                    }
+                    if(j == temp.length - 1)
+                        descRes += temp[j];
+                    else
+                        descRes += temp[j] + " ";
+                }
+                result.put(dateRes, descRes);
+                if(finish)
+                    break;
+            }
+            return result;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

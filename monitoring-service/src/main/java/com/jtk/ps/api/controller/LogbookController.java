@@ -58,7 +58,7 @@ public class LogbookController {
     @PreAuthorize("hasAnyAuthority('SUPERVISOR')")
     public ResponseEntity<Object> gradeLogbook(@RequestBody LogbookGradeRequest logbookGradeRequest, HttpServletRequest request) {
         try {
-            Integer lecturer = Integer.parseInt(String.valueOf(request.getAttribute(Constant.VerifyConstant.SUB)));
+            Integer lecturer = (Integer) request.getAttribute(Constant.VerifyConstant.ID);
             monitoringService.gradeLogbook(logbookGradeRequest, lecturer);
             return ResponseHandler.generateResponse("Save Grade Logbook succeed", HttpStatus.OK);
         } catch (HttpClientErrorException ex){
