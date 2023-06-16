@@ -12,7 +12,7 @@ public interface DeadlineRepository extends JpaRepository<Deadline, Integer> {
     Deadline findById(int id);
 //    @Query(value = "select * from deadline d  where d.name like :name", nativeQuery = true)
     Deadline findByNameLike(String name);
-    @Query(value = "select * from deadline where d.name like '%laporan%'", nativeQuery = true)
+    @Query(value = "select * from deadline where name like '%laporan%'", nativeQuery = true)
     List<Deadline> findAllLaporan();
     @Query(value = "select count(*) from deadline d where d.name like '%laporan%'", nativeQuery = true)
     Integer countLaporanPhase();

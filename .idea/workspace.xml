@@ -7,10 +7,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d4c7c1a4-fecb-4126-864a-961220f9e7ef" name="Changes" comment="add getDeadlineLaporan and fix getSupervisorByProdi">
+    <list default="true" id="d4c7c1a4-fecb-4126-864a-961220f9e7ef" name="Changes" comment="fix getDeadlineLaporan">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/repository/DeadlineRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/repository/DeadlineRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/service/MonitoringService.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/service/MonitoringService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -566,7 +565,14 @@
       <option name="project" value="LOCAL" />
       <updated>1686886724938</updated>
     </task>
-    <option name="localTasksCounter" value="47" />
+    <task id="LOCAL-00047" summary="fix getDeadlineLaporan">
+      <created>1686925920233</created>
+      <option name="number" value="00047" />
+      <option name="presentableId" value="LOCAL-00047" />
+      <option name="project" value="LOCAL" />
+      <updated>1686925920233</updated>
+    </task>
+    <option name="localTasksCounter" value="48" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -581,7 +587,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fix Self Assessment response" />
     <MESSAGE value="Add AssociatedDocument.java" />
     <MESSAGE value="Fix Deliverables etc" />
     <MESSAGE value="Fix AssociatedDocument and Supervisormapping wrong id and supervisor by prodi_id" />
@@ -606,7 +611,8 @@
     <MESSAGE value="fix All Lecturer sub with id" />
     <MESSAGE value="add Function getHariLiburInMonth, to get data from https://kalenderbali.com" />
     <MESSAGE value="add getDeadlineLaporan and fix getSupervisorByProdi" />
-    <option name="LAST_COMMIT_MESSAGE" value="add getDeadlineLaporan and fix getSupervisorByProdi" />
+    <MESSAGE value="fix getDeadlineLaporan" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix getDeadlineLaporan" />
   </component>
   <component name="XDebuggerManager">
     <pin-to-top-manager>
