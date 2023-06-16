@@ -1298,7 +1298,7 @@ public class MonitoringService implements IMonitoringService {
 
     @Override
     public List<DeadlineResponse> getDeadlineLaporan() {
-        List<Deadline> deadline = deadlineRepository.findAllByNameLike("Laporan");
+        List<Deadline> deadline = deadlineRepository.findAllLaporan();
         List<DeadlineResponse> response = new ArrayList<>();
         for(Deadline temp:deadline){
             response.add(new DeadlineResponse(temp.getId(), temp.getName(), temp.getDayRange(), temp.getStartAssignmentDate(), temp.getFinishAssignmentDate()));
@@ -1517,7 +1517,7 @@ public class MonitoringService implements IMonitoringService {
         int year = date.getYear();
         int month = date.getMonthValue();
         try {
-            Document doc= Jsoup.connect("http://kalenderbali.com/hari-penting/?bl="+month+"&th="+year).get();
+            Document doc = Jsoup.connect("http://kalenderbali.com/hari-penting/?bl="+month+"&th="+year).get();
             Element hariLibur =  doc.select("div#right-sidebar").select("div.foresmall").first();
             String[] split = hariLibur.toString().split("\\n <br>-");
             HashMap<LocalDate, String> result = new HashMap<>();
