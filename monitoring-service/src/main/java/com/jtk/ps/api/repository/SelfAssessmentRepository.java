@@ -22,4 +22,6 @@ public interface SelfAssessmentRepository extends JpaRepository<SelfAssessment, 
     Integer countByParticipantId(@Param("participant_id") int participantId);
     @Query(value = "select count(*) from self_assessment where participant_id in (:participant)",nativeQuery = true)
     Integer countAllInParticipantId(@Param("participant") List<Integer> participant);
+    @Query(value = "select count(*) from self_assessment sa join self_assessment_grade sag on sa.id = sag.self_assessment_id join self_assessment_aspect saa on saa.id = sag.self_assessment_aspect_id where sa.participant_id = :participant and (saa.name like '%apresiasi%' and sag.grade > 0)",nativeQuery = true)
+    Integer countApresiasiPerusahaanNotNull(@Param("participant") int participant);
 }

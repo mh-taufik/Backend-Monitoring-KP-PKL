@@ -23,7 +23,6 @@ public class SelfAssessmentController {
     @Autowired
     private IMonitoringService monitoringService;
 
-
     @PostMapping("/create")
     @PreAuthorize("hasAnyAuthority('PARTICIPANT')")
     public ResponseEntity<Object> saveSelfAssessment(@RequestBody SelfAssessmentRequest selfAssessmentCreateRequest, HttpServletRequest request) {

@@ -41,7 +41,7 @@ public class SupervisorGradeController {
     @PreAuthorize("hasAnyAuthority('SUPERVISOR')")
     public ResponseEntity<Object> updateSupervisorGrade(@RequestBody SupervisorGradeUpdateRequest supervisorGradeUpdateRequest, HttpServletRequest request) {
         try {
-            Integer supervisorId = Integer.parseInt(String.valueOf(request.getAttribute(Constant.VerifyConstant.SUB)));
+            Integer supervisorId = (Integer) request.getAttribute(Constant.VerifyConstant.ID);
             monitoringService.updateSupervisorGrade(supervisorGradeUpdateRequest, supervisorId);
             return ResponseHandler.generateResponse("Update SupervisorGrade succeed", HttpStatus.OK);
         } catch (HttpClientErrorException ex){

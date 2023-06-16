@@ -44,7 +44,6 @@ public class SupervisorMappingController {
             int prodi = (int) request.getAttribute(Constant.VerifyConstant.ID_PRODI);
             int id = (int) request.getAttribute(Constant.VerifyConstant.ID);
             Integer role = (Integer) request.getAttribute(Constant.VerifyConstant.ID_ROLE);
-            Integer lecturer = Integer.parseInt(String.valueOf(request.getAttribute(Constant.VerifyConstant.SUB)));
             if(year != null){
                 List<SupervisorMappingResponse> response = monitoringService.getSupervisorMappingByYear(cookie, year);
                 return ResponseHandler.generateResponse("Get Supervisor Mapping in " + year +" succeed", HttpStatus.OK, response);
@@ -58,7 +57,7 @@ public class SupervisorMappingController {
                 return ResponseHandler.generateResponse("Get Supervisor Mapping succeed", HttpStatus.OK, response);
             }
             if(role == ERole.SUPERVISOR.id){
-                List<SupervisorMappingResponse> response = monitoringService.getSupervisorMappingLecturer(cookie, lecturer);
+                List<SupervisorMappingResponse> response = monitoringService.getSupervisorMappingLecturer(cookie, id);
                 return ResponseHandler.generateResponse("Get Supervisor Mapping succeed", HttpStatus.OK, response);
             }
             if(role == ERole.PARTICIPANT.id){
@@ -81,7 +80,7 @@ public class SupervisorMappingController {
     public ResponseEntity<Object> createSupervisorMapping(@RequestBody List<SupervisorMappingRequest> supervisorMappingRequest, HttpServletRequest request){
         try {
             String cookie = request.getHeader(Constant.PayloadResponseConstant.COOKIE);
-            int creatorId = Integer.parseInt(String.valueOf(request.getAttribute(Constant.VerifyConstant.SUB)));
+            int creatorId = (Integer) request.getAttribute(Constant.VerifyConstant.ID);
             monitoringService.createSupervisorMapping(supervisorMappingRequest, cookie, creatorId);
             return ResponseHandler.generateResponse("Create Supervisor Mapping succeed", HttpStatus.OK);
         } catch (Exception e) {
@@ -94,7 +93,7 @@ public class SupervisorMappingController {
     public ResponseEntity<Object> updateSupervisorMapping(@RequestBody List<SupervisorMappingRequest> supervisorMappingRequest, HttpServletRequest request){
         try {
             String cookie = request.getHeader(Constant.PayloadResponseConstant.COOKIE);
-            int creatorId = Integer.parseInt(String.valueOf(request.getAttribute(Constant.VerifyConstant.SUB)));
+            int creatorId = (Integer) request.getAttribute(Constant.VerifyConstant.ID);
             monitoringService.updateSupervisorMapping(supervisorMappingRequest, cookie, creatorId);
             return ResponseHandler.generateResponse("Update Supervisor Mapping succeed", HttpStatus.OK);
         } catch (Exception e) {

@@ -35,4 +35,6 @@ public class StatisticResponse {
     private Percentage selfAssessmentSubmitted;
     @JsonProperty("self_assessment_missing")
     private Percentage selfAssessmentMissing;
+    @JsonProperty("self_assessment_apresiasi_perusahaan")
+    private Percentage selfAssessmentApresiasiPerusahaan;
 }
