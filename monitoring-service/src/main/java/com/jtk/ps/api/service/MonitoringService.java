@@ -23,11 +23,12 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
@@ -310,8 +311,9 @@ public class MonitoringService implements IMonitoringService {
         if(date.getDayOfWeek().name() == SUNDAY.name() || date.getDayOfWeek().name() == SATURDAY.name()) {
             throw new IllegalStateException("Hari ini termasuk weekend, tidak menerima logbook");
         }
-
-        return logbookRepository.isExist(participantId, date);
+        if(logbookRepository.isExist(participantId, date))
+            throw new IllegalStateException("logbook sudah ada pada tanggal ini, mohon pilih update");
+        return true;
     }
 
     @Override
@@ -510,17 +512,21 @@ public class MonitoringService implements IMonitoringService {
         List<SelfAssessmentAspect> aspectList = selfAssessmentAspectRepository.findAll();
         List<SelfAssessmentGrade> gradeList = new ArrayList<>();
         for (SelfAssessmentAspect aspect : aspectList) {
+            boolean find = false;
             for(AssessmentGradeRequest grade: request.getGrade()) {
                 if (aspect.getId() == grade.getAspectId() && grade != null){
+                    find = true;
                     if(grade.getGrade() == null)
                         gradeList.add(new SelfAssessmentGrade(null, sa, aspect, 0, grade.getDescription()));
                     else
                         gradeList.add(new SelfAssessmentGrade(null, sa, aspect, grade.getGrade(), grade.getDescription()));
                     break;
                 }
-                gradeList.add(new SelfAssessmentGrade(null, sa, aspect, 0, "-"));
             }
+            if(!find)
+                gradeList.add(new SelfAssessmentGrade(null, sa, aspect, 0, "-"));
         }
+
         selfAssessmentGradeRepository.saveAll(gradeList);
         return new CreateId(sa.getId());
     }
@@ -944,6 +950,31 @@ public class MonitoringService implements IMonitoringService {
             response.add(new SupervisorGradeAspectResponse(aspect.getId(), aspect.getDescription(), aspect.getMaxGrade(), aspect.getEditedBy(), aspect.getLastEditDate(), aspect.getName()));
         }
         return response;
+    }
+
+    @Override
+    public CreateId uploadLaporan(Integer phase, MultipartFile file, Integer participantId) {
+        Laporan laporan = new Laporan();
+        laporan.setParticipant(participantId);
+//        laporan.setUriName(laporanCreateRequest.getUri());
+//        laporan.setPhase(laporanCreateRequest.getPhase());
+        laporan.setUploadDate(LocalDate.now());
+
+//        if(laporanRepository.findByParticipantIdAndPhaseOrderByPhaseAsc(participantId, laporanCreateRequest.getPhase()) == null){
+//            laporan.setId(null);
+//        }
+
+//        Laporan temp = laporanRepository.save(laporan);
+
+//        List<SupervisorGradeAspect> aspectList = supervisorGradeAspectRepository.findAll();
+//        List<GradeRequest> requests = new ArrayList<>();
+//        for(SupervisorGradeAspect aspect:aspectList){
+//            requests.add(new GradeRequest(aspect.getId(), 0));
+//        }
+//        createSupervisorGrade(new SupervisorGradeCreateRequest(temp.getPhase(), temp.getParticipant(), requests));
+//
+//        return new CreateId(temp.getId());
+        return null;
     }
 
     @Override
@@ -1507,7 +1538,10 @@ public class MonitoringService implements IMonitoringService {
         DocumentGradeStat response = new DocumentGradeStat();
         response.setLogbookGraded(logbookRepository.countGradeNotNull(participantId));
         response.setLogbookUngraded(logbookRepository.countGradeNull(participantId));
-        response.setLaporanGraded(supervisorGradeResultRepository.countTotalGraded(participantId));
+        if(supervisorGradeResultRepository.countTotalGraded(participantId) != null)
+            response.setLaporanGraded(supervisorGradeResultRepository.countTotalGraded(participantId));
+        else
+            response.setLaporanGraded(0);
         response.setLaporanUngraded(getPhase() - response.getLaporanGraded());
         return response;
     }
