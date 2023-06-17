@@ -1,6 +1,5 @@
 package com.jtk.ps.api.controller;
 
-import com.jtk.ps.api.dto.CheckDate;
 import com.jtk.ps.api.dto.CheckLaporan;
 import com.jtk.ps.api.dto.CreateId;
 import com.jtk.ps.api.dto.laporan.LaporanCreateRequest;
@@ -15,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -51,6 +51,18 @@ public class LaporanController {
             return ResponseHandler.generateResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+//    @PostMapping("/upload")
+//    @PreAuthorize("hasAnyAuthority('PARTICIPANT')")
+//    public ResponseEntity<Object> uploadLaporan(@RequestParam("phase") Integer phase, @RequestParam("file") MultipartFile file, HttpServletRequest request){
+//        try {
+//            Integer participantId = (Integer) request.getAttribute(Constant.VerifyConstant.ID);
+//            CreateId id = monitoringService.uploadLaporan(, laporanUploadRequest, , participantId);
+//            return ResponseHandler.generateResponse("Create Laporan succeed", HttpStatus.OK, id);
+//        } catch (Exception e) {
+//            return ResponseHandler.generateResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
+//    }
 
     @PostMapping("/create")
     @PreAuthorize("hasAnyAuthority('PARTICIPANT')")
