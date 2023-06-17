@@ -4,6 +4,7 @@ import com.jtk.ps.api.dto.*;
 import com.jtk.ps.api.dto.deadline.DeadlineCreateRequest;
 import com.jtk.ps.api.dto.deadline.DeadlineResponse;
 import com.jtk.ps.api.dto.deadline.DeadlineUpdateRequest;
+import com.jtk.ps.api.dto.laporan.LaporanUploadRequest;
 import com.jtk.ps.api.dto.rpp.*;
 import com.jtk.ps.api.dto.self_assessment.*;
 import com.jtk.ps.api.dto.supervisor_grade.*;
@@ -13,6 +14,7 @@ import com.jtk.ps.api.dto.laporan.LaporanCreateRequest;
 import com.jtk.ps.api.dto.laporan.LaporanResponse;
 import com.jtk.ps.api.dto.laporan.LaporanUpdateRequest;
 import com.jtk.ps.api.dto.logbook.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -68,6 +70,7 @@ public interface IMonitoringService {
     List<SupervisorGradeAspectResponse> getListSupervisorGradeAspect();
 
     //Laporan KP PKL
+    CreateId uploadLaporan(Integer phase, MultipartFile file, Integer participantId);
     CreateId createLaporan(LaporanCreateRequest laporanCreateRequest, Integer participantId);
     void updateLaporan(LaporanUpdateRequest laporanUpdateRequest, Integer participantId);
     LaporanResponse getLaporan(Integer id);
