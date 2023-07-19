@@ -7,14 +7,30 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d4c7c1a4-fecb-4126-864a-961220f9e7ef" name="Changes" comment="fix getDeadlineLaporan">
-      <change afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/dto/laporan/LaporanUploadRequest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/error/FileStorageException.java" afterDir="false" />
+    <list default="true" id="d4c7c1a4-fecb-4126-864a-961220f9e7ef" name="Changes" comment="add LaporanUploadRequest">
+      <change afterPath="$PROJECT_DIR$/mapping-service/src/main/java/com/jtk/ps/api/dto/ListFinalMappingResponse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/dto/Response.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/monitoring-service/src/test/java/com/jtk/ps/api/integration/DeadlineControllerTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/monitoring-service/src/test/java/com/jtk/ps/api/integration/IntegrationTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/monitoring-service/src/test/java/com/jtk/ps/api/integration/LogbookControllerTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/monitoring-service/src/test/java/com/jtk/ps/api/integration/SupervisorMappingControllerTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/controller/LaporanController.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/controller/LaporanController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mapping-service/src/main/java/com/jtk/ps/api/controller/MappingController.java" beforeDir="false" afterPath="$PROJECT_DIR$/mapping-service/src/main/java/com/jtk/ps/api/controller/MappingController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mapping-service/src/main/java/com/jtk/ps/api/service/MappingService.java" beforeDir="false" afterPath="$PROJECT_DIR$/mapping-service/src/main/java/com/jtk/ps/api/service/MappingService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/controller/MonitoringController.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/controller/MonitoringController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/controller/SupervisorGradeController.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/controller/SupervisorGradeController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/dto/DashboardParticipant.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/dto/DashboardParticipant.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/dto/logbook/LogbookGradeRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/dto/logbook/LogbookGradeRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/dto/logbook/LogbookResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/dto/logbook/LogbookResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/model/ENilai.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/model/EGrade.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/model/Logbook.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/model/Logbook.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/service/IMonitoringService.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/service/IMonitoringService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/service/MonitoringService.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/service/MonitoringService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/util/Constant.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/util/Constant.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/participant-service/src/main/java/com/jtk/ps/api/controller/ParticipantController.java" beforeDir="false" afterPath="$PROJECT_DIR$/participant-service/src/main/java/com/jtk/ps/api/controller/ParticipantController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/participant-service/src/main/java/com/jtk/ps/api/repository/ParticipantRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/participant-service/src/main/java/com/jtk/ps/api/repository/ParticipantRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/participant-service/src/main/java/com/jtk/ps/api/service/IParticipantService.java" beforeDir="false" afterPath="$PROJECT_DIR$/participant-service/src/main/java/com/jtk/ps/api/service/IParticipantService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/participant-service/src/main/java/com/jtk/ps/api/service/ParticipantService.java" beforeDir="false" afterPath="$PROJECT_DIR$/participant-service/src/main/java/com/jtk/ps/api/service/ParticipantService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -91,10 +107,10 @@
 }</component>
   <component name="RecentsManager">
     <key name="CreateClassDialog.RecentsKey">
+      <recent name="com.jtk.ps.api.dto" />
       <recent name="com.jtk.ps.api.dto.laporan" />
       <recent name="com.jtk.ps.api.dto.supervisor_grade" />
       <recent name="com.jtk.ps.api.dto.self_assessment" />
-      <recent name="com.jtk.ps.api.dto" />
       <recent name="com.jtk.ps.api.dto.supervisor_mapping" />
     </key>
     <key name="CopyFile.RECENT_KEYS">
@@ -103,11 +119,11 @@
       <recent name="D:\TA\Github\Backend-Monitoring-KP-PKL\monitoring-service\src\main\resources" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
-      <recent name="com.jtk.ps.api.model" />
       <recent name="com.jtk.ps.api.dto" />
+      <recent name="com.jtk.ps.api.integration" />
+      <recent name="com.jtk.ps.api.model" />
       <recent name="com.jtk.ps.api.dto.rpp" />
       <recent name="com.jtk.ps.api.dto.supervisor_mapping" />
-      <recent name="com.jtk.ps.api.repository" />
     </key>
   </component>
   <component name="RunAnythingCache">
@@ -124,13 +140,13 @@
       </set>
     </option>
   </component>
-  <component name="RunManager" selected="Application.MonitoringServiceApplication">
-    <configuration name="AccountServiceApplication" type="Application" factoryName="Application" nameIsGenerated="true">
+  <component name="RunManager" selected="Application.ParticipantServiceApplication">
+    <configuration name="AccountServiceApplication" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="com.jtk.ps.api.AccountServiceApplication" />
       <module name="account-service" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.jtk.ps.api.*" />
+          <option name="PATTERN" value="com.jtk.ps.api.unit.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -151,12 +167,12 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="CompanyServiceApplication" type="Application" factoryName="Application" nameIsGenerated="true">
+    <configuration name="CompanyServiceApplication" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="com.jtk.ps.api.CompanyServiceApplication" />
       <module name="company-service" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.jtk.ps.api.*" />
+          <option name="PATTERN" value="com.jtk.ps.api.unit.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -164,12 +180,12 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="ManagementContentServiceApplication" type="Application" factoryName="Application" nameIsGenerated="true">
+    <configuration name="ManagementContentServiceApplication" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="com.jtk.ps.api.ManagementContentServiceApplication" />
       <module name="management-content-service" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.jtk.ps.api.*" />
+          <option name="PATTERN" value="com.jtk.ps.api.unit.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -177,12 +193,12 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="MappingServiceApplication" type="Application" factoryName="Application" nameIsGenerated="true">
+    <configuration name="MappingServiceApplication" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="com.jtk.ps.api.MappingServiceApplication" />
       <module name="mapping-service" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.jtk.ps.api.*" />
+          <option name="PATTERN" value="com.jtk.ps.api.unit.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -190,12 +206,12 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="MonitoringServiceApplication" type="Application" factoryName="Application" nameIsGenerated="true">
+    <configuration name="MonitoringServiceApplication" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="com.jtk.ps.api.MonitoringServiceApplication" />
       <module name="monitoring-service" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.jtk.ps.api.*" />
+          <option name="PATTERN" value="com.jtk.ps.api.unit.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -203,12 +219,12 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="ParticipantServiceApplication" type="Application" factoryName="Application" nameIsGenerated="true">
+    <configuration name="ParticipantServiceApplication" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="com.jtk.ps.api.ParticipantServiceApplication" />
       <module name="participant-service" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.jtk.ps.api.*" />
+          <option name="PATTERN" value="com.jtk.ps.api.unit.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -229,16 +245,37 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="SupervisorMappingControllerTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="monitoring-service" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.jtk.ps.api.integration.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.jtk.ps.api.integration" />
+      <option name="MAIN_CLASS_NAME" value="com.jtk.ps.api.integration.SupervisorMappingControllerTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <list>
-      <item itemvalue="Application.AccountServiceApplication" />
       <item itemvalue="Application.MonitoringServiceApplication" />
-      <item itemvalue="Application.ServiceRegistryApplication" />
-      <item itemvalue="Application.ParticipantServiceApplication" />
-      <item itemvalue="Application.ApiGatewayApplication" />
+      <item itemvalue="Application.AccountServiceApplication" />
       <item itemvalue="Application.CompanyServiceApplication" />
       <item itemvalue="Application.ManagementContentServiceApplication" />
       <item itemvalue="Application.MappingServiceApplication" />
+      <item itemvalue="Application.ParticipantServiceApplication" />
+      <item itemvalue="Application.ServiceRegistryApplication" />
+      <item itemvalue="Application.ApiGatewayApplication" />
+      <item itemvalue="JUnit.SupervisorMappingControllerTest" />
     </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="JUnit.SupervisorMappingControllerTest" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -248,20 +285,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1674536022871</updated>
-    </task>
-    <task id="LOCAL-00001" summary="fix mapping-service controller">
-      <created>1685813311010</created>
-      <option name="number" value="00001" />
-      <option name="presentableId" value="LOCAL-00001" />
-      <option name="project" value="LOCAL" />
-      <updated>1685813311010</updated>
-    </task>
-    <task id="LOCAL-00002" summary="fix monitoring-service controller">
-      <created>1685864074665</created>
-      <option name="number" value="00002" />
-      <option name="presentableId" value="LOCAL-00002" />
-      <option name="project" value="LOCAL" />
-      <updated>1685864074666</updated>
     </task>
     <task id="LOCAL-00003" summary="fix monitoring-service controller">
       <created>1685864137154</created>
@@ -585,7 +608,28 @@
       <option name="project" value="LOCAL" />
       <updated>1686935701111</updated>
     </task>
-    <option name="localTasksCounter" value="49" />
+    <task id="LOCAL-00049" summary="fix getDocumentGradeStat and createSelfAssessment">
+      <created>1687010505230</created>
+      <option name="number" value="00049" />
+      <option name="presentableId" value="LOCAL-00049" />
+      <option name="project" value="LOCAL" />
+      <updated>1687010505230</updated>
+    </task>
+    <task id="LOCAL-00050" summary="fix getDocumentGradeStat and createSelfAssessment">
+      <created>1687010572924</created>
+      <option name="number" value="00050" />
+      <option name="presentableId" value="LOCAL-00050" />
+      <option name="project" value="LOCAL" />
+      <updated>1687010572925</updated>
+    </task>
+    <task id="LOCAL-00051" summary="add LaporanUploadRequest">
+      <created>1687017123014</created>
+      <option name="number" value="00051" />
+      <option name="presentableId" value="LOCAL-00051" />
+      <option name="project" value="LOCAL" />
+      <updated>1687017123014</updated>
+    </task>
+    <option name="localTasksCounter" value="52" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -600,8 +644,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Add AssociatedDocument.java" />
-    <MESSAGE value="Fix Deliverables etc" />
     <MESSAGE value="Fix AssociatedDocument and Supervisormapping wrong id and supervisor by prodi_id" />
     <MESSAGE value="Fix UpdateRpp" />
     <MESSAGE value="Fix getSelfAssessmentAspect" />
@@ -625,7 +667,9 @@
     <MESSAGE value="add Function getHariLiburInMonth, to get data from https://kalenderbali.com" />
     <MESSAGE value="add getDeadlineLaporan and fix getSupervisorByProdi" />
     <MESSAGE value="fix getDeadlineLaporan" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix getDeadlineLaporan" />
+    <MESSAGE value="fix getDocumentGradeStat and createSelfAssessment" />
+    <MESSAGE value="add LaporanUploadRequest" />
+    <option name="LAST_COMMIT_MESSAGE" value="add LaporanUploadRequest" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

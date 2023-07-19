@@ -116,7 +116,7 @@ public class MappingService implements IMappingService {
         HttpEntity<String> req = new HttpEntity<>(headers);
 
         ResponseEntity<ResponseList<ParticipantResponse>> pResponse = restTemplate.exchange(
-                "http://participant-service/participant/get-all?year=" + currentYear,
+                "http://participant-service/participant/get-all?type=full&year=" + currentYear,
                 HttpMethod.GET,
                 req,
                 new ParameterizedTypeReference<>() {

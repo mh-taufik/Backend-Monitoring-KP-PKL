@@ -1,8 +1,5 @@
 package com.jtk.ps.api.model;
 
-import com.jtk.ps.api.dto.logbook.LogbookGradeRequest;
-import com.jtk.ps.api.dto.logbook.LogbookCreateRequest;
-import com.jtk.ps.api.dto.logbook.LogbookUpdateRequest;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -57,7 +54,7 @@ public class Logbook {
     private String description;
 
     @Column(name = "grade")
-    private ENilai grade;
+    private EGrade grade;
 
     @Column(name = "encountered_problem")
     private String encounteredProblem;

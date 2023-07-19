@@ -26,11 +26,11 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAdjusters;
+import java.time.temporal.WeekFields;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -409,7 +409,7 @@ public class MonitoringService implements IMonitoringService {
                 logbook.getTools(),
                 logbook.getWorkResult(),
                 logbook.getDescription(),
-                ENilai.BELUM_DINILAI,
+                EGrade.BELUM_DINILAI,
                 logbook.getEncounteredProblem(),
                 null
         );
@@ -867,12 +867,12 @@ public class MonitoringService implements IMonitoringService {
         int missingLogbook = (totalLogbook - submittedLogbook);
 
         //Nilai Logbook
-        HashMap<ENilai, Integer> nilai = new HashMap<>();
-        nilai.put(ENilai.SANGAT_BAIK, logbookRepository.countByParticipantIdAndGrade(participantId, ENilai.SANGAT_BAIK.id));
-        nilai.put(ENilai.BAIK, logbookRepository.countByParticipantIdAndGrade(participantId, ENilai.BAIK.id));
-        nilai.put(ENilai.CUKUP, logbookRepository.countByParticipantIdAndGrade(participantId, ENilai.CUKUP.id));
-        nilai.put(ENilai.KURANG, logbookRepository.countByParticipantIdAndGrade(participantId, ENilai.KURANG.id));
-        nilai.put(ENilai.BELUM_DINILAI, logbookRepository.countByParticipantIdAndGrade(participantId, ENilai.BELUM_DINILAI.id));
+        HashMap<EGrade, Integer> nilai = new HashMap<>();
+        nilai.put(EGrade.SANGAT_BAIK, logbookRepository.countByParticipantIdAndGrade(participantId, EGrade.SANGAT_BAIK.id));
+        nilai.put(EGrade.BAIK, logbookRepository.countByParticipantIdAndGrade(participantId, EGrade.BAIK.id));
+        nilai.put(EGrade.CUKUP, logbookRepository.countByParticipantIdAndGrade(participantId, EGrade.CUKUP.id));
+        nilai.put(EGrade.KURANG, logbookRepository.countByParticipantIdAndGrade(participantId, EGrade.KURANG.id));
+        nilai.put(EGrade.BELUM_DINILAI, logbookRepository.countByParticipantIdAndGrade(participantId, EGrade.BELUM_DINILAI.id));
 
         //Kedisiplinan Logbook
         Integer onTime = logbookRepository.countStatusOnTime(participantId);
@@ -899,11 +899,11 @@ public class MonitoringService implements IMonitoringService {
             getPercentage(late, totalLogbook),
             getPercentage(match, totalLogbook),
             getPercentage(notMatch, totalLogbook),
-            getPercentage(nilai.get(ENilai.SANGAT_BAIK), totalLogbook),
-            getPercentage(nilai.get(ENilai.BAIK), totalLogbook),
-            getPercentage(nilai.get(ENilai.CUKUP), totalLogbook),
-            getPercentage(nilai.get(ENilai.KURANG), totalLogbook),
-            getPercentage(nilai.get(ENilai.BELUM_DINILAI) + missingLogbook, totalLogbook),
+            getPercentage(nilai.get(EGrade.SANGAT_BAIK), totalLogbook),
+            getPercentage(nilai.get(EGrade.BAIK), totalLogbook),
+            getPercentage(nilai.get(EGrade.CUKUP), totalLogbook),
+            getPercentage(nilai.get(EGrade.KURANG), totalLogbook),
+            getPercentage(nilai.get(EGrade.BELUM_DINILAI) + missingLogbook, totalLogbook),
             getPercentage(submittedSelfAssessment, totalSelfAssessment),
             getPercentage(missingSelfAssessment, totalSelfAssessment),
             getPercentage(apresiasiPerusahaanSelfAssessment, totalSelfAssessment)
@@ -950,31 +950,6 @@ public class MonitoringService implements IMonitoringService {
             response.add(new SupervisorGradeAspectResponse(aspect.getId(), aspect.getDescription(), aspect.getMaxGrade(), aspect.getEditedBy(), aspect.getLastEditDate(), aspect.getName()));
         }
         return response;
-    }
-
-    @Override
-    public CreateId uploadLaporan(Integer phase, MultipartFile file, Integer participantId) {
-        Laporan laporan = new Laporan();
-        laporan.setParticipant(participantId);
-//        laporan.setUriName(laporanCreateRequest.getUri());
-//        laporan.setPhase(laporanCreateRequest.getPhase());
-        laporan.setUploadDate(LocalDate.now());
-
-//        if(laporanRepository.findByParticipantIdAndPhaseOrderByPhaseAsc(participantId, laporanCreateRequest.getPhase()) == null){
-//            laporan.setId(null);
-//        }
-
-//        Laporan temp = laporanRepository.save(laporan);
-
-//        List<SupervisorGradeAspect> aspectList = supervisorGradeAspectRepository.findAll();
-//        List<GradeRequest> requests = new ArrayList<>();
-//        for(SupervisorGradeAspect aspect:aspectList){
-//            requests.add(new GradeRequest(aspect.getId(), 0));
-//        }
-//        createSupervisorGrade(new SupervisorGradeCreateRequest(temp.getPhase(), temp.getParticipant(), requests));
-//
-//        return new CreateId(temp.getId());
-        return null;
     }
 
     @Override
@@ -1070,8 +1045,18 @@ public class MonitoringService implements IMonitoringService {
             ResponseEntity<ResponseList<MappingResponse>> mappingRes = restTemplate.exchange("http://mapping-service/mapping/final/company/"+request.getCompanyId(),
                     HttpMethod.GET, req, new ParameterizedTypeReference<>() {});
             List<MappingResponse> mappingResponses = Objects.requireNonNull(mappingRes.getBody()).getData();
-            for (MappingResponse mapping : mappingResponses) {
-                map.add(new SupervisorMapping(null, LocalDate.now(), request.getCompanyId(), mapping.getParticipantId(), request.getLecturerId(), mapping.getProdiId(), creatorId));
+            List<SupervisorMapping> mappingList = supervisorMappingRepository.findByCompanyId(request.getCompanyId());
+            if(mappingList.size() == 0){
+                for (MappingResponse mapping : mappingResponses) {
+                    map.add(new SupervisorMapping(null, LocalDate.now(), request.getCompanyId(), mapping.getParticipantId(), request.getLecturerId(), mapping.getProdiId(), creatorId));
+                }
+            }else{
+                for(SupervisorMapping temp:mappingList){
+                    temp.setDate(LocalDate.now());
+                    temp.setCreateBy(creatorId);
+                    temp.setLecturerId(request.getLecturerId());
+                    map.add(temp);
+                }
             }
             supervisorMappingRepository.saveAll(map);
         }
@@ -1112,14 +1097,18 @@ public class MonitoringService implements IMonitoringService {
             }
             user.add(participantList);
         } else if(type.equals("simple") && year == null){
-            ResponseEntity<ResponseList<ParticipantDropdownResponse>> participantRes = restTemplate.exchange("http://participant-service/participant/get-all?type=dropdown",
+            HashMap<Integer, String> companyList = new HashMap<>();
+            ResponseEntity<Response<FinalMapResponse>> mappingRes = restTemplate.exchange("http://mapping-service/mapping/final",
                     HttpMethod.GET, req, new ParameterizedTypeReference<>() {
                     });
-            List<ParticipantDropdownResponse> participantResponseList = Objects.requireNonNull(participantRes.getBody()).getData();
-            for (ParticipantDropdownResponse participant : participantResponseList) {
-                participantList.put(participant.getId(), participant.getName());
+            FinalMapResponse finalMappingResponse = Objects.requireNonNull(mappingRes.getBody()).getData();
+            for (FinalMappingItem item : finalMappingResponse.getFinalMapping()) {
+                companyList.put(item.getCompany().getId(), item.getCompany().getName());
+                item.getParticipant().forEach(temp -> {participantList.put(temp.getId(), temp.getName());});
             }
+
             user.add(participantList);
+            user.add(companyList);
         } else if(type.equals("full") && year == null){
             ResponseEntity<ResponseList<ParticipantResponse>> participantRes = restTemplate.exchange("http://participant-service/participant/get-all",
                     HttpMethod.GET, req, new ParameterizedTypeReference<>() {
@@ -1132,15 +1121,17 @@ public class MonitoringService implements IMonitoringService {
         }
 
         //get company
-        HashMap<Integer, String> companyList = new HashMap<>();
-        ResponseEntity<ResponseList<CompanyResponse>> companyRes = restTemplate.exchange("http://company-service/company/get-all?type=dropdown",
-                HttpMethod.GET, req, new ParameterizedTypeReference<>() {
-                });
-        List<CompanyResponse> companyResponses = Objects.requireNonNull(companyRes.getBody()).getData();
-        for (CompanyResponse company : companyResponses) {
-            companyList.put(company.getId(), company.getName());
+        if(!type.equals("simple")){
+            HashMap<Integer, String> companyList = new HashMap<>();
+            ResponseEntity<ResponseList<CompanyResponse>> companyRes = restTemplate.exchange("http://company-service/company/get-all?type=dropdown",
+                    HttpMethod.GET, req, new ParameterizedTypeReference<>() {
+                    });
+            List<CompanyResponse> companyResponses = Objects.requireNonNull(companyRes.getBody()).getData();
+            for (CompanyResponse company : companyResponses) {
+                companyList.put(company.getId(), company.getName());
+            }
+            user.add(companyList);
         }
-        user.add(companyList);
 
         //get Supervisor
         HashMap<Integer, String> lecturerList = new HashMap<>();
@@ -1229,12 +1220,23 @@ public class MonitoringService implements IMonitoringService {
             companyList.remove(map.getCompanyId());
         }
 
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(Constant.PayloadResponseConstant.COOKIE, cookie);
+        HttpEntity<String> req = new HttpEntity<>(headers);
+        ResponseEntity<Response<FinalMapResponse>> mappingRes = restTemplate.exchange("http://mapping-service/mapping/final",
+                HttpMethod.GET, req, new ParameterizedTypeReference<>() {
+                });
+        FinalMapResponse finalMappingResponse = Objects.requireNonNull(mappingRes.getBody()).getData();
+
         if(!companyList.isEmpty()){
             for(Integer key: companyList.keySet()){
-                response.add(new SupervisorMappingResponse(
-                        key, companyList.get(key),
-                        null, null, null, null, null)
-                );
+                for(FinalMappingItem item:finalMappingResponse.getFinalMapping()){
+                    if(companyList.get(key).equals(item.getCompany().getName())){
+                        response.add(new SupervisorMappingResponse(key, companyList.get(key),
+                                null, null, prodi, null, item.getParticipant())
+                        );
+                    }
+                }
             }
         }
 
@@ -1291,7 +1293,6 @@ public class MonitoringService implements IMonitoringService {
         headers.add(Constant.PayloadResponseConstant.COOKIE, cookie);
         HttpEntity<String> req = new HttpEntity<>(headers);
 
-
         ResponseEntity<ResponseList<ParticipantDropdownResponse>> participantRes = restTemplate.exchange("http://participant-service/participant/get-all?type=dropdown",
                 HttpMethod.GET, req, new ParameterizedTypeReference<>() {
                 });
@@ -1311,12 +1312,22 @@ public class MonitoringService implements IMonitoringService {
     @Override
     public void updateDeadline(DeadlineUpdateRequest request) {
         Deadline deadline = deadlineRepository.findById((int)request.getId());
-        if(request.getDayRange() != null)
+        if(deadline.getId() <= 3) {
+            if (request.getStartAssignmentDate() != null)
+                deadline.setStartAssignmentDate(request.getStartAssignmentDate());
+                WeekFields weekFields = WeekFields.of(Locale.getDefault());
+                LocalDate date = LocalDate.ofYearDay(request.getStartAssignmentDate().getYear(), 1)
+                    .with(weekFields.weekOfYear(), request.getStartAssignmentDate().get(ChronoField.ALIGNED_WEEK_OF_YEAR) + 17)
+                    .with(weekFields.dayOfWeek(), 6);
+                deadline.setFinishAssignmentDate(date);
+        }else{
+            if (request.getStartAssignmentDate() != null)
+                deadline.setStartAssignmentDate(request.getStartAssignmentDate());
+            if(request.getFinishAssignmentDate() != null)
+                deadline.setFinishAssignmentDate(request.getFinishAssignmentDate());
+        }
+        if (request.getDayRange() != null)
             deadline.setDayRange(request.getDayRange());
-        if(request.getStartAssignmentDate() != null)
-            deadline.setStartAssignmentDate(request.getStartAssignmentDate());
-        if(request.getFinishAssignmentDate() != null)
-            deadline.setFinishAssignmentDate(request.getFinishAssignmentDate());
         deadlineRepository.save(deadline);
     }
 
@@ -1360,7 +1371,7 @@ public class MonitoringService implements IMonitoringService {
             totalLogbook = logbook.getStartAssignmentDate().datesUntil(LocalDate.now().plusDays(1)).filter((t -> businessDays.contains(t.getDayOfWeek()))).count();
         }
         response.setLogbookSubmitted(logbookRepository.countByParticipantId(participantId));
-        response.setLogbookMissing((int) (totalLogbook - response.getLogbookSubmitted()));
+        response.setLogbookTotal((int)totalLogbook);
 
         Deadline selfAssessment = deadlineRepository.findByNameLike("self assessment");
         int totalSelfAssessment = 0;
@@ -1370,11 +1381,11 @@ public class MonitoringService implements IMonitoringService {
             totalSelfAssessment = LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.SUNDAY)).get(ChronoField.ALIGNED_WEEK_OF_YEAR) - selfAssessment.getStartAssignmentDate().get(ChronoField.ALIGNED_WEEK_OF_YEAR);
         }
         response.setSelfAssessmentSubmitted(selfAssessmentRepository.countByParticipantId(participantId));
-        response.setSelfAssessmentMissing(totalSelfAssessment - response.getSelfAssessmentSubmitted());
+        response.setSelfAssessmentTotal(totalSelfAssessment);
 
         int totalLaporan =  deadlineRepository.countLaporanPhaseNow(LocalDate.now());
         response.setLaporanSubmitted(laporanRepository.countByParticipantId(participantId));
-        response.setLaporanMissing(totalLaporan - response.getLaporanSubmitted());
+        response.setLaporanTotal(totalLaporan);
         response.setRppSubmitted(rppRepository.countByParticipantId(participantId));
 
         return response;

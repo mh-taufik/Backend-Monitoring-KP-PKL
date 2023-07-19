@@ -104,6 +104,14 @@ public class ParticipantService implements IParticipantService {
     }
 
     @Override
+    public List<Participant> getAllParticipant(Integer year) {
+        if (year == null) {
+            return participantRepository.findAll();
+        }
+        return participantRepository.findByYear(year);
+    }
+
+    @Override
     public List<Participant> getParticipantById(List<Integer> id) {
         return participantRepository.findByIdIn(id);
     }

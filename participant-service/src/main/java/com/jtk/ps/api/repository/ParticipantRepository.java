@@ -11,8 +11,10 @@ import java.util.List;
 @Repository
 public interface ParticipantRepository extends JpaRepository<Participant, Integer> {
 
-    @Query(value = "SELECT * FROM participant p WHERE p.year = ?1 AND p.prodi_id = ?2",
-            nativeQuery = true)
+    @Query(value = "SELECT * FROM participant p WHERE p.year = ?1", nativeQuery = true)
+    List<Participant> findByYear(Integer year);
+
+    @Query(value = "SELECT * FROM participant p WHERE p.year = ?1 AND p.prodi_id = ?2", nativeQuery = true)
     List<Participant> findByYearAndProdiId(Integer year, Integer prodiId);
 
     List<Participant> findByAccountIdIn(@Param("account_id") List<Integer> accountId);

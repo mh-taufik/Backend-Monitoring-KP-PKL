@@ -70,7 +70,6 @@ public interface IMonitoringService {
     List<SupervisorGradeAspectResponse> getListSupervisorGradeAspect();
 
     //Laporan KP PKL
-    CreateId uploadLaporan(Integer phase, MultipartFile file, Integer participantId);
     CreateId createLaporan(LaporanCreateRequest laporanCreateRequest, Integer participantId);
     void updateLaporan(LaporanUpdateRequest laporanUpdateRequest, Integer participantId);
     LaporanResponse getLaporan(Integer id);

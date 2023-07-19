@@ -2,6 +2,7 @@ package com.jtk.ps.api.controller;
 
 import com.jtk.ps.api.dto.FinalMappingRequest;
 import com.jtk.ps.api.dto.FinalMappingResponse;
+import com.jtk.ps.api.dto.ListFinalMappingResponse;
 import com.jtk.ps.api.dto.ParticipantFinalMappingResponse;
 import com.jtk.ps.api.dto.ranking.RankingAndDateResponse;
 import com.jtk.ps.api.dto.ranking.RankingResponse;
@@ -56,7 +57,26 @@ public class MappingController {
             return ResponseHandler.generateResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    
+
+    @GetMapping("/final/all")
+    public ResponseEntity<Object> getFinalMappingAllProdi(HttpServletRequest request) {
+        try {
+            Integer idRole = (Integer) Objects.requireNonNull(request.getAttribute(Constant.VerifyConstant.ID_ROLE));
+            String cookie = request.getHeader(Constant.PayloadResponseConstant.COOKIE);
+
+            FinalMappingResponse finalMappingD3 = mappingService.getFinalMapping(idRole, 0, cookie);
+            FinalMappingResponse finalMappingD4 = mappingService.getFinalMapping(idRole, 1, cookie);
+            ListFinalMappingResponse finalMapping = new ListFinalMappingResponse(finalMappingD3, finalMappingD4);
+
+            return ResponseHandler.generateResponse("Get all final mapping data succeed", HttpStatus.OK, finalMapping);
+        } catch (HttpClientErrorException ex) {
+            return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return ResponseHandler.generateResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
     @PostMapping("/final/create")
     @PreAuthorize("hasAuthority('COMMITTEE')")
     public ResponseEntity<Object> createFinalMapping(

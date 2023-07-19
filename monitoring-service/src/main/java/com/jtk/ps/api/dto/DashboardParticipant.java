@@ -13,14 +13,14 @@ public class DashboardParticipant {
     private Integer rppSubmitted;
     @JsonProperty("logbook_submitted")
     private Integer logbookSubmitted;
-    @JsonProperty("logbook_missing")
-    private Integer logbookMissing;
+    @JsonProperty("logbook_total")
+    private Integer logbookTotal;
     @JsonProperty("self_assessment_submitted")
     private Integer selfAssessmentSubmitted;
-    @JsonProperty("self_assessment_missing")
-    private Integer selfAssessmentMissing;
+    @JsonProperty("self_assessment_total")
+    private Integer selfAssessmentTotal;
     @JsonProperty("laporan_submitted")
     private Integer laporanSubmitted;
-    @JsonProperty("laporan_missing")
-    private Integer laporanMissing;
+    @JsonProperty("laporan_total")
+    private Integer laporanTotal;
 }

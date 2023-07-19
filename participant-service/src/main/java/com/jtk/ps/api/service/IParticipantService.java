@@ -14,6 +14,8 @@ import java.util.List;
 public interface IParticipantService {
     List<ParticipantIdName> getNameAndIdCompanies(Integer idProdi);
 
+    List<Participant> getAllParticipant(Integer year);
+
     List<Participant> getParticipantById(List<Integer> id);
 
     List<Participant> getParticipantByYear(Integer year, Integer prodiId);

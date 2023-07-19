@@ -70,6 +70,10 @@ public class ParticipantController {
                         "Success",
                         HttpStatus.OK,
                         participantService.getNameAndIdCompanies(idProdi));
+            }else if(Objects.equals(type, "full")) {
+                List<Participant> listParticipant = participantService.getAllParticipant(year);
+                List<ParticipantResponse> listParticipantResponse = participantListToParticipantResponse(listParticipant);
+                return ResponseHandler.generateResponse("Get all participant by year succeed", HttpStatus.OK, listParticipantResponse);
             }
             
             List<Participant> listParticipant = participantService.getParticipantByYear(year, (Integer) Objects.requireNonNull(request.getAttribute(Constant.VerifyConstant.ID_PRODI)));

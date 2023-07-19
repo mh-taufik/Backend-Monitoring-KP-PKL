@@ -102,24 +102,6 @@ public class MonitoringController {
         }
     }
 
-    @GetMapping("/get")
-    public ResponseEntity<Object> verify(HttpServletRequest request) {
-        try {
-            List<Object> response = new ArrayList<>();
-            response.add(request.getAttribute(Constant.VerifyConstant.NAME));
-            response.add(request.getAttribute(Constant.VerifyConstant.ID));
-            response.add(request.getAttribute(Constant.VerifyConstant.ID_ROLE));
-            response.add(request.getAttribute(Constant.VerifyConstant.ID_PRODI));
-            response.add(request.getAttribute(Constant.VerifyConstant.STATUS));
-            response.add(request.getAttribute(Constant.VerifyConstant.SUB));
-            return ResponseHandler.generateResponse("get succeed", HttpStatus.OK, response);
-        } catch (HttpClientErrorException ex){
-            return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
-        } catch (Exception e) {
-            return ResponseHandler.generateResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
     @GetMapping("/document-grade")
     public ResponseEntity<Object> getDocumentGradeStats(@RequestParam("participant_id") Integer participant, HttpServletRequest request) {
         try {

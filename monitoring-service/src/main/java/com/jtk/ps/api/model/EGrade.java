@@ -1,6 +1,6 @@
 package com.jtk.ps.api.model;
 
-public enum ENilai {
+public enum EGrade {
     BELUM_DINILAI(0),
     SANGAT_BAIK(1),
     BAIK(2),
@@ -9,12 +9,12 @@ public enum ENilai {
 
     public final int id;
 
-    ENilai(int i) {
+    EGrade(int i) {
         this.id = i;
     }
 
-    public static ENilai valueOfId(int id) {
-        for (ENilai e : values()) {
+    public static EGrade valueOfId(int id) {
+        for (EGrade e : values()) {
             if (e.id == id) {
                 return e;
             }

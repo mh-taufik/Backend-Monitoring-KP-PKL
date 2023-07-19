@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Objects;
 
 @RestController
-@RequestMapping("/supervisor/grade")
+@RequestMapping("/supervisor-grade")
 public class SupervisorGradeController {
     @Autowired
     private IMonitoringService monitoringService;
