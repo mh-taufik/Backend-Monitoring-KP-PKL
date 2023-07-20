@@ -1088,7 +1088,7 @@ public class MonitoringService implements IMonitoringService {
         HashMap<Integer, String> participantList = new HashMap<>();
 
         if(year != null){
-            ResponseEntity<ResponseList<ParticipantResponse>> participantRes = restTemplate.exchange("http://participant-service/participant/get-all?year="+year,
+            ResponseEntity<ResponseList<ParticipantResponse>> participantRes = restTemplate.exchange("http://participant-service/participant/get-all?type=full&year="+year,
                     HttpMethod.GET, req, new ParameterizedTypeReference<>() {
                     });
             List<ParticipantResponse> participantResponseList = Objects.requireNonNull(participantRes.getBody()).getData();
@@ -1110,7 +1110,7 @@ public class MonitoringService implements IMonitoringService {
             user.add(participantList);
             user.add(companyList);
         } else if(type.equals("full") && year == null){
-            ResponseEntity<ResponseList<ParticipantResponse>> participantRes = restTemplate.exchange("http://participant-service/participant/get-all",
+            ResponseEntity<ResponseList<ParticipantResponse>> participantRes = restTemplate.exchange("http://participant-service/participant/get-all?type=full",
                     HttpMethod.GET, req, new ParameterizedTypeReference<>() {
                     });
             List<ParticipantResponse> participantResponseList = Objects.requireNonNull(participantRes.getBody()).getData();
@@ -1246,7 +1246,7 @@ public class MonitoringService implements IMonitoringService {
     @Override
     public List<SupervisorMappingResponse> getSupervisorMappingLecturer(String cookie, int lecturerId) {
         List<SupervisorMapping> mapping = supervisorMappingRepository.findByLecturerIdGroupByCompanyId(lecturerId);
-        List<HashMap<Integer, String>> user = getUserList(cookie, null, "simple");
+        List<HashMap<Integer, String>> user = getUserList(cookie, null, "full");
         HashMap<Integer, String> participantList = user.get(0);
         HashMap<Integer, String> companyList = user.get(1);
         HashMap<Integer, String> lecturerList = user.get(2);
