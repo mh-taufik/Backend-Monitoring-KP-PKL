@@ -5,6 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -15,6 +18,8 @@ public class DashboardParticipant {
     private Integer logbookSubmitted;
     @JsonProperty("logbook_total")
     private Integer logbookTotal;
+    @JsonProperty("logbook_missing")
+    private List<LocalDate> logbookMissing;
     @JsonProperty("self_assessment_submitted")
     private Integer selfAssessmentSubmitted;
     @JsonProperty("self_assessment_total")
