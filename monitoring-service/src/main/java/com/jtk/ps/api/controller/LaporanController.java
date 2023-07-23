@@ -3,8 +3,10 @@ package com.jtk.ps.api.controller;
 import com.jtk.ps.api.dto.CheckLaporan;
 import com.jtk.ps.api.dto.CreateId;
 import com.jtk.ps.api.dto.laporan.LaporanCreateRequest;
+import com.jtk.ps.api.dto.laporan.LaporanRekapResponse;
 import com.jtk.ps.api.dto.laporan.LaporanResponse;
 import com.jtk.ps.api.dto.laporan.LaporanUpdateRequest;
+import com.jtk.ps.api.model.ERole;
 import com.jtk.ps.api.service.IMonitoringService;
 import com.jtk.ps.api.util.Constant;
 import com.jtk.ps.api.util.ResponseHandler;
@@ -105,6 +107,30 @@ public class LaporanController {
     public ResponseEntity<Object> isFinalPhase(HttpServletRequest request) {
         try {
             return ResponseHandler.generateResponse("Get Phase Laporan succeed", HttpStatus.OK, monitoringService.isFinalPhase());
+        } catch (HttpClientErrorException ex){
+            return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return ResponseHandler.generateResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/rekap")
+    @PreAuthorize("hasAnyAuthority('COMMITTEE','SUPERVISOR')")
+    public ResponseEntity<Object> getRekapLaporan(HttpServletRequest request) {
+        try {
+            String cookie = request.getHeader(Constant.PayloadResponseConstant.COOKIE);
+            Integer role = (Integer) request.getAttribute(Constant.VerifyConstant.ID_ROLE);
+            if(role == ERole.SUPERVISOR.id){
+                Integer id = (Integer) request.getAttribute(Constant.VerifyConstant.ID);
+                List<LaporanRekapResponse> response = monitoringService.getRekapLaporan(ERole.SUPERVISOR, id, cookie);
+                return ResponseHandler.generateResponse("Get Phase Laporan succeed", HttpStatus.OK, response);
+            }
+            if(role == ERole.COMMITTEE.id){
+                Integer prodiId = (Integer) request.getAttribute(Constant.VerifyConstant.ID_PRODI);
+                List<LaporanRekapResponse> response = monitoringService.getRekapLaporan(ERole.SUPERVISOR, prodiId, cookie);
+                return ResponseHandler.generateResponse("Get Phase Laporan succeed", HttpStatus.OK, response);
+            }
+            return ResponseHandler.generateResponse("Get Phase Laporan succeed", HttpStatus.OK);
         } catch (HttpClientErrorException ex){
             return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {

@@ -18,6 +18,8 @@ public interface LogbookRepository extends JpaRepository<Logbook, Integer> {
 
     @Query(value = "select if(count(*)>0, 'true', 'false') from Logbook where participant_id = :participant_id and date = :date", nativeQuery = true)
     Boolean isExist(@Param("participant_id") int participantId, @Param("date")  LocalDate date);
+    @Query(value = "select count(*) from Logbook where participant_id = :participant_id and date in :date", nativeQuery = true)
+    Integer countExistBetweenDate(@Param("participant_id") int participantId, @Param("date")  List<LocalDate> date);
 
     @Query(value = "select if(count(*)>0, 'true', 'false') from Logbook where id = :id and grade != 0", nativeQuery = true)
     Boolean isChecked(@Param("id") int id);

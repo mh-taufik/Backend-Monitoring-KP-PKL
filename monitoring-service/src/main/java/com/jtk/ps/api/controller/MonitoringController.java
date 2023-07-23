@@ -1,11 +1,13 @@
 package com.jtk.ps.api.controller;
 
 import com.jtk.ps.api.dto.*;
+import com.jtk.ps.api.dto.dashboard.DashboardCommittee;
+import com.jtk.ps.api.dto.dashboard.DashboardLecturer;
+import com.jtk.ps.api.dto.dashboard.DashboardParticipant;
 import com.jtk.ps.api.model.ERole;
 import com.jtk.ps.api.service.IMonitoringService;
 import com.jtk.ps.api.util.Constant;
 import com.jtk.ps.api.util.ResponseHandler;
-import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -15,9 +17,7 @@ import org.springframework.web.client.HttpClientErrorException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 @RestController
 @RequestMapping("")
@@ -38,7 +38,8 @@ public class MonitoringController {
                 return ResponseHandler.generateResponse("get data dashboard participant succeed", HttpStatus.OK, response);
             }else if(role == ERole.SUPERVISOR.id){
                 Integer id = (Integer) request.getAttribute(Constant.VerifyConstant.ID);
-                DashboardLecturer response = monitoringService.getDashboardDataLecturer(id);
+                String cookie = request.getHeader(Constant.PayloadResponseConstant.COOKIE);
+                DashboardLecturer response = monitoringService.getDashboardDataLecturer(id, cookie);
                 return ResponseHandler.generateResponse("get data dashboard supervisor succeed", HttpStatus.OK, response);
             }else if(role == ERole.COMMITTEE.id){
                 Integer id = (Integer) request.getAttribute(Constant.VerifyConstant.ID_PRODI);

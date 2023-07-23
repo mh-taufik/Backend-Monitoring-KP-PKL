@@ -1,10 +1,13 @@
 package com.jtk.ps.api.service;
 
 import com.jtk.ps.api.dto.*;
+import com.jtk.ps.api.dto.dashboard.DashboardCommittee;
+import com.jtk.ps.api.dto.dashboard.DashboardLecturer;
+import com.jtk.ps.api.dto.dashboard.DashboardParticipant;
 import com.jtk.ps.api.dto.deadline.DeadlineCreateRequest;
 import com.jtk.ps.api.dto.deadline.DeadlineResponse;
 import com.jtk.ps.api.dto.deadline.DeadlineUpdateRequest;
-import com.jtk.ps.api.dto.laporan.LaporanUploadRequest;
+import com.jtk.ps.api.dto.laporan.LaporanRekapResponse;
 import com.jtk.ps.api.dto.rpp.*;
 import com.jtk.ps.api.dto.self_assessment.*;
 import com.jtk.ps.api.dto.supervisor_grade.*;
@@ -14,7 +17,7 @@ import com.jtk.ps.api.dto.laporan.LaporanCreateRequest;
 import com.jtk.ps.api.dto.laporan.LaporanResponse;
 import com.jtk.ps.api.dto.laporan.LaporanUpdateRequest;
 import com.jtk.ps.api.dto.logbook.*;
-import org.springframework.web.multipart.MultipartFile;
+import com.jtk.ps.api.model.ERole;
 
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -44,6 +47,7 @@ public interface IMonitoringService {
     CreateId createLogbook(LogbookCreateRequest logbook, Integer participantId);
     void updateLogbook(LogbookUpdateRequest logbook, Integer participantId);
     void gradeLogbook(LogbookGradeRequest gradeRequest, int lecturer);
+    List<LogbookRekapResponse> getRekapLogbook(ERole role, int id, String cookie);
 
     //Self Assessment
     Boolean isSelfAssessmentExist(int participantId, LocalDate date);
@@ -77,6 +81,7 @@ public interface IMonitoringService {
     Integer getPhase();
     Boolean isFinalPhase();
     Boolean isLaporanExist(int participantId, int phase);
+    List<LaporanRekapResponse> getRekapLaporan(ERole role, int id, String cookie);
 
     //Supervisor mapping
     void createSupervisorMapping(List<SupervisorMappingRequest> supervisorMappingRequest, String cookie, int creatorId);
@@ -98,7 +103,7 @@ public interface IMonitoringService {
 
     //Monitoring
     DashboardParticipant getDashboardDataParticipant(int participantId);
-    DashboardLecturer getDashboardDataLecturer(int lecturerId);
+    DashboardLecturer getDashboardDataLecturer(int lecturerId, String cookie);
     DashboardCommittee getDashboardDataCommittee(int prodiId, String cookie);
     AssociatedDocumentRpp getAssociatedRpp(int participantId, int rppId);
     AssociatedDocumentLogbook getAssociatedLogbook(int participantId, int logbookId);

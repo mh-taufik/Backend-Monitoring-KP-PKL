@@ -1,9 +1,11 @@
 package com.jtk.ps.api.service;
 
 import com.jtk.ps.api.dto.*;
+import com.jtk.ps.api.dto.dashboard.*;
 import com.jtk.ps.api.dto.deadline.DeadlineCreateRequest;
 import com.jtk.ps.api.dto.deadline.DeadlineResponse;
 import com.jtk.ps.api.dto.deadline.DeadlineUpdateRequest;
+import com.jtk.ps.api.dto.laporan.LaporanRekapResponse;
 import com.jtk.ps.api.dto.self_assessment.*;
 import com.jtk.ps.api.dto.supervisor_grade.*;
 import com.jtk.ps.api.dto.supervisor_mapping.*;
@@ -470,6 +472,11 @@ public class MonitoringService implements IMonitoringService {
             logbook.setGrade(gradeRequest.getGrade());
             logbookRepository.save(logbook);
         }
+    }
+
+    @Override
+    public List<LogbookRekapResponse> getRekapLogbook(ERole role, int id, String cookie) {
+        return null;
     }
 
     @Override
@@ -1034,6 +1041,34 @@ public class MonitoringService implements IMonitoringService {
     }
 
     @Override
+    public List<LaporanRekapResponse> getRekapLaporan(ERole role, int id, String cookie) {
+        List<HashMap<Integer, String>> user = getUserList(cookie, null, "full");
+        HashMap<Integer, String> participantList = user.get(0);
+        HashMap<Integer, String> companyList = user.get(1);
+        List<LaporanRekapResponse> response = new ArrayList<>();
+        List<SupervisorMapping> mapping = new ArrayList<>();
+        if(role.id == ERole.SUPERVISOR.id)
+            mapping = supervisorMappingRepository.findByLecturerId(id);
+        if(role.id == ERole.COMMITTEE.id)
+            mapping = supervisorMappingRepository.findByProdiId(id);
+
+        for(SupervisorMapping map:mapping){
+            String status = "Belum Mengumpulkan";
+            if(laporanRepository.isExist(map.getParticipantId(), deadlineRepository.countLaporanPhaseNow(LocalDate.now())))
+                status = "Sudah Mengumpulkan";
+            response.add(new LaporanRekapResponse(
+                    map.getParticipantId(),
+                    participantList.get(map.getParticipantId()),
+                    companyList.get(map.getCompanyId()),
+                    status
+                    )
+            );
+        }
+
+        return response;
+    }
+
+    @Override
     public void createSupervisorMapping(List<SupervisorMappingRequest> supervisorMappingRequest, String cookie, int creatorId) {
         HttpHeaders headers = new HttpHeaders();
         headers.add(Constant.PayloadResponseConstant.COOKIE, cookie);
@@ -1425,79 +1460,243 @@ public class MonitoringService implements IMonitoringService {
     }
 
     @Override
-    public DashboardLecturer getDashboardDataLecturer(int lecturerId) {
+    public DashboardLecturer getDashboardDataLecturer(int lecturerId, String cookie) {
         DashboardLecturer response = new DashboardLecturer();
+        DashboardItem weekly = new DashboardItem(), all = new DashboardItem();
         final Set<DayOfWeek> businessDays = Set.of(MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY);
         List<SupervisorMapping> supervisorMapping = supervisorMappingRepository.findByLecturerId(lecturerId);
-        List<Integer> participants = new ArrayList<>();
-        for(SupervisorMapping map:supervisorMapping){
-            participants.add(map.getParticipantId());
-        }
+        List<HashMap<Integer, String>> user = getUserList(cookie, null, "simple");
+        HashMap<Integer, String> participantList = user.get(0);
+        HashMap<Integer, String> companyList = user.get(1);
 
         Deadline logbook = deadlineRepository.findByNameLike("logbook");
-        int totalLogbook = 0;
+        int logbookStartWeek = logbook.getStartAssignmentDate().get(ChronoField.ALIGNED_WEEK_OF_YEAR);
+        Map<Integer, List<LocalDate>> logbookDateList;
         if(LocalDate.now().isAfter(logbook.getFinishAssignmentDate())){
-            totalLogbook = (int) logbook.getStartAssignmentDate().datesUntil(logbook.getFinishAssignmentDate().plusDays(1)).filter((t -> businessDays.contains(t.getDayOfWeek()))).count() * participants.size();
+            logbookDateList = logbook.getStartAssignmentDate().datesUntil(logbook.getFinishAssignmentDate().plusDays(1)).filter((t -> businessDays.contains(t.getDayOfWeek()))).collect(Collectors.groupingBy(o -> o.get(ChronoField.ALIGNED_WEEK_OF_YEAR)));
         }else{
-            totalLogbook = (int) logbook.getStartAssignmentDate().datesUntil(LocalDate.now().plusDays(1)).filter((t -> businessDays.contains(t.getDayOfWeek()))).count() * participants.size();
+            logbookDateList = logbook.getStartAssignmentDate().datesUntil(LocalDate.now().plusDays(1)).filter((t -> businessDays.contains(t.getDayOfWeek()))).collect(Collectors.groupingBy(o -> o.get(ChronoField.ALIGNED_WEEK_OF_YEAR)));
         }
-        response.setLogbookSubmitted(logbookRepository.countAllInParticipantId(participants));
-        response.setLogbookMissing(totalLogbook - response.getLogbookSubmitted());
 
-        Deadline selfAssessment = deadlineRepository.findByNameLike("self assessment");
-        int totalSelfAssessment = 0;
-        if(LocalDate.now().isAfter(selfAssessment.getFinishAssignmentDate())){
-            totalSelfAssessment = (selfAssessment.getFinishAssignmentDate().get(ChronoField.ALIGNED_WEEK_OF_YEAR) - selfAssessment.getStartAssignmentDate().get(ChronoField.ALIGNED_WEEK_OF_YEAR)) * participants.size();
-        }else{
-            totalSelfAssessment = (LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.SUNDAY)).get(ChronoField.ALIGNED_WEEK_OF_YEAR) - selfAssessment.getStartAssignmentDate().get(ChronoField.ALIGNED_WEEK_OF_YEAR)) * participants.size();
+        //mengelompokan logbook per 2 minggu
+        int totalLogbook = 0;
+        Map<Integer, List<LocalDate>> newDateList = new HashMap<>();
+        for(Integer key:logbookDateList.keySet()){
+            if((key - logbookStartWeek) % 2 != 0) {
+                List<LocalDate> temp = newDateList.get(totalLogbook);
+                temp.addAll(logbookDateList.get(key));
+                newDateList.put(totalLogbook, temp);
+            }else{
+                totalLogbook++;
+                newDateList.put(totalLogbook, logbookDateList.get(key));
+            }
         }
-        response.setSelfAssessmentSubmitted(selfAssessmentRepository.countAllInParticipantId(participants));
-        response.setSelfAssessmentMissing(totalSelfAssessment - response.getSelfAssessmentSubmitted());
+        weekly.setLogbookTotal(totalLogbook);
+        all.setLogbookTotal(totalLogbook * supervisorMapping.size());
 
-        int totalLaporan = deadlineRepository.countLaporanPhaseNow(LocalDate.now()) * participants.size();
-        response.setLaporanSubmitted(laporanRepository.countAllInParticipantId(participants));
-        response.setLaporanMissing(totalLaporan - response.getLaporanSubmitted());
-        response.setRppSubmitted(rppRepository.countAllInParticipantId(participants));
-        response.setRppMissing(participants.size() - response.getRppSubmitted());
+//        Deadline selfAssessment = deadlineRepository.findByNameLike("self assessment");
+//        int totalSelfAssessment = 0;
+//        if(LocalDate.now().isAfter(selfAssessment.getFinishAssignmentDate())){
+//            totalSelfAssessment = (selfAssessment.getFinishAssignmentDate().get(ChronoField.ALIGNED_WEEK_OF_YEAR) - selfAssessment.getStartAssignmentDate().get(ChronoField.ALIGNED_WEEK_OF_YEAR)) * participants.size();
+//        }else{
+//            totalSelfAssessment = (LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.SUNDAY)).get(ChronoField.ALIGNED_WEEK_OF_YEAR) - selfAssessment.getStartAssignmentDate().get(ChronoField.ALIGNED_WEEK_OF_YEAR)) * participants.size();
+//        }
 
+        int totalLaporan = deadlineRepository.countLaporanPhaseNow(LocalDate.now());
+
+        List<ItemParticipant> missingLogbookAll = new ArrayList<>();
+        List<ItemParticipant> missingLogbookWeekly = new ArrayList<>();
+        List<ItemParticipant> missingRpp = new ArrayList<>();
+        List<ItemParticipant> missingLaporan = new ArrayList<>();
+        List<ItemParticipant> missingLaporanCur = new ArrayList<>();
+        List<ItemParticipant> missingSelfAssessment = new ArrayList<>();
+        int submittedLogbook = 0, submittedLogbookWeekly = 0;
+        int submittedRpp = 0, submittedLaporan = 0, submittedLaporanCurPhase = 0;
+        int submittedSelfAssessment = 0;
+        for(SupervisorMapping map:supervisorMapping){
+            ItemParticipant temp = new ItemParticipant(map.getParticipantId(), participantList.get(map.getParticipantId()), companyList.get(map.getCompanyId()));
+            //logbook
+            for (Integer key : newDateList.keySet()) {
+                if (logbookRepository.countExistBetweenDate(map.getParticipantId(), newDateList.get(key)) < newDateList.get(key).size()) {
+                    if(newDateList.containsValue(LocalDate.now()))
+                        missingLogbookWeekly.add(new ItemParticipant(map.getParticipantId(), participantList.get(map.getParticipantId()), companyList.get(map.getCompanyId())));
+                    if(!missingLogbookAll.contains(temp))
+                        missingLogbookAll.add(temp);
+                }else{
+                    if(newDateList.containsValue(LocalDate.now()))
+                        submittedLogbookWeekly++;
+                    submittedLogbook++;
+                }
+            }
+
+            //selfAssessment
+            if(selfAssessmentRepository.isExistBetweenDate(map.getParticipantId(), LocalDate.now()))
+                submittedSelfAssessment++;
+            else
+                missingSelfAssessment.add(temp);
+
+            //rpp
+            if(rppRepository.findByParticipantId(map.getParticipantId()).size() == 0)
+                missingRpp.add(temp);
+            else
+                submittedRpp++;
+
+            //laporan
+            if(laporanRepository.countByParticipantId(map.getParticipantId()) < totalLaporan)
+                missingLaporan.add(temp);
+            submittedLaporan += laporanRepository.countByParticipantId(map.getParticipantId());
+
+            if(laporanRepository.isExist(map.getParticipantId(), totalLaporan)){
+                submittedLaporanCurPhase++;
+            }else{
+                missingLaporanCur.add(temp);
+            }
+
+        }
+        weekly.setLogbookMissing(missingLogbookWeekly);
+        weekly.setLogbookSubmitted(submittedLogbookWeekly);
+        weekly.setLogbookTotal(supervisorMapping.size());
+        weekly.setRppSubmitted(submittedRpp);
+        weekly.setRppTotal(supervisorMapping.size());
+        weekly.setRppMissing(missingRpp);
+        weekly.setSelfAssessmentSubmitted(submittedSelfAssessment);
+        weekly.setSelfAssessmentMissing(missingSelfAssessment);
+        weekly.setSelfAssessmentTotal(supervisorMapping.size());
+        weekly.setLaporanTotal(supervisorMapping.size());
+        weekly.setLaporanMissing(missingLaporanCur);
+        weekly.setLaporanSubmitted(submittedLaporanCurPhase);
+
+        all.setLogbookMissing(missingLogbookAll);
+        all.setLogbookSubmitted(submittedLogbook);
+        all.setLogbookTotal(newDateList.size() * supervisorMapping.size());
+        all.setRppSubmitted(submittedRpp);
+        all.setRppTotal(supervisorMapping.size());
+        all.setRppMissing(missingRpp);
+        all.setLaporanTotal(totalLaporan * supervisorMapping.size());
+        all.setLaporanMissing(missingLaporan);
+        all.setLaporanSubmitted(submittedLaporan);
+
+        response.setAll(all);
+        response.setWeekly(weekly);
         return response;
     }
 
     @Override
     public DashboardCommittee getDashboardDataCommittee(int prodiId, String cookie) {
         DashboardCommittee response = new DashboardCommittee();
+        DashboardItem weekly = new DashboardItem(), all = new DashboardItem();
         final Set<DayOfWeek> businessDays = Set.of(MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY);
         List<SupervisorMapping> supervisorMapping = supervisorMappingRepository.findByProdiId(prodiId);
-        List<Integer> participants = new ArrayList<>();
-        for(SupervisorMapping map:supervisorMapping){
-            participants.add(map.getParticipantId());
-        }
+        List<HashMap<Integer, String>> user = getUserList(cookie, null, "simple");
+        HashMap<Integer, String> participantList = user.get(0);
+        HashMap<Integer, String> companyList = user.get(1);
 
         Deadline logbook = deadlineRepository.findByNameLike("logbook");
-        int totalLogbook = 0;
+        int logbookStartWeek = logbook.getStartAssignmentDate().get(ChronoField.ALIGNED_WEEK_OF_YEAR);
+        Map<Integer, List<LocalDate>> logbookDateList;
         if(LocalDate.now().isAfter(logbook.getFinishAssignmentDate())){
-            totalLogbook = (int) logbook.getStartAssignmentDate().datesUntil(logbook.getFinishAssignmentDate().plusDays(1)).filter((t -> businessDays.contains(t.getDayOfWeek()))).count() * participants.size();
+            logbookDateList = logbook.getStartAssignmentDate().datesUntil(logbook.getFinishAssignmentDate().plusDays(1)).filter((t -> businessDays.contains(t.getDayOfWeek()))).collect(Collectors.groupingBy(o -> o.get(ChronoField.ALIGNED_WEEK_OF_YEAR)));
         }else{
-            totalLogbook = (int) logbook.getStartAssignmentDate().datesUntil(LocalDate.now().plusDays(1)).filter((t -> businessDays.contains(t.getDayOfWeek()))).count() * participants.size();
+            logbookDateList = logbook.getStartAssignmentDate().datesUntil(LocalDate.now().plusDays(1)).filter((t -> businessDays.contains(t.getDayOfWeek()))).collect(Collectors.groupingBy(o -> o.get(ChronoField.ALIGNED_WEEK_OF_YEAR)));
         }
-        response.setLogbookSubmitted(logbookRepository.countAllInParticipantId(participants));
-        response.setLogbookMissing(totalLogbook- response.getLogbookSubmitted());
 
-        Deadline selfAssessment = deadlineRepository.findByNameLike("self assessment");
-        int totalSelfAssessment = 0;
-        if(LocalDate.now().isAfter(selfAssessment.getFinishAssignmentDate())){
-            totalSelfAssessment = (selfAssessment.getFinishAssignmentDate().get(ChronoField.ALIGNED_WEEK_OF_YEAR) - selfAssessment.getStartAssignmentDate().get(ChronoField.ALIGNED_WEEK_OF_YEAR)) * participants.size();
-        }else{
-            totalSelfAssessment = (LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.SUNDAY)).get(ChronoField.ALIGNED_WEEK_OF_YEAR) - selfAssessment.getStartAssignmentDate().get(ChronoField.ALIGNED_WEEK_OF_YEAR)) * participants.size();
+        //mengelompokan logbook per 2 minggu
+        int totalLogbook = 0;
+        Map<Integer, List<LocalDate>> newDateList = new HashMap<>();
+        for(Integer key:logbookDateList.keySet()){
+            if((key - logbookStartWeek) % 2 != 0) {
+                List<LocalDate> temp = newDateList.get(totalLogbook);
+                temp.addAll(logbookDateList.get(key));
+                newDateList.put(totalLogbook, temp);
+            }else{
+                totalLogbook++;
+                newDateList.put(totalLogbook, logbookDateList.get(key));
+            }
         }
-        response.setSelfAssessmentSubmitted(selfAssessmentRepository.countAllInParticipantId(participants));
-        response.setSelfAssessmentMissing(totalSelfAssessment - response.getSelfAssessmentSubmitted());
+        weekly.setLogbookTotal(totalLogbook);
+        all.setLogbookTotal(totalLogbook * supervisorMapping.size());
+//
+//        Deadline selfAssessment = deadlineRepository.findByNameLike("self assessment");
+//        int totalSelfAssessment = 0;
+//        if(LocalDate.now().isAfter(selfAssessment.getFinishAssignmentDate())){
+//            totalSelfAssessment = (selfAssessment.getFinishAssignmentDate().get(ChronoField.ALIGNED_WEEK_OF_YEAR) - selfAssessment.getStartAssignmentDate().get(ChronoField.ALIGNED_WEEK_OF_YEAR)) * participants.size();
+//        }else{
+//            totalSelfAssessment = (LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.SUNDAY)).get(ChronoField.ALIGNED_WEEK_OF_YEAR) - selfAssessment.getStartAssignmentDate().get(ChronoField.ALIGNED_WEEK_OF_YEAR)) * participants.size();
+//        }
 
-        int totalLaporan = deadlineRepository.countLaporanPhaseNow(LocalDate.now()) * participants.size();
-        response.setLaporanSubmitted(laporanRepository.countAllInParticipantId(participants));
-        response.setLaporanMissing(totalLaporan - response.getLaporanSubmitted());
-        response.setRppSubmitted(rppRepository.countAllInParticipantId(participants));
-        response.setRppMissing(participants.size() - response.getRppSubmitted());
+        int totalLaporan = deadlineRepository.countLaporanPhaseNow(LocalDate.now());
+
+        List<ItemParticipant> missingLogbookAll = new ArrayList<>();
+        List<ItemParticipant> missingLogbookWeekly = new ArrayList<>();
+        List<ItemParticipant> missingRpp = new ArrayList<>();
+        List<ItemParticipant> missingLaporan = new ArrayList<>();
+        List<ItemParticipant> missingLaporanCur = new ArrayList<>();
+        List<ItemParticipant> missingSelfAssessment = new ArrayList<>();
+        int submittedLogbook = 0, submittedLogbookWeekly = 0;
+        int submittedRpp = 0, submittedLaporan = 0, submittedLaporanCurPhase = 0;
+        int submittedSelfAssessment = 0;
+        for(SupervisorMapping map:supervisorMapping){
+            ItemParticipant temp = new ItemParticipant(map.getParticipantId(), participantList.get(map.getParticipantId()), companyList.get(map.getCompanyId()));
+            //logbook
+            for (Integer key : newDateList.keySet()) {
+                if (logbookRepository.countExistBetweenDate(map.getParticipantId(), newDateList.get(key)) < newDateList.get(key).size()) {
+                    if(newDateList.containsValue(LocalDate.now()))
+                        missingLogbookWeekly.add(new ItemParticipant(map.getParticipantId(), participantList.get(map.getParticipantId()), companyList.get(map.getCompanyId())));
+                    if(!missingLogbookAll.contains(temp))
+                        missingLogbookAll.add(temp);
+                }else{
+                    if(newDateList.containsValue(LocalDate.now()))
+                        submittedLogbookWeekly++;
+                    submittedLogbook++;
+                }
+            }
+
+            //selfAssessment
+            if(selfAssessmentRepository.isExistBetweenDate(map.getParticipantId(), LocalDate.now()))
+                submittedSelfAssessment++;
+            else
+                missingSelfAssessment.add(temp);
+
+            //rpp
+            if(rppRepository.findByParticipantId(map.getParticipantId()).size() == 0)
+                missingRpp.add(temp);
+            else
+                submittedRpp++;
+
+            //laporan
+            if(laporanRepository.countByParticipantId(map.getParticipantId()) < totalLaporan)
+                missingLaporan.add(temp);
+            submittedLaporan += laporanRepository.countByParticipantId(map.getParticipantId());
+
+            if(laporanRepository.isExist(map.getParticipantId(), totalLaporan)){
+                submittedLaporanCurPhase++;
+            }else{
+                missingLaporanCur.add(temp);
+            }
+
+        }
+        weekly.setLogbookMissing(missingLogbookWeekly);
+        weekly.setLogbookSubmitted(submittedLogbookWeekly);
+        weekly.setLogbookTotal(supervisorMapping.size());
+        weekly.setRppSubmitted(submittedRpp);
+        weekly.setRppTotal(supervisorMapping.size());
+        weekly.setRppMissing(missingRpp);
+        weekly.setSelfAssessmentSubmitted(submittedSelfAssessment);
+        weekly.setSelfAssessmentMissing(missingSelfAssessment);
+        weekly.setSelfAssessmentTotal(supervisorMapping.size());
+        weekly.setLaporanTotal(supervisorMapping.size());
+        weekly.setLaporanMissing(missingLaporanCur);
+        weekly.setLaporanSubmitted(submittedLaporanCurPhase);
+
+        all.setLogbookMissing(missingLogbookAll);
+        all.setLogbookSubmitted(submittedLogbook);
+        all.setLogbookTotal(newDateList.size() * supervisorMapping.size());
+        all.setRppSubmitted(submittedRpp);
+        all.setRppTotal(supervisorMapping.size());
+        all.setRppMissing(missingRpp);
+        all.setLaporanTotal(totalLaporan * supervisorMapping.size());
+        all.setLaporanMissing(missingLaporan);
+        all.setLaporanSubmitted(submittedLaporan);
 
         HttpHeaders headers = new HttpHeaders();
         headers.add(Constant.PayloadResponseConstant.COOKIE, cookie);
@@ -1506,8 +1705,10 @@ public class MonitoringService implements IMonitoringService {
                 HttpMethod.GET, req, new ParameterizedTypeReference<>() {
                 });
         Integer totalParticipant = Objects.requireNonNull(participantRes.getBody()).getData().size();
-        response.setSupervisorMappingDone(participants.size());
-        response.setSupervisorMappingUndone(totalParticipant - participants.size());
+        response.setAll(all);
+        response.setWeekly(weekly);
+        response.setSupervisorMappingDone(supervisorMapping.size());
+        response.setSupervisorMappingUndone(totalParticipant - supervisorMapping.size());
 
         return response;
     }
