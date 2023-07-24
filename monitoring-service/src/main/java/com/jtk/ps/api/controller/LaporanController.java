@@ -123,14 +123,14 @@ public class LaporanController {
             if(role == ERole.SUPERVISOR.id){
                 Integer id = (Integer) request.getAttribute(Constant.VerifyConstant.ID);
                 List<LaporanRekapResponse> response = monitoringService.getRekapLaporan(ERole.SUPERVISOR, id, cookie);
-                return ResponseHandler.generateResponse("Get Phase Laporan succeed", HttpStatus.OK, response);
+                return ResponseHandler.generateResponse("Get Rekap Laporan succeed", HttpStatus.OK, response);
             }
             if(role == ERole.COMMITTEE.id){
                 Integer prodiId = (Integer) request.getAttribute(Constant.VerifyConstant.ID_PRODI);
-                List<LaporanRekapResponse> response = monitoringService.getRekapLaporan(ERole.SUPERVISOR, prodiId, cookie);
-                return ResponseHandler.generateResponse("Get Phase Laporan succeed", HttpStatus.OK, response);
+                List<LaporanRekapResponse> response = monitoringService.getRekapLaporan(ERole.COMMITTEE, prodiId, cookie);
+                return ResponseHandler.generateResponse("Get Rekap Laporan succeed", HttpStatus.OK, response);
             }
-            return ResponseHandler.generateResponse("Get Phase Laporan succeed", HttpStatus.OK);
+            return ResponseHandler.generateResponse("Get Rekap Laporan Failed", HttpStatus.BAD_REQUEST);
         } catch (HttpClientErrorException ex){
             return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {

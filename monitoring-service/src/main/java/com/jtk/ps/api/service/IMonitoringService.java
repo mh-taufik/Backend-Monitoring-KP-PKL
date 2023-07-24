@@ -39,6 +39,7 @@ public interface IMonitoringService {
     void updateCompletionSchedule(List<CompletionScheduleRequest> request, int rppId);
     void createWeeklyAchievementPlan(List<WeeklyAchievementPlanRequest> request, int rppId);
     void updateWeeklyAchievementPlan(List<WeeklyAchievementPlanRequest> request, int rppId);
+    List<RppRekapResponse> getRekapRpp(ERole role, int id, String cookie);
 
     //Logbook
     Boolean isLogbookExist(int participantId, LocalDate date);
@@ -62,6 +63,7 @@ public interface IMonitoringService {
     void updateSelfAssessmentAspect(SelfAssessmentAspectRequest request, int creator);
     List<SelfAssessmentAspectResponse> getActiveSelfAssessmentAspect();
     List<SelfAssessmentAspectResponse> getSelfAssessmentAspect();
+    List<SelfAssessmentRekapResponse> getRekapSelfAssessment(ERole role, int id, String cookie);
 
     //Supervisor Grade
     CreateId createSupervisorGrade(SupervisorGradeCreateRequest request);

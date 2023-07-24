@@ -34,6 +34,7 @@ import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.WeekFields;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static java.time.DayOfWeek.*;
@@ -305,6 +306,34 @@ public class MonitoringService implements IMonitoringService {
     }
 
     @Override
+    public List<RppRekapResponse> getRekapRpp(ERole role, int id, String cookie) {
+        List<HashMap<Integer, String>> user = getUserList(cookie, null, "full");
+        HashMap<Integer, String> participantList = user.get(0);
+        HashMap<Integer, String> companyList = user.get(1);
+        List<RppRekapResponse> response = new ArrayList<>();
+        List<SupervisorMapping> mapping = new ArrayList<>();
+        if(role.id == ERole.SUPERVISOR.id)
+            mapping = supervisorMappingRepository.findByLecturerId(id);
+        if(role.id == ERole.COMMITTEE.id)
+            mapping = supervisorMappingRepository.findByProdiId(id);
+
+        for(SupervisorMapping map:mapping){
+            String status = "Belum Mengumpulkan";
+            if(rppRepository.findByParticipantId(map.getParticipantId()).size() > 0)
+                status = "Sudah Mengumpulkan";
+            response.add(new RppRekapResponse(
+                            map.getParticipantId(),
+                            participantList.get(map.getParticipantId()),
+                            companyList.get(map.getCompanyId()),
+                            status
+                    )
+            );
+        }
+
+        return response;
+    }
+
+    @Override
     public Boolean isLogbookExist(int participantId, LocalDate date) {
         HashMap<LocalDate, String> hariLibur = getHariLiburFromDate(LocalDate.now());
         if(hariLibur.containsKey(date)) {
@@ -476,7 +505,63 @@ public class MonitoringService implements IMonitoringService {
 
     @Override
     public List<LogbookRekapResponse> getRekapLogbook(ERole role, int id, String cookie) {
-        return null;
+        List<HashMap<Integer, String>> user = getUserList(cookie, null, "full");
+        HashMap<Integer, String> participantList = user.get(0);
+        HashMap<Integer, String> companyList = user.get(1);
+        List<LogbookRekapResponse> response = new ArrayList<>();
+        List<SupervisorMapping> mapping = new ArrayList<>();
+        if(role.id == ERole.SUPERVISOR.id)
+            mapping = supervisorMappingRepository.findByLecturerId(id);
+        else if(role.id == ERole.COMMITTEE.id)
+            mapping = supervisorMappingRepository.findByProdiId(id);
+
+        Deadline logbook = deadlineRepository.findByNameLike("logbook");
+        final Set<DayOfWeek> businessDays = Set.of(MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY);
+        int logbookStartWeek = logbook.getStartAssignmentDate().get(ChronoField.ALIGNED_WEEK_OF_YEAR);
+        Map<Integer, List<LocalDate>> logbookDateList;
+        if(LocalDate.now().isAfter(logbook.getFinishAssignmentDate())){
+            logbookDateList = logbook.getStartAssignmentDate().datesUntil(logbook.getFinishAssignmentDate().plusDays(1)).filter((t -> businessDays.contains(t.getDayOfWeek()))).collect(Collectors.groupingBy(o -> o.get(ChronoField.ALIGNED_WEEK_OF_YEAR)));
+        }else{
+            logbookDateList = logbook.getStartAssignmentDate().datesUntil(LocalDate.now().plusDays(1)).filter((t -> businessDays.contains(t.getDayOfWeek()))).collect(Collectors.groupingBy(o -> o.get(ChronoField.ALIGNED_WEEK_OF_YEAR)));
+        }
+
+        //mengelompokan logbook per 2 minggu
+        int totalLogbook = 0;
+        Map<Integer, List<LocalDate>> newDateList = new HashMap<>();
+        for(Integer key:logbookDateList.keySet()){
+            if((key - logbookStartWeek) % 2 != 0) {
+                List<LocalDate> temp = newDateList.get(totalLogbook);
+                temp.addAll(logbookDateList.get(key));
+                newDateList.put(totalLogbook, temp);
+            }else{
+                totalLogbook++;
+                newDateList.put(totalLogbook, logbookDateList.get(key));
+            }
+        }
+
+        List<LocalDate> dates = new ArrayList<>();
+        for(Integer key:newDateList.keySet()){
+            if(newDateList.get(key).contains(LocalDate.now())){
+                dates = newDateList.get(key);
+            }
+        }
+
+        for(SupervisorMapping map:mapping){
+            AtomicInteger submitted = new AtomicInteger();
+            dates.forEach(date -> {
+                if(logbookRepository.isExist(map.getParticipantId(), date))
+                    submitted.getAndIncrement();
+            });
+            response.add(new LogbookRekapResponse(
+                            map.getParticipantId(),
+                            participantList.get(map.getParticipantId()),
+                            companyList.get(map.getCompanyId()),
+                            submitted + " / " + dates.size()
+                    )
+            );
+        }
+
+        return response;
     }
 
     @Override
@@ -503,6 +588,34 @@ public class MonitoringService implements IMonitoringService {
         for(SelfAssessmentAspect temp:aspect){
             response.add(new SelfAssessmentAspectResponse(temp.getId(), temp.getName(), temp.getStartAssessmentDate(), temp.getDescription(), temp.getStatus().getStatus(), deadline.getDayRange()));
         }
+        return response;
+    }
+
+    @Override
+    public List<SelfAssessmentRekapResponse> getRekapSelfAssessment(ERole role, int id, String cookie) {
+        List<HashMap<Integer, String>> user = getUserList(cookie, null, "full");
+        HashMap<Integer, String> participantList = user.get(0);
+        HashMap<Integer, String> companyList = user.get(1);
+        List<SelfAssessmentRekapResponse> response = new ArrayList<>();
+        List<SupervisorMapping> mapping = new ArrayList<>();
+        if(role.id == ERole.SUPERVISOR.id)
+            mapping = supervisorMappingRepository.findByLecturerId(id);
+        if(role.id == ERole.COMMITTEE.id)
+            mapping = supervisorMappingRepository.findByProdiId(id);
+
+        for(SupervisorMapping map:mapping){
+            String status = "Belum Mengumpulkan";
+            if(selfAssessmentRepository.isExistBetweenDate(map.getParticipantId(), LocalDate.now()))
+                status = "Sudah Mengumpulkan";
+            response.add(new SelfAssessmentRekapResponse(
+                            map.getParticipantId(),
+                            participantList.get(map.getParticipantId()),
+                            companyList.get(map.getCompanyId()),
+                            status
+                    )
+            );
+        }
+
         return response;
     }
 

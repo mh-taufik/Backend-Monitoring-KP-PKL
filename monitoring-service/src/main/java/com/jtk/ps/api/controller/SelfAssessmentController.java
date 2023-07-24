@@ -2,7 +2,9 @@ package com.jtk.ps.api.controller;
 
 import com.jtk.ps.api.dto.CheckDate;
 import com.jtk.ps.api.dto.CreateId;
+import com.jtk.ps.api.dto.laporan.LaporanRekapResponse;
 import com.jtk.ps.api.dto.self_assessment.*;
+import com.jtk.ps.api.model.ERole;
 import com.jtk.ps.api.service.IMonitoringService;
 import com.jtk.ps.api.util.Constant;
 import com.jtk.ps.api.util.ResponseHandler;
@@ -140,6 +142,31 @@ public class SelfAssessmentController {
         try {
             Integer id = (Integer) Objects.requireNonNull(request.getAttribute(Constant.VerifyConstant.ID));
             return ResponseHandler.generateResponse("Check date succeed", HttpStatus.OK, monitoringService.isSelfAssessmentExist(id, date.getDate()));
+        } catch (HttpClientErrorException ex){
+            return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return ResponseHandler.generateResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+    @GetMapping("/rekap")
+    @PreAuthorize("hasAnyAuthority('COMMITTEE','SUPERVISOR')")
+    public ResponseEntity<Object> getRekapSelfAssessment(HttpServletRequest request) {
+        try {
+            String cookie = request.getHeader(Constant.PayloadResponseConstant.COOKIE);
+            Integer role = (Integer) request.getAttribute(Constant.VerifyConstant.ID_ROLE);
+            if(role == ERole.SUPERVISOR.id){
+                Integer id = (Integer) request.getAttribute(Constant.VerifyConstant.ID);
+                List<SelfAssessmentRekapResponse> response = monitoringService.getRekapSelfAssessment(ERole.SUPERVISOR, id, cookie);
+                return ResponseHandler.generateResponse("Get Rekap Self Assessment succeed", HttpStatus.OK, response);
+            }
+            if(role == ERole.COMMITTEE.id){
+                Integer prodiId = (Integer) request.getAttribute(Constant.VerifyConstant.ID_PRODI);
+                List<SelfAssessmentRekapResponse> response = monitoringService.getRekapSelfAssessment(ERole.COMMITTEE, prodiId, cookie);
+                return ResponseHandler.generateResponse("Get Rekap Self Assessment succeed", HttpStatus.OK, response);
+            }
+            return ResponseHandler.generateResponse("Get Rekap Self Assessment Failed", HttpStatus.BAD_REQUEST);
         } catch (HttpClientErrorException ex){
             return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {

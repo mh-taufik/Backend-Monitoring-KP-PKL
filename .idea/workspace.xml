@@ -7,9 +7,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d4c7c1a4-fecb-4126-864a-961220f9e7ef" name="Changes" comment="add LaporanUploadRequest">
+    <list default="true" id="d4c7c1a4-fecb-4126-864a-961220f9e7ef" name="Changes" comment="Fix DashboardCommittee and DashboardLecturer &#10;Add getRekapLaporan">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/dto/DashboardParticipant.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/dto/DashboardParticipant.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/controller/LaporanController.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/controller/LaporanController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/controller/LogbookController.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/controller/LogbookController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/controller/RppController.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/controller/RppController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/controller/SelfAssessmentController.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/controller/SelfAssessmentController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/service/IMonitoringService.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/service/IMonitoringService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/service/MonitoringService.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/service/MonitoringService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -99,11 +103,11 @@
       <recent name="D:\TA\Github\Backend-Monitoring-KP-PKL\monitoring-service\src\main\resources" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="com.jtk.ps.api.dto.laporan" />
+      <recent name="com.jtk.ps.api.dto.self_assessment" />
+      <recent name="com.jtk.ps.api.dto.rpp" />
       <recent name="com.jtk.ps.api.dto" />
       <recent name="com.jtk.ps.api.integration" />
-      <recent name="com.jtk.ps.api.model" />
-      <recent name="com.jtk.ps.api.dto.rpp" />
-      <recent name="com.jtk.ps.api.dto.supervisor_mapping" />
     </key>
   </component>
   <component name="RunAnythingCache">
@@ -265,13 +269,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1674536022871</updated>
-    </task>
-    <task id="LOCAL-00003" summary="fix monitoring-service controller">
-      <created>1685864137154</created>
-      <option name="number" value="00003" />
-      <option name="presentableId" value="LOCAL-00003" />
-      <option name="project" value="LOCAL" />
-      <updated>1685864137154</updated>
     </task>
     <task id="LOCAL-00004" summary="MonitoringService add to project">
       <created>1685865199190</created>
@@ -609,7 +606,14 @@
       <option name="project" value="LOCAL" />
       <updated>1687017123014</updated>
     </task>
-    <option name="localTasksCounter" value="52" />
+    <task id="LOCAL-00052" summary="Fix DashboardCommittee and DashboardLecturer &#10;Add getRekapLaporan">
+      <created>1690134655133</created>
+      <option name="number" value="00052" />
+      <option name="presentableId" value="LOCAL-00052" />
+      <option name="project" value="LOCAL" />
+      <updated>1690134655134</updated>
+    </task>
+    <option name="localTasksCounter" value="53" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -624,7 +628,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fix AssociatedDocument and Supervisormapping wrong id and supervisor by prodi_id" />
     <MESSAGE value="Fix UpdateRpp" />
     <MESSAGE value="Fix getSelfAssessmentAspect" />
     <MESSAGE value="Fix updateMilestone" />
@@ -649,22 +652,10 @@
     <MESSAGE value="fix getDeadlineLaporan" />
     <MESSAGE value="fix getDocumentGradeStat and createSelfAssessment" />
     <MESSAGE value="add LaporanUploadRequest" />
-    <option name="LAST_COMMIT_MESSAGE" value="add LaporanUploadRequest" />
+    <MESSAGE value="Fix DashboardCommittee and DashboardLecturer &#10;Add getRekapLaporan" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fix DashboardCommittee and DashboardLecturer &#10;Add getRekapLaporan" />
   </component>
   <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-method">
-          <url>file://$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/service/MonitoringService.java</url>
-          <line>502</line>
-          <properties class="com.jtk.ps.api.service.MonitoringService" method="createSelfAssessment">
-            <option name="EMULATED" value="true" />
-            <option name="WATCH_EXIT" value="false" />
-          </properties>
-          <option name="timeStamp" value="2" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
     <pin-to-top-manager>
       <pinned-members>
         <PinnedItemInfo parentTag="org.springframework.http.ResponseEntity" memberName="body" />
@@ -677,7 +668,7 @@
         <watch expression="this" />
         <watch expression="this" />
       </configuration>
-      <inline-watch fileUrl="file://$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/controller/LogbookController.java" line="105">
+      <inline-watch fileUrl="file://$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/controller/LogbookController.java" line="131">
         <watch expression="e" language="JAVA" />
       </inline-watch>
     </watches-manager>
