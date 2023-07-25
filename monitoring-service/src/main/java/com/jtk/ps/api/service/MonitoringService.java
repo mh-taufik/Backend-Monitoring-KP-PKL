@@ -23,12 +23,14 @@ import org.jsoup.nodes.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.WeekFields;
@@ -86,17 +88,17 @@ public class MonitoringService implements IMonitoringService {
         List<RppResponse> responses = new ArrayList<>();
         for(Rpp temp:rppList){
             Rpp rpp = rppRepository.findById((int)temp.getId());
-            if(rpp.getStartDate().isBefore(LocalDate.now()) && rpp.getFinishDate().isAfter(LocalDate.now())){
+            if(rpp.getStartDate().isBefore(LocalDate.now(ZoneId.of("Asia/Jakarta"))) && rpp.getFinishDate().isAfter(LocalDate.now(ZoneId.of("Asia/Jakarta")))){
                 rpp.setStatus(statusRepository.findById(9));
                 rppRepository.save(rpp);
                 responses.add(new RppResponse(temp.getId(), temp.getWorkTitle(), temp.getStartDate(), temp.getFinishDate(), rpp.getStatus().getStatus()));
             }
-            if(rpp.getFinishDate().isBefore(LocalDate.now())){
+            if(rpp.getFinishDate().isBefore(LocalDate.now(ZoneId.of("Asia/Jakarta")))){
                 rpp.setStatus(statusRepository.findById(10));
                 rppRepository.save(rpp);
                 responses.add(new RppResponse(temp.getId(), temp.getWorkTitle(), temp.getStartDate(), temp.getFinishDate(), rpp.getStatus().getStatus()));
             }
-            if(rpp.getStartDate().isAfter(LocalDate.now())){
+            if(rpp.getStartDate().isAfter(LocalDate.now(ZoneId.of("Asia/Jakarta")))){
                 rpp.setStatus(statusRepository.findById(11));
                 rppRepository.save(rpp);
                 responses.add(new RppResponse(temp.getId(), temp.getWorkTitle(), temp.getStartDate(), temp.getFinishDate(), rpp.getStatus().getStatus()));
@@ -131,13 +133,13 @@ public class MonitoringService implements IMonitoringService {
         rppNew.setTaskDescription(rpp.getTaskDescription());
         rppNew.setStartDate(rpp.getStartDate());
         rppNew.setFinishDate(rpp.getFinishDate());
-        if((rpp.getStartDate().isBefore(LocalDate.now()) || rpp.getStartDate().isEqual(LocalDate.now())) && (rpp.getFinishDate().isAfter(LocalDate.now()) || rpp.getFinishDate().isEqual(LocalDate.now()))) {
+        if((rpp.getStartDate().isBefore(LocalDate.now(ZoneId.of("Asia/Jakarta"))) || rpp.getStartDate().isEqual(LocalDate.now(ZoneId.of("Asia/Jakarta")))) && (rpp.getFinishDate().isAfter(LocalDate.now(ZoneId.of("Asia/Jakarta"))) || rpp.getFinishDate().isEqual(LocalDate.now(ZoneId.of("Asia/Jakarta"))))) {
             rppNew.setStatus(statusRepository.findById(9));
         }
-        if(rpp.getFinishDate().isBefore(LocalDate.now())){
+        if(rpp.getFinishDate().isBefore(LocalDate.now(ZoneId.of("Asia/Jakarta")))){
             rppNew.setStatus(statusRepository.findById(10));
         }
-        if(rpp.getStartDate().isAfter(LocalDate.now())){
+        if(rpp.getStartDate().isAfter(LocalDate.now(ZoneId.of("Asia/Jakarta")))){
             rppNew.setStatus(statusRepository.findById(11));
         }
         Rpp temp = rppRepository.save(rppNew);
@@ -167,7 +169,7 @@ public class MonitoringService implements IMonitoringService {
         if(!rpp.getParticipantId().equals(participantId)){
             throw new IllegalStateException("Rpp tidak dapat diedit");
         }
-        LocalDate sunday = LocalDate.now().with(next(SUNDAY));
+        LocalDate sunday = LocalDate.now(ZoneId.of("Asia/Jakarta")).with(next(SUNDAY));
         if(rppUpdate.getFinishDate().isAfter(sunday))
             rpp.setFinishDate(rppUpdate.getFinishDate());
         else
@@ -198,7 +200,7 @@ public class MonitoringService implements IMonitoringService {
         Optional<Rpp> rpp = rppRepository.findById((Integer)rppUpdate.getRppId());
         if(rpp.isEmpty())
             throw new IllegalStateException("Rpp tidak ditemukan");
-        LocalDate sunday = LocalDate.now().with(next(SUNDAY));
+        LocalDate sunday = LocalDate.now(ZoneId.of("Asia/Jakarta")).with(next(SUNDAY));
         if(!rpp.get().getParticipantId().equals(participantId)){
             throw new IllegalStateException("Rpp tidak dapat diedit");
         }
@@ -219,13 +221,13 @@ public class MonitoringService implements IMonitoringService {
         rppNew.setTaskDescription(rpp.getTaskDescription());
         rppNew.setStartDate(rpp.getStartDate());
         rppNew.setFinishDate(rpp.getFinishDate());
-        if((rpp.getStartDate().isBefore(LocalDate.now()) || rpp.getStartDate().isEqual(LocalDate.now())) && (rpp.getFinishDate().isAfter(LocalDate.now()) || rpp.getFinishDate().isEqual(LocalDate.now()))) {
+        if((rpp.getStartDate().isBefore(LocalDate.now(ZoneId.of("Asia/Jakarta"))) || rpp.getStartDate().isEqual(LocalDate.now(ZoneId.of("Asia/Jakarta")))) && (rpp.getFinishDate().isAfter(LocalDate.now(ZoneId.of("Asia/Jakarta"))) || rpp.getFinishDate().isEqual(LocalDate.now(ZoneId.of("Asia/Jakarta"))))) {
             rppNew.setStatus(statusRepository.findById(9));
         }
-        if(rpp.getFinishDate().isBefore(LocalDate.now())){
+        if(rpp.getFinishDate().isBefore(LocalDate.now(ZoneId.of("Asia/Jakarta")))){
             rppNew.setStatus(statusRepository.findById(10));
         }
-        if(rpp.getStartDate().isAfter(LocalDate.now())){
+        if(rpp.getStartDate().isAfter(LocalDate.now(ZoneId.of("Asia/Jakarta")))){
             rppNew.setStatus(statusRepository.findById(11));
         }
         Rpp temp = rppRepository.save(rppNew);
@@ -243,7 +245,7 @@ public class MonitoringService implements IMonitoringService {
 
     @Override
     public void updateMilestone(List<MilestoneRequest> request, int rppId) {
-        LocalDate sunday = LocalDate.now().with(next(SUNDAY));
+        LocalDate sunday = LocalDate.now(ZoneId.of("Asia/Jakarta")).with(next(SUNDAY));
         Rpp rpp = rppRepository.findById(rppId);
         for(MilestoneRequest milestone: request){
             if(milestone.getStartDate().isAfter(sunday) &&  milestone.getId() != null)
@@ -261,7 +263,7 @@ public class MonitoringService implements IMonitoringService {
 
     @Override
     public void updateDeliverables(List<DeliverablesRequest> request, int rppId) {
-        LocalDate sunday = LocalDate.now().with(next(SUNDAY));
+        LocalDate sunday = LocalDate.now(ZoneId.of("Asia/Jakarta")).with(next(SUNDAY));
         Rpp rpp = rppRepository.findById(rppId);
         for(DeliverablesRequest deliverable:request){
             if(deliverable.getDueDate().isAfter(sunday) && deliverable.getId() != null)
@@ -279,7 +281,7 @@ public class MonitoringService implements IMonitoringService {
 
     @Override
     public void updateCompletionSchedule(List<CompletionScheduleRequest> request, int rppId) {
-        LocalDate sunday = LocalDate.now().with(next(SUNDAY));
+        LocalDate sunday = LocalDate.now(ZoneId.of("Asia/Jakarta")).with(next(SUNDAY));
         Rpp rpp = rppRepository.findById(rppId);
         for(CompletionScheduleRequest completionSchedule:request){
             if(completionSchedule.getStartDate().isAfter(sunday) && completionSchedule.getId() != null)
@@ -297,7 +299,7 @@ public class MonitoringService implements IMonitoringService {
 
     @Override
     public void updateWeeklyAchievementPlan(List<WeeklyAchievementPlanRequest> request, int rppId) {
-        LocalDate sunday = LocalDate.now().with(next(SUNDAY));
+        LocalDate sunday = LocalDate.now(ZoneId.of("Asia/Jakarta")).with(next(SUNDAY));
         Rpp rpp = rppRepository.findById(rppId);
         for(WeeklyAchievementPlanRequest weeklyAchievementPlan:request){
             if(weeklyAchievementPlan.getStartDate().isAfter(sunday) && weeklyAchievementPlan.getId() != null)
@@ -313,9 +315,9 @@ public class MonitoringService implements IMonitoringService {
         List<RppRekapResponse> response = new ArrayList<>();
         List<SupervisorMapping> mapping = new ArrayList<>();
         if(role.id == ERole.SUPERVISOR.id)
-            mapping = supervisorMappingRepository.findByLecturerId(id);
+            mapping = supervisorMappingRepository.findByLecturerId(id, LocalDate.now(ZoneId.of("Asia/Jakarta")).getYear());
         if(role.id == ERole.COMMITTEE.id)
-            mapping = supervisorMappingRepository.findByProdiId(id);
+            mapping = supervisorMappingRepository.findByProdiId(id, LocalDate.now(ZoneId.of("Asia/Jakarta")).getYear());
 
         for(SupervisorMapping map:mapping){
             String status = "Belum Mengumpulkan";
@@ -335,7 +337,7 @@ public class MonitoringService implements IMonitoringService {
 
     @Override
     public Boolean isLogbookExist(int participantId, LocalDate date) {
-        HashMap<LocalDate, String> hariLibur = getHariLiburFromDate(LocalDate.now());
+        HashMap<LocalDate, String> hariLibur = getHariLiburFromDate(LocalDate.now(ZoneId.of("Asia/Jakarta")));
         if(hariLibur.containsKey(date)) {
             throw new IllegalStateException("Hari ini merupakan " + hariLibur.get(date));
         }
@@ -357,12 +359,12 @@ public class MonitoringService implements IMonitoringService {
         Deadline logbook = deadlineRepository.findByNameLike("logbook");
         long totalLogbook = 0;
         List<LocalDate> dateList = new ArrayList<>();
-        if(LocalDate.now().isAfter(logbook.getFinishAssignmentDate())){
+        if(LocalDate.now(ZoneId.of("Asia/Jakarta")).isAfter(logbook.getFinishAssignmentDate())){
             totalLogbook = logbook.getStartAssignmentDate().datesUntil(logbook.getFinishAssignmentDate().plusDays(1)).filter((t -> businessDays.contains(t.getDayOfWeek()))).count();
             dateList = logbook.getStartAssignmentDate().datesUntil(logbook.getFinishAssignmentDate().plusDays(1)).filter((t -> businessDays.contains(t.getDayOfWeek()))).collect(Collectors.toList());
         }else{
-            totalLogbook = logbook.getStartAssignmentDate().datesUntil(LocalDate.now().plusDays(1)).filter((t -> businessDays.contains(t.getDayOfWeek()))).count();
-            dateList = logbook.getStartAssignmentDate().datesUntil(LocalDate.now().plusDays(1)).filter((t -> businessDays.contains(t.getDayOfWeek()))).collect(Collectors.toList());
+            totalLogbook = logbook.getStartAssignmentDate().datesUntil(LocalDate.now(ZoneId.of("Asia/Jakarta")).plusDays(1)).filter((t -> businessDays.contains(t.getDayOfWeek()))).count();
+            dateList = logbook.getStartAssignmentDate().datesUntil(LocalDate.now(ZoneId.of("Asia/Jakarta")).plusDays(1)).filter((t -> businessDays.contains(t.getDayOfWeek()))).collect(Collectors.toList());
         }
 
         List<LogbookResponse> responses = new ArrayList<>();
@@ -425,7 +427,7 @@ public class MonitoringService implements IMonitoringService {
         if(logbookRepository.isExist(participantId, logbook.getDate())) {
             throw new IllegalStateException("Logbook pada tanggal ini sudah ada, lakukan update");
         }
-        if(logbook.getDate().isAfter(LocalDate.now())) {
+        if(logbook.getDate().isAfter(LocalDate.now(ZoneId.of("Asia/Jakarta")))) {
             throw new IllegalStateException("Pengumpulan belum dibuka logbook untuk tanggal "+logbook.getDate());
         }
         Logbook newLogbook = new Logbook(
@@ -445,7 +447,7 @@ public class MonitoringService implements IMonitoringService {
                 null
         );
 
-        if(LocalDate.now().isAfter(newLogbook.getDate())){
+        if(LocalDate.now(ZoneId.of("Asia/Jakarta")).isAfter(newLogbook.getDate())){
             newLogbook.setStatus(statusRepository.findById(4));
         }else{
             newLogbook.setStatus(statusRepository.findById(5));
@@ -481,7 +483,7 @@ public class MonitoringService implements IMonitoringService {
         if(!logbook.getEncounteredProblem().isEmpty())
             newLogbook.setEncounteredProblem(logbook.getEncounteredProblem());
 
-        if(LocalDate.now().isAfter(newLogbook.getDate()))
+        if(LocalDate.now(ZoneId.of("Asia/Jakarta")).isAfter(newLogbook.getDate()))
             newLogbook.setStatus(statusRepository.findById(4));
         else
             newLogbook.setStatus(statusRepository.findById(5));
@@ -511,18 +513,18 @@ public class MonitoringService implements IMonitoringService {
         List<LogbookRekapResponse> response = new ArrayList<>();
         List<SupervisorMapping> mapping = new ArrayList<>();
         if(role.id == ERole.SUPERVISOR.id)
-            mapping = supervisorMappingRepository.findByLecturerId(id);
+            mapping = supervisorMappingRepository.findByLecturerId(id, LocalDate.now(ZoneId.of("Asia/Jakarta")).getYear());
         else if(role.id == ERole.COMMITTEE.id)
-            mapping = supervisorMappingRepository.findByProdiId(id);
+            mapping = supervisorMappingRepository.findByProdiId(id, LocalDate.now(ZoneId.of("Asia/Jakarta")).getYear());
 
         Deadline logbook = deadlineRepository.findByNameLike("logbook");
         final Set<DayOfWeek> businessDays = Set.of(MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY);
         int logbookStartWeek = logbook.getStartAssignmentDate().get(ChronoField.ALIGNED_WEEK_OF_YEAR);
         Map<Integer, List<LocalDate>> logbookDateList;
-        if(LocalDate.now().isAfter(logbook.getFinishAssignmentDate())){
+        if(LocalDate.now(ZoneId.of("Asia/Jakarta")).isAfter(logbook.getFinishAssignmentDate())){
             logbookDateList = logbook.getStartAssignmentDate().datesUntil(logbook.getFinishAssignmentDate().plusDays(1)).filter((t -> businessDays.contains(t.getDayOfWeek()))).collect(Collectors.groupingBy(o -> o.get(ChronoField.ALIGNED_WEEK_OF_YEAR)));
         }else{
-            logbookDateList = logbook.getStartAssignmentDate().datesUntil(LocalDate.now().plusDays(1)).filter((t -> businessDays.contains(t.getDayOfWeek()))).collect(Collectors.groupingBy(o -> o.get(ChronoField.ALIGNED_WEEK_OF_YEAR)));
+            logbookDateList = logbook.getStartAssignmentDate().datesUntil(LocalDate.now(ZoneId.of("Asia/Jakarta")).plusDays(1)).filter((t -> businessDays.contains(t.getDayOfWeek()))).collect(Collectors.groupingBy(o -> o.get(ChronoField.ALIGNED_WEEK_OF_YEAR)));
         }
 
         //mengelompokan logbook per 2 minggu
@@ -541,7 +543,7 @@ public class MonitoringService implements IMonitoringService {
 
         List<LocalDate> dates = new ArrayList<>();
         for(Integer key:newDateList.keySet()){
-            if(newDateList.get(key).contains(LocalDate.now())){
+            if(newDateList.get(key).contains(LocalDate.now(ZoneId.of("Asia/Jakarta")))){
                 dates = newDateList.get(key);
             }
         }
@@ -599,13 +601,13 @@ public class MonitoringService implements IMonitoringService {
         List<SelfAssessmentRekapResponse> response = new ArrayList<>();
         List<SupervisorMapping> mapping = new ArrayList<>();
         if(role.id == ERole.SUPERVISOR.id)
-            mapping = supervisorMappingRepository.findByLecturerId(id);
+            mapping = supervisorMappingRepository.findByLecturerId(id, LocalDate.now(ZoneId.of("Asia/Jakarta")).getYear());
         if(role.id == ERole.COMMITTEE.id)
-            mapping = supervisorMappingRepository.findByProdiId(id);
+            mapping = supervisorMappingRepository.findByProdiId(id, LocalDate.now(ZoneId.of("Asia/Jakarta")).getYear());
 
         for(SupervisorMapping map:mapping){
             String status = "Belum Mengumpulkan";
-            if(selfAssessmentRepository.isExistBetweenDate(map.getParticipantId(), LocalDate.now()))
+            if(selfAssessmentRepository.isExistBetweenDate(map.getParticipantId(), LocalDate.now(ZoneId.of("Asia/Jakarta"))))
                 status = "Sudah Mengumpulkan";
             response.add(new SelfAssessmentRekapResponse(
                             map.getParticipantId(),
@@ -699,12 +701,12 @@ public class MonitoringService implements IMonitoringService {
         final Set<DayOfWeek> businessDays = Set.of(MONDAY);
         Deadline selfAssessment = deadlineRepository.findByNameLike("self assessment");
         int totalSelfAssessment = 0;
-        if(LocalDate.now().isAfter(selfAssessment.getFinishAssignmentDate())){
+        if(LocalDate.now(ZoneId.of("Asia/Jakarta")).isAfter(selfAssessment.getFinishAssignmentDate())){
             totalSelfAssessment = selfAssessment.getFinishAssignmentDate().get(ChronoField.ALIGNED_WEEK_OF_YEAR) - selfAssessment.getStartAssignmentDate().get(ChronoField.ALIGNED_WEEK_OF_YEAR);
             dateList = selfAssessment.getStartAssignmentDate().datesUntil(selfAssessment.getFinishAssignmentDate()).filter((t -> businessDays.contains(t.getDayOfWeek()))).collect(Collectors.toList());
         }else{
-            totalSelfAssessment = LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.SUNDAY)).get(ChronoField.ALIGNED_WEEK_OF_YEAR) - selfAssessment.getStartAssignmentDate().get(ChronoField.ALIGNED_WEEK_OF_YEAR);
-            dateList = selfAssessment.getStartAssignmentDate().datesUntil(LocalDate.now()).filter((t -> businessDays.contains(t.getDayOfWeek()))).collect(Collectors.toList());
+            totalSelfAssessment = LocalDate.now(ZoneId.of("Asia/Jakarta")).with(TemporalAdjusters.next(DayOfWeek.SUNDAY)).get(ChronoField.ALIGNED_WEEK_OF_YEAR) - selfAssessment.getStartAssignmentDate().get(ChronoField.ALIGNED_WEEK_OF_YEAR);
+            dateList = selfAssessment.getStartAssignmentDate().datesUntil(LocalDate.now(ZoneId.of("Asia/Jakarta"))).filter((t -> businessDays.contains(t.getDayOfWeek()))).collect(Collectors.toList());
         }
 
         for(SelfAssessment temp:selfAssessments){
@@ -874,6 +876,28 @@ public class MonitoringService implements IMonitoringService {
     }
 
     @Override
+    @Scheduled(cron = "0 0 0 * * 6")
+    public void createSelfAssessmentMissingAfterDeadline() {
+        List<SupervisorMapping> mapping = supervisorMappingRepository.findByYear(LocalDate.now(ZoneId.of("Asia/Jakarta")).getYear());
+        for(SupervisorMapping map:mapping){
+            if(selfAssessmentRepository.isExistBetweenDate(map.getParticipantId(), LocalDate.now(ZoneId.of("Asia/Jakarta")).with(TemporalAdjusters.previous(TUESDAY)))){
+                SelfAssessment sa = selfAssessmentRepository.save(new SelfAssessment(
+                        null,
+                        map.getParticipantId(),
+                        LocalDate.now(ZoneId.of("Asia/Jakarta")).with(TemporalAdjusters.previous(MONDAY)),
+                        LocalDate.now(ZoneId.of("Asia/Jakarta")).with(TemporalAdjusters.previous(FRIDAY)),
+                        null));
+                List<SelfAssessmentAspect> aspectList = selfAssessmentAspectRepository.findAllActiveAspect();
+                List<SelfAssessmentGrade> gradeList = new ArrayList<>();
+                for (SelfAssessmentAspect aspect : aspectList) {
+                    gradeList.add(new SelfAssessmentGrade(null, sa, aspect, 0, "-"));
+                }
+                selfAssessmentGradeRepository.saveAll(gradeList);
+            }
+        }
+    }
+
+    @Override
     public void createSelfAssessmentAspect(SelfAssessmentAspectRequest request, int creator) {
         SelfAssessmentAspect aspect = new SelfAssessmentAspect();
         aspect.setId(null);
@@ -881,7 +905,7 @@ public class MonitoringService implements IMonitoringService {
         aspect.setDescription(request.getDescription());
         aspect.setStartAssessmentDate(request.getStartAssessmentDate());
         aspect.setEditedBy(creator);
-        aspect.setLastEditedDate(LocalDate.now());
+        aspect.setLastEditedDate(LocalDate.now(ZoneId.of("Asia/Jakarta")));
         aspect.setStatus(statusRepository.findById((int)request.getStatus()));
         selfAssessmentAspectRepository.save(aspect);
     }
@@ -894,7 +918,7 @@ public class MonitoringService implements IMonitoringService {
         aspect.setDescription(request.getDescription());
         aspect.setStartAssessmentDate(request.getStartAssessmentDate());
         aspect.setEditedBy(creator);
-        aspect.setLastEditedDate(LocalDate.now());
+        aspect.setLastEditedDate(LocalDate.now(ZoneId.of("Asia/Jakarta")));
         aspect.setStatus(statusRepository.findById((int)request.getStatus()));
         selfAssessmentAspectRepository.save(aspect);
     }
@@ -907,7 +931,7 @@ public class MonitoringService implements IMonitoringService {
         supervisorGrade.setId(null);
         supervisorGrade.setSupervisorId(0);
         supervisorGrade.setParticipantId(request.getParticipantId());
-        supervisorGrade.setDate(LocalDate.now());
+        supervisorGrade.setDate(LocalDate.now(ZoneId.of("Asia/Jakarta")));
         supervisorGrade.setPhase(request.getPhase());
         SupervisorGrade temp = supervisorGradeRepository.save(supervisorGrade);
         for(GradeRequest grade:request.getGradeList()){
@@ -921,7 +945,7 @@ public class MonitoringService implements IMonitoringService {
     public void updateSupervisorGrade(SupervisorGradeUpdateRequest request, int supervisorId) {
         SupervisorGrade supervisorGrade = supervisorGradeRepository.findById((int)request.getId());
         if(supervisorGrade != null){
-            supervisorGrade.setDate(LocalDate.now());
+            supervisorGrade.setDate(LocalDate.now(ZoneId.of("Asia/Jakarta")));
             supervisorGrade.setPhase(request.getPhase());
             SupervisorGrade temp = supervisorGradeRepository.save(supervisorGrade);
             for (GradeUpdateRequest grade : request.getGradeList()) {
@@ -978,10 +1002,10 @@ public class MonitoringService implements IMonitoringService {
         //get jumlah total logbook yang seharusnya dikumpulkan menggunakan tanggal di deadline
         Deadline logbook = deadlineRepository.findByNameLike("logbook");
         int totalLogbook = 0;
-        if(LocalDate.now().isAfter(logbook.getFinishAssignmentDate())){
+        if(LocalDate.now(ZoneId.of("Asia/Jakarta")).isAfter(logbook.getFinishAssignmentDate())){
             totalLogbook = (int) logbook.getStartAssignmentDate().datesUntil(logbook.getFinishAssignmentDate().plusDays(1)).filter((t -> businessDays.contains(t.getDayOfWeek()))).count();
         }else{
-            totalLogbook = (int) logbook.getStartAssignmentDate().datesUntil(LocalDate.now().plusDays(1)).filter((t -> businessDays.contains(t.getDayOfWeek()))).count();
+            totalLogbook = (int) logbook.getStartAssignmentDate().datesUntil(LocalDate.now(ZoneId.of("Asia/Jakarta")).plusDays(1)).filter((t -> businessDays.contains(t.getDayOfWeek()))).count();
         }
         int submittedLogbook = logbookRepository.countByParticipantId(participantId);
         int missingLogbook = (totalLogbook - submittedLogbook);
@@ -1003,10 +1027,10 @@ public class MonitoringService implements IMonitoringService {
         //get jumlah total self assessment yang seharusnya dikumpulkan menggunakan tanggal di deadline
         Deadline selfAssessment = deadlineRepository.findByNameLike("self assessment");
         int totalSelfAssessment = 0;
-        if(LocalDate.now().isAfter(selfAssessment.getFinishAssignmentDate())){
+        if(LocalDate.now(ZoneId.of("Asia/Jakarta")).isAfter(selfAssessment.getFinishAssignmentDate())){
             totalSelfAssessment = (selfAssessment.getFinishAssignmentDate().get(ChronoField.ALIGNED_WEEK_OF_YEAR) - selfAssessment.getStartAssignmentDate().get(ChronoField.ALIGNED_WEEK_OF_YEAR));
         }else{
-            totalSelfAssessment = (LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.SUNDAY)).get(ChronoField.ALIGNED_WEEK_OF_YEAR) - selfAssessment.getStartAssignmentDate().get(ChronoField.ALIGNED_WEEK_OF_YEAR));
+            totalSelfAssessment = (LocalDate.now(ZoneId.of("Asia/Jakarta")).with(TemporalAdjusters.next(DayOfWeek.SUNDAY)).get(ChronoField.ALIGNED_WEEK_OF_YEAR) - selfAssessment.getStartAssignmentDate().get(ChronoField.ALIGNED_WEEK_OF_YEAR));
         }
         int submittedSelfAssessment = selfAssessmentRepository.countByParticipantId(participantId);
         int missingSelfAssessment = totalSelfAssessment - submittedSelfAssessment;
@@ -1043,7 +1067,7 @@ public class MonitoringService implements IMonitoringService {
         aspect.setMaxGrade(request.getMaxGrade());
         aspect.setDescription(request.getDescription());
         aspect.setEditedBy(creator);
-        aspect.setLastEditDate(LocalDate.now());
+        aspect.setLastEditDate(LocalDate.now(ZoneId.of("Asia/Jakarta")));
         aspect.setName(request.getName());
         supervisorGradeAspectRepository.save(aspect);
     }
@@ -1056,7 +1080,7 @@ public class MonitoringService implements IMonitoringService {
             aspect.setMaxGrade(request.getMaxGrade());
             aspect.setDescription(request.getDescription());
             aspect.setEditedBy(creator);
-            aspect.setLastEditDate(LocalDate.now());
+            aspect.setLastEditDate(LocalDate.now(ZoneId.of("Asia/Jakarta")));
             aspect.setName(request.getName());
             supervisorGradeAspectRepository.save(aspect);
         }
@@ -1078,7 +1102,7 @@ public class MonitoringService implements IMonitoringService {
         laporan.setParticipant(participantId);
         laporan.setUriName(laporanCreateRequest.getUri());
         laporan.setPhase(laporanCreateRequest.getPhase());
-        laporan.setUploadDate(LocalDate.now());
+        laporan.setUploadDate(LocalDate.now(ZoneId.of("Asia/Jakarta")));
 
         if(laporanRepository.findByParticipantIdAndPhaseOrderByPhaseAsc(participantId, laporanCreateRequest.getPhase()) == null){
             laporan.setId(null);
@@ -1108,7 +1132,7 @@ public class MonitoringService implements IMonitoringService {
 
         laporan.setUriName(laporanUpdateRequest.getUri());
         laporan.setPhase(laporanUpdateRequest.getPhase());
-        laporan.setUploadDate(LocalDate.now());
+        laporan.setUploadDate(LocalDate.now(ZoneId.of("Asia/Jakarta")));
         laporanRepository.save(laporan);
     }
 
@@ -1137,12 +1161,12 @@ public class MonitoringService implements IMonitoringService {
 
     @Override
     public Integer getPhase() {
-        return deadlineRepository.countLaporanPhaseNow(LocalDate.now());
+        return deadlineRepository.countLaporanPhaseNow(LocalDate.now(ZoneId.of("Asia/Jakarta")));
     }
 
     @Override
     public Boolean isFinalPhase() {
-        Integer phase = deadlineRepository.countLaporanPhaseNow(LocalDate.now());
+        Integer phase = deadlineRepository.countLaporanPhaseNow(LocalDate.now(ZoneId.of("Asia/Jakarta")));
         if(deadlineRepository.countLaporanPhase() == phase)
             return true;
         return false;
@@ -1161,13 +1185,13 @@ public class MonitoringService implements IMonitoringService {
         List<LaporanRekapResponse> response = new ArrayList<>();
         List<SupervisorMapping> mapping = new ArrayList<>();
         if(role.id == ERole.SUPERVISOR.id)
-            mapping = supervisorMappingRepository.findByLecturerId(id);
+            mapping = supervisorMappingRepository.findByLecturerId(id, LocalDate.now(ZoneId.of("Asia/Jakarta")).getYear());
         if(role.id == ERole.COMMITTEE.id)
-            mapping = supervisorMappingRepository.findByProdiId(id);
+            mapping = supervisorMappingRepository.findByProdiId(id, LocalDate.now(ZoneId.of("Asia/Jakarta")).getYear());
 
         for(SupervisorMapping map:mapping){
             String status = "Belum Mengumpulkan";
-            if(laporanRepository.isExist(map.getParticipantId(), deadlineRepository.countLaporanPhaseNow(LocalDate.now())))
+            if(laporanRepository.isExist(map.getParticipantId(), deadlineRepository.countLaporanPhaseNow(LocalDate.now(ZoneId.of("Asia/Jakarta")))))
                 status = "Sudah Mengumpulkan";
             response.add(new LaporanRekapResponse(
                     map.getParticipantId(),
@@ -1196,11 +1220,11 @@ public class MonitoringService implements IMonitoringService {
             List<SupervisorMapping> mappingList = supervisorMappingRepository.findByCompanyId(request.getCompanyId());
             if(mappingList.size() == 0){
                 for (MappingResponse mapping : mappingResponses) {
-                    map.add(new SupervisorMapping(null, LocalDate.now(), request.getCompanyId(), mapping.getParticipantId(), request.getLecturerId(), mapping.getProdiId(), creatorId));
+                    map.add(new SupervisorMapping(null, LocalDate.now(ZoneId.of("Asia/Jakarta")), request.getCompanyId(), mapping.getParticipantId(), request.getLecturerId(), mapping.getProdiId(), creatorId));
                 }
             }else{
                 for(SupervisorMapping temp:mappingList){
-                    temp.setDate(LocalDate.now());
+                    temp.setDate(LocalDate.now(ZoneId.of("Asia/Jakarta")));
                     temp.setCreateBy(creatorId);
                     temp.setLecturerId(request.getLecturerId());
                     map.add(temp);
@@ -1216,7 +1240,7 @@ public class MonitoringService implements IMonitoringService {
             List<SupervisorMapping> mapping = supervisorMappingRepository.findByCompanyId(request.getCompanyId());
             List<SupervisorMapping> map = new ArrayList<>();
             for(SupervisorMapping temp:mapping){
-                temp.setDate(LocalDate.now());
+                temp.setDate(LocalDate.now(ZoneId.of("Asia/Jakarta")));
                 temp.setCreateBy(creatorId);
                 temp.setLecturerId(request.getLecturerId());
                 map.add(temp);
@@ -1418,7 +1442,7 @@ public class MonitoringService implements IMonitoringService {
 
     @Override
     public SupervisorMappingResponse getSupervisorMappingByParticipant(String cookie, int participantId) {
-        SupervisorMapping mapping = supervisorMappingRepository.findByParticipantId(participantId);
+        SupervisorMapping mapping = supervisorMappingRepository.findByParticipantId(participantId, LocalDate.now(ZoneId.of("Asia/Jakarta")).getYear());
         List<HashMap<Integer, String>> user = getUserList(cookie, null, "simple");
         HashMap<Integer, String> participantList = user.get(0);
         HashMap<Integer, String> companyList = user.get(1);
@@ -1446,7 +1470,7 @@ public class MonitoringService implements IMonitoringService {
                 });
         List<ParticipantDropdownResponse> participantResponseList = Objects.requireNonNull(participantRes.getBody()).getData();
 
-        if(participantResponseList.size() == supervisorMappingRepository.countByYear(LocalDate.now().getYear(), prodi))
+        if(participantResponseList.size() == supervisorMappingRepository.countByYear(LocalDate.now(ZoneId.of("Asia/Jakarta")).getYear(), prodi))
             return true;
         else
             return false;
@@ -1514,11 +1538,11 @@ public class MonitoringService implements IMonitoringService {
         Deadline logbook = deadlineRepository.findByNameLike("logbook");
         int logbookStartWeek = logbook.getStartAssignmentDate().get(ChronoField.ALIGNED_WEEK_OF_YEAR);
         Map<Integer, List<LocalDate>> logbookDateList;
-        if(LocalDate.now().isAfter(logbook.getFinishAssignmentDate())){
+        if(LocalDate.now(ZoneId.of("Asia/Jakarta")).isAfter(logbook.getFinishAssignmentDate())){
             logbookDateList = logbook.getStartAssignmentDate().datesUntil(logbook.getFinishAssignmentDate().plusDays(1)).filter((t -> businessDays.contains(t.getDayOfWeek()))).collect(Collectors.groupingBy(o -> o.get(ChronoField.ALIGNED_WEEK_OF_YEAR)));
             //TODO: tambahkan pengecualian untuk tanggal merah
         }else{
-            logbookDateList = logbook.getStartAssignmentDate().datesUntil(LocalDate.now().plusDays(1)).filter((t -> businessDays.contains(t.getDayOfWeek()))).collect(Collectors.groupingBy(o -> o.get(ChronoField.ALIGNED_WEEK_OF_YEAR)));
+            logbookDateList = logbook.getStartAssignmentDate().datesUntil(LocalDate.now(ZoneId.of("Asia/Jakarta")).plusDays(1)).filter((t -> businessDays.contains(t.getDayOfWeek()))).collect(Collectors.groupingBy(o -> o.get(ChronoField.ALIGNED_WEEK_OF_YEAR)));
         }
 
         //mengelompokan logbook per 2 minggu
@@ -1557,15 +1581,15 @@ public class MonitoringService implements IMonitoringService {
 
         Deadline selfAssessment = deadlineRepository.findByNameLike("self assessment");
         int totalSelfAssessment;
-        if(LocalDate.now().isAfter(selfAssessment.getFinishAssignmentDate())){
+        if(LocalDate.now(ZoneId.of("Asia/Jakarta")).isAfter(selfAssessment.getFinishAssignmentDate())){
             totalSelfAssessment = selfAssessment.getFinishAssignmentDate().get(ChronoField.ALIGNED_WEEK_OF_YEAR) - selfAssessment.getStartAssignmentDate().get(ChronoField.ALIGNED_WEEK_OF_YEAR);
         }else{
-            totalSelfAssessment = LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.SUNDAY)).get(ChronoField.ALIGNED_WEEK_OF_YEAR) - selfAssessment.getStartAssignmentDate().get(ChronoField.ALIGNED_WEEK_OF_YEAR);
+            totalSelfAssessment = LocalDate.now(ZoneId.of("Asia/Jakarta")).with(TemporalAdjusters.next(DayOfWeek.SUNDAY)).get(ChronoField.ALIGNED_WEEK_OF_YEAR) - selfAssessment.getStartAssignmentDate().get(ChronoField.ALIGNED_WEEK_OF_YEAR);
         }
         response.setSelfAssessmentSubmitted(selfAssessmentRepository.countByParticipantId(participantId));
         response.setSelfAssessmentTotal(totalSelfAssessment);
 
-        int totalLaporan =  deadlineRepository.countLaporanPhaseNow(LocalDate.now());
+        int totalLaporan =  deadlineRepository.countLaporanPhaseNow(LocalDate.now(ZoneId.of("Asia/Jakarta")));
         response.setLaporanSubmitted(laporanRepository.countByParticipantId(participantId));
         response.setLaporanTotal(totalLaporan);
         response.setRppSubmitted(rppRepository.countByParticipantId(participantId));
@@ -1577,7 +1601,7 @@ public class MonitoringService implements IMonitoringService {
         DashboardLecturer response = new DashboardLecturer();
         DashboardItem weekly = new DashboardItem(), all = new DashboardItem();
         final Set<DayOfWeek> businessDays = Set.of(MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY);
-        List<SupervisorMapping> supervisorMapping = supervisorMappingRepository.findByLecturerId(lecturerId);
+        List<SupervisorMapping> supervisorMapping = supervisorMappingRepository.findByLecturerId(lecturerId, LocalDate.now(ZoneId.of("Asia/Jakarta")).getYear());
         List<HashMap<Integer, String>> user = getUserList(cookie, null, "simple");
         HashMap<Integer, String> participantList = user.get(0);
         HashMap<Integer, String> companyList = user.get(1);
@@ -1585,10 +1609,10 @@ public class MonitoringService implements IMonitoringService {
         Deadline logbook = deadlineRepository.findByNameLike("logbook");
         int logbookStartWeek = logbook.getStartAssignmentDate().get(ChronoField.ALIGNED_WEEK_OF_YEAR);
         Map<Integer, List<LocalDate>> logbookDateList;
-        if(LocalDate.now().isAfter(logbook.getFinishAssignmentDate())){
+        if(LocalDate.now(ZoneId.of("Asia/Jakarta")).isAfter(logbook.getFinishAssignmentDate())){
             logbookDateList = logbook.getStartAssignmentDate().datesUntil(logbook.getFinishAssignmentDate().plusDays(1)).filter((t -> businessDays.contains(t.getDayOfWeek()))).collect(Collectors.groupingBy(o -> o.get(ChronoField.ALIGNED_WEEK_OF_YEAR)));
         }else{
-            logbookDateList = logbook.getStartAssignmentDate().datesUntil(LocalDate.now().plusDays(1)).filter((t -> businessDays.contains(t.getDayOfWeek()))).collect(Collectors.groupingBy(o -> o.get(ChronoField.ALIGNED_WEEK_OF_YEAR)));
+            logbookDateList = logbook.getStartAssignmentDate().datesUntil(LocalDate.now(ZoneId.of("Asia/Jakarta")).plusDays(1)).filter((t -> businessDays.contains(t.getDayOfWeek()))).collect(Collectors.groupingBy(o -> o.get(ChronoField.ALIGNED_WEEK_OF_YEAR)));
         }
 
         //mengelompokan logbook per 2 minggu
@@ -1607,15 +1631,7 @@ public class MonitoringService implements IMonitoringService {
         weekly.setLogbookTotal(totalLogbook);
         all.setLogbookTotal(totalLogbook * supervisorMapping.size());
 
-//        Deadline selfAssessment = deadlineRepository.findByNameLike("self assessment");
-//        int totalSelfAssessment = 0;
-//        if(LocalDate.now().isAfter(selfAssessment.getFinishAssignmentDate())){
-//            totalSelfAssessment = (selfAssessment.getFinishAssignmentDate().get(ChronoField.ALIGNED_WEEK_OF_YEAR) - selfAssessment.getStartAssignmentDate().get(ChronoField.ALIGNED_WEEK_OF_YEAR)) * participants.size();
-//        }else{
-//            totalSelfAssessment = (LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.SUNDAY)).get(ChronoField.ALIGNED_WEEK_OF_YEAR) - selfAssessment.getStartAssignmentDate().get(ChronoField.ALIGNED_WEEK_OF_YEAR)) * participants.size();
-//        }
-
-        int totalLaporan = deadlineRepository.countLaporanPhaseNow(LocalDate.now());
+        int totalLaporan = deadlineRepository.countLaporanPhaseNow(LocalDate.now(ZoneId.of("Asia/Jakarta")));
 
         List<ItemParticipant> missingLogbookAll = new ArrayList<>();
         List<ItemParticipant> missingLogbookWeekly = new ArrayList<>();
@@ -1629,24 +1645,27 @@ public class MonitoringService implements IMonitoringService {
         for(SupervisorMapping map:supervisorMapping){
             ItemParticipant temp = new ItemParticipant(map.getParticipantId(), participantList.get(map.getParticipantId()), companyList.get(map.getCompanyId()));
             //logbook
+            boolean isComplete = true;
             for (Integer key : newDateList.keySet()) {
                 if (logbookRepository.countExistBetweenDate(map.getParticipantId(), newDateList.get(key)) < newDateList.get(key).size()) {
-                    if(newDateList.containsValue(LocalDate.now()))
+                    isComplete = false;
+                    if(newDateList.containsValue(LocalDate.now(ZoneId.of("Asia/Jakarta"))))
                         missingLogbookWeekly.add(new ItemParticipant(map.getParticipantId(), participantList.get(map.getParticipantId()), companyList.get(map.getCompanyId())));
                     if(!missingLogbookAll.contains(temp))
                         missingLogbookAll.add(temp);
                 }else{
-                    if(newDateList.containsValue(LocalDate.now()))
+                    if(newDateList.containsValue(LocalDate.now(ZoneId.of("Asia/Jakarta"))))
                         submittedLogbookWeekly++;
-                    submittedLogbook++;
                 }
             }
+            if(isComplete)
+                submittedLogbook++;
 
             //selfAssessment
-            if(selfAssessmentRepository.isExistBetweenDate(map.getParticipantId(), LocalDate.now()))
-                submittedSelfAssessment++;
-            else
+            if(!selfAssessmentRepository.isExistBetweenDate(map.getParticipantId(), LocalDate.now(ZoneId.of("Asia/Jakarta"))))
                 missingSelfAssessment.add(temp);
+            else
+                submittedSelfAssessment++;
 
             //rpp
             if(rppRepository.findByParticipantId(map.getParticipantId()).size() == 0)
@@ -1657,15 +1676,15 @@ public class MonitoringService implements IMonitoringService {
             //laporan
             if(laporanRepository.countByParticipantId(map.getParticipantId()) < totalLaporan)
                 missingLaporan.add(temp);
-            submittedLaporan += laporanRepository.countByParticipantId(map.getParticipantId());
+            else
+                submittedLaporan++;
 
-            if(laporanRepository.isExist(map.getParticipantId(), totalLaporan)){
-                submittedLaporanCurPhase++;
-            }else{
+            if(!laporanRepository.isExist(map.getParticipantId(), totalLaporan))
                 missingLaporanCur.add(temp);
-            }
-
+            else
+                submittedLaporanCurPhase++;
         }
+
         weekly.setLogbookMissing(missingLogbookWeekly);
         weekly.setLogbookSubmitted(submittedLogbookWeekly);
         weekly.setLogbookTotal(supervisorMapping.size());
@@ -1681,11 +1700,11 @@ public class MonitoringService implements IMonitoringService {
 
         all.setLogbookMissing(missingLogbookAll);
         all.setLogbookSubmitted(submittedLogbook);
-        all.setLogbookTotal(newDateList.size() * supervisorMapping.size());
+        all.setLogbookTotal(supervisorMapping.size());
         all.setRppSubmitted(submittedRpp);
         all.setRppTotal(supervisorMapping.size());
         all.setRppMissing(missingRpp);
-        all.setLaporanTotal(totalLaporan * supervisorMapping.size());
+        all.setLaporanTotal(supervisorMapping.size());
         all.setLaporanMissing(missingLaporan);
         all.setLaporanSubmitted(submittedLaporan);
 
@@ -1699,7 +1718,7 @@ public class MonitoringService implements IMonitoringService {
         DashboardCommittee response = new DashboardCommittee();
         DashboardItem weekly = new DashboardItem(), all = new DashboardItem();
         final Set<DayOfWeek> businessDays = Set.of(MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY);
-        List<SupervisorMapping> supervisorMapping = supervisorMappingRepository.findByProdiId(prodiId);
+        List<SupervisorMapping> supervisorMapping = supervisorMappingRepository.findByProdiId(prodiId, LocalDate.now(ZoneId.of("Asia/Jakarta")).getYear());
         List<HashMap<Integer, String>> user = getUserList(cookie, null, "simple");
         HashMap<Integer, String> participantList = user.get(0);
         HashMap<Integer, String> companyList = user.get(1);
@@ -1707,10 +1726,10 @@ public class MonitoringService implements IMonitoringService {
         Deadline logbook = deadlineRepository.findByNameLike("logbook");
         int logbookStartWeek = logbook.getStartAssignmentDate().get(ChronoField.ALIGNED_WEEK_OF_YEAR);
         Map<Integer, List<LocalDate>> logbookDateList;
-        if(LocalDate.now().isAfter(logbook.getFinishAssignmentDate())){
+        if(LocalDate.now(ZoneId.of("Asia/Jakarta")).isAfter(logbook.getFinishAssignmentDate())){
             logbookDateList = logbook.getStartAssignmentDate().datesUntil(logbook.getFinishAssignmentDate().plusDays(1)).filter((t -> businessDays.contains(t.getDayOfWeek()))).collect(Collectors.groupingBy(o -> o.get(ChronoField.ALIGNED_WEEK_OF_YEAR)));
         }else{
-            logbookDateList = logbook.getStartAssignmentDate().datesUntil(LocalDate.now().plusDays(1)).filter((t -> businessDays.contains(t.getDayOfWeek()))).collect(Collectors.groupingBy(o -> o.get(ChronoField.ALIGNED_WEEK_OF_YEAR)));
+            logbookDateList = logbook.getStartAssignmentDate().datesUntil(LocalDate.now(ZoneId.of("Asia/Jakarta")).plusDays(1)).filter((t -> businessDays.contains(t.getDayOfWeek()))).collect(Collectors.groupingBy(o -> o.get(ChronoField.ALIGNED_WEEK_OF_YEAR)));
         }
 
         //mengelompokan logbook per 2 minggu
@@ -1728,16 +1747,8 @@ public class MonitoringService implements IMonitoringService {
         }
         weekly.setLogbookTotal(totalLogbook);
         all.setLogbookTotal(totalLogbook * supervisorMapping.size());
-//
-//        Deadline selfAssessment = deadlineRepository.findByNameLike("self assessment");
-//        int totalSelfAssessment = 0;
-//        if(LocalDate.now().isAfter(selfAssessment.getFinishAssignmentDate())){
-//            totalSelfAssessment = (selfAssessment.getFinishAssignmentDate().get(ChronoField.ALIGNED_WEEK_OF_YEAR) - selfAssessment.getStartAssignmentDate().get(ChronoField.ALIGNED_WEEK_OF_YEAR)) * participants.size();
-//        }else{
-//            totalSelfAssessment = (LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.SUNDAY)).get(ChronoField.ALIGNED_WEEK_OF_YEAR) - selfAssessment.getStartAssignmentDate().get(ChronoField.ALIGNED_WEEK_OF_YEAR)) * participants.size();
-//        }
 
-        int totalLaporan = deadlineRepository.countLaporanPhaseNow(LocalDate.now());
+        int totalLaporan = deadlineRepository.countLaporanPhaseNow(LocalDate.now(ZoneId.of("Asia/Jakarta")));
 
         List<ItemParticipant> missingLogbookAll = new ArrayList<>();
         List<ItemParticipant> missingLogbookWeekly = new ArrayList<>();
@@ -1751,24 +1762,27 @@ public class MonitoringService implements IMonitoringService {
         for(SupervisorMapping map:supervisorMapping){
             ItemParticipant temp = new ItemParticipant(map.getParticipantId(), participantList.get(map.getParticipantId()), companyList.get(map.getCompanyId()));
             //logbook
+            boolean isComplete = true;
             for (Integer key : newDateList.keySet()) {
                 if (logbookRepository.countExistBetweenDate(map.getParticipantId(), newDateList.get(key)) < newDateList.get(key).size()) {
-                    if(newDateList.containsValue(LocalDate.now()))
+                    isComplete = false;
+                    if(newDateList.containsValue(LocalDate.now(ZoneId.of("Asia/Jakarta"))))
                         missingLogbookWeekly.add(new ItemParticipant(map.getParticipantId(), participantList.get(map.getParticipantId()), companyList.get(map.getCompanyId())));
                     if(!missingLogbookAll.contains(temp))
                         missingLogbookAll.add(temp);
                 }else{
-                    if(newDateList.containsValue(LocalDate.now()))
+                    if(newDateList.containsValue(LocalDate.now(ZoneId.of("Asia/Jakarta"))))
                         submittedLogbookWeekly++;
-                    submittedLogbook++;
                 }
             }
+            if(isComplete)
+                submittedLogbook++;
 
             //selfAssessment
-            if(selfAssessmentRepository.isExistBetweenDate(map.getParticipantId(), LocalDate.now()))
-                submittedSelfAssessment++;
-            else
+            if(!selfAssessmentRepository.isExistBetweenDate(map.getParticipantId(), LocalDate.now(ZoneId.of("Asia/Jakarta"))))
                 missingSelfAssessment.add(temp);
+            else
+                submittedSelfAssessment++;
 
             //rpp
             if(rppRepository.findByParticipantId(map.getParticipantId()).size() == 0)
@@ -1779,15 +1793,15 @@ public class MonitoringService implements IMonitoringService {
             //laporan
             if(laporanRepository.countByParticipantId(map.getParticipantId()) < totalLaporan)
                 missingLaporan.add(temp);
-            submittedLaporan += laporanRepository.countByParticipantId(map.getParticipantId());
+            else
+                submittedLaporan++;
 
-            if(laporanRepository.isExist(map.getParticipantId(), totalLaporan)){
-                submittedLaporanCurPhase++;
-            }else{
+            if(!laporanRepository.isExist(map.getParticipantId(), totalLaporan))
                 missingLaporanCur.add(temp);
-            }
-
+            else
+                submittedLaporanCurPhase++;
         }
+
         weekly.setLogbookMissing(missingLogbookWeekly);
         weekly.setLogbookSubmitted(submittedLogbookWeekly);
         weekly.setLogbookTotal(supervisorMapping.size());
@@ -1803,11 +1817,11 @@ public class MonitoringService implements IMonitoringService {
 
         all.setLogbookMissing(missingLogbookAll);
         all.setLogbookSubmitted(submittedLogbook);
-        all.setLogbookTotal(newDateList.size() * supervisorMapping.size());
+        all.setLogbookTotal(supervisorMapping.size());
         all.setRppSubmitted(submittedRpp);
         all.setRppTotal(supervisorMapping.size());
         all.setRppMissing(missingRpp);
-        all.setLaporanTotal(totalLaporan * supervisorMapping.size());
+        all.setLaporanTotal(supervisorMapping.size());
         all.setLaporanMissing(missingLaporan);
         all.setLaporanSubmitted(submittedLaporan);
 

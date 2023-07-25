@@ -1,7 +1,9 @@
 package com.jtk.ps.api.model;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -10,6 +12,8 @@ import java.util.List;
 @Entity
 @Table(name = "self_assessment")
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class SelfAssessment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -10,9 +10,12 @@ import java.util.Optional;
 
 public interface SupervisorMappingRepository extends JpaRepository<SupervisorMapping, Integer> {
     SupervisorMapping findById(int id);
-    SupervisorMapping findByParticipantId(int participantId);
-    List<SupervisorMapping> findByLecturerId(int lecturerId);
-    List<SupervisorMapping> findByProdiId(int prodiId);
+    @Query(value = "select * from supervisor_mapping where participant_id = :participant and year(date) = :year",nativeQuery = true)
+    SupervisorMapping findByParticipantId(@Param("participant") int participantId, @Param("year") int year);
+    @Query(value = "select * from supervisor_mapping where lecturer_id = :lecturer and year(date) = :year",nativeQuery = true)
+    List<SupervisorMapping> findByLecturerId(@Param("lecturer") int lecturerId, @Param("year") int year);
+    @Query(value = "select * from supervisor_mapping where prodi_id = :prodi and year(date) = :year",nativeQuery = true)
+    List<SupervisorMapping> findByProdiId(@Param("prodi") int prodiId, @Param("year") int year);
     @Query(value = "select * from supervisor_mapping where prodi_id = :prodi group by company_id",nativeQuery = true)
     List<SupervisorMapping> findByProdiGroupByCompanyId(@Param("prodi") int prodi);
     @Query(value = "select * from supervisor_mapping where lecturer_id = :lecturer group by company_id",nativeQuery = true)

@@ -64,6 +64,7 @@ public interface IMonitoringService {
     List<SelfAssessmentAspectResponse> getActiveSelfAssessmentAspect();
     List<SelfAssessmentAspectResponse> getSelfAssessmentAspect();
     List<SelfAssessmentRekapResponse> getRekapSelfAssessment(ERole role, int id, String cookie);
+    void createSelfAssessmentMissingAfterDeadline();
 
     //Supervisor Grade
     CreateId createSupervisorGrade(SupervisorGradeCreateRequest request);
