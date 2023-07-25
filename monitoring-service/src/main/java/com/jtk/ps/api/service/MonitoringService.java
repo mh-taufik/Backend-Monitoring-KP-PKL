@@ -880,7 +880,7 @@ public class MonitoringService implements IMonitoringService {
     public void createSelfAssessmentMissingAfterDeadline() {
         List<SupervisorMapping> mapping = supervisorMappingRepository.findByYear(LocalDate.now(ZoneId.of("Asia/Jakarta")).getYear());
         for(SupervisorMapping map:mapping){
-            if(selfAssessmentRepository.isExistBetweenDate(map.getParticipantId(), LocalDate.now(ZoneId.of("Asia/Jakarta")).with(TemporalAdjusters.previous(TUESDAY)))){
+            if(!selfAssessmentRepository.isExistBetweenDate(map.getParticipantId(), LocalDate.now(ZoneId.of("Asia/Jakarta")).with(TemporalAdjusters.previous(TUESDAY)))){
                 SelfAssessment sa = selfAssessmentRepository.save(new SelfAssessment(
                         null,
                         map.getParticipantId(),
@@ -1649,12 +1649,12 @@ public class MonitoringService implements IMonitoringService {
             for (Integer key : newDateList.keySet()) {
                 if (logbookRepository.countExistBetweenDate(map.getParticipantId(), newDateList.get(key)) < newDateList.get(key).size()) {
                     isComplete = false;
-                    if(newDateList.containsValue(LocalDate.now(ZoneId.of("Asia/Jakarta"))))
-                        missingLogbookWeekly.add(new ItemParticipant(map.getParticipantId(), participantList.get(map.getParticipantId()), companyList.get(map.getCompanyId())));
+                    if(newDateList.get(key).contains(LocalDate.now(ZoneId.of("Asia/Jakarta"))))
+                        missingLogbookWeekly.add(temp);
                     if(!missingLogbookAll.contains(temp))
                         missingLogbookAll.add(temp);
                 }else{
-                    if(newDateList.containsValue(LocalDate.now(ZoneId.of("Asia/Jakarta"))))
+                    if(newDateList.get(key).contains(LocalDate.now(ZoneId.of("Asia/Jakarta"))))
                         submittedLogbookWeekly++;
                 }
             }
@@ -1766,12 +1766,12 @@ public class MonitoringService implements IMonitoringService {
             for (Integer key : newDateList.keySet()) {
                 if (logbookRepository.countExistBetweenDate(map.getParticipantId(), newDateList.get(key)) < newDateList.get(key).size()) {
                     isComplete = false;
-                    if(newDateList.containsValue(LocalDate.now(ZoneId.of("Asia/Jakarta"))))
-                        missingLogbookWeekly.add(new ItemParticipant(map.getParticipantId(), participantList.get(map.getParticipantId()), companyList.get(map.getCompanyId())));
+                    if(newDateList.get(key).contains(LocalDate.now(ZoneId.of("Asia/Jakarta"))))
+                        missingLogbookWeekly.add(temp);
                     if(!missingLogbookAll.contains(temp))
                         missingLogbookAll.add(temp);
                 }else{
-                    if(newDateList.containsValue(LocalDate.now(ZoneId.of("Asia/Jakarta"))))
+                    if(newDateList.get(key).contains(LocalDate.now(ZoneId.of("Asia/Jakarta"))))
                         submittedLogbookWeekly++;
                 }
             }
