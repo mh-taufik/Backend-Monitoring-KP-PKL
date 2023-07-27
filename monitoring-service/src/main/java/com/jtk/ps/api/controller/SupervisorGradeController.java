@@ -22,7 +22,6 @@ public class SupervisorGradeController {
     @Autowired
     private IMonitoringService monitoringService;
 
-
     @PostMapping("/create")
     @PreAuthorize("hasAnyAuthority('SUPERVISOR')")
     public ResponseEntity<Object> saveSupervisorGrade(@RequestBody SupervisorGradeCreateRequest supervisorGradeCreateRequest, HttpServletRequest request) {
@@ -95,7 +94,8 @@ public class SupervisorGradeController {
     public ResponseEntity<Object> saveSupervisorGradeAspect(@RequestBody SupervisorGradeAspectRequest supervisorGradeAspectRequest, HttpServletRequest request) {
         try {
             Integer id = (Integer) Objects.requireNonNull(request.getAttribute(Constant.VerifyConstant.ID));
-            monitoringService.createSupervisorGradeAspect(supervisorGradeAspectRequest, id);
+            Integer prodi = (Integer) request.getAttribute(Constant.VerifyConstant.ID_PRODI);
+            monitoringService.createSupervisorGradeAspect(supervisorGradeAspectRequest, id, prodi);
             return ResponseHandler.generateResponse("Save Supervisor grade aspect succeed", HttpStatus.OK, id);
         } catch (HttpClientErrorException ex){
             return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
@@ -109,7 +109,8 @@ public class SupervisorGradeController {
     public ResponseEntity<Object> updateSupervisorGradeAspect(@RequestBody SupervisorGradeAspectRequest supervisorGradeAspectRequest, HttpServletRequest request) {
         try {
             Integer id = (Integer) Objects.requireNonNull(request.getAttribute(Constant.VerifyConstant.ID));
-            monitoringService.updateSupervisorGradeAspect(supervisorGradeAspectRequest, id);
+            Integer prodi = (Integer) request.getAttribute(Constant.VerifyConstant.ID_PRODI);
+            monitoringService.updateSupervisorGradeAspect(supervisorGradeAspectRequest, id, prodi);
             return ResponseHandler.generateResponse("Update Supervisor grade aspect succeed", HttpStatus.OK);
         } catch (HttpClientErrorException ex){
             return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
@@ -122,7 +123,8 @@ public class SupervisorGradeController {
     @PreAuthorize("hasAnyAuthority('COMMITTEE','PARTICIPANT','SUPERVISOR')")
     public ResponseEntity<Object> getSupervisorGradeAspect(HttpServletRequest request) {
         try {
-            List<SupervisorGradeAspectResponse> response = monitoringService.getListSupervisorGradeAspect();
+            Integer prodi = (Integer) request.getAttribute(Constant.VerifyConstant.ID_PRODI);
+            List<SupervisorGradeAspectResponse> response = monitoringService.getListSupervisorGradeAspect(prodi);
             return ResponseHandler.generateResponse("Get Supervisor Grade succeed", HttpStatus.OK, response);
         } catch (HttpClientErrorException ex){
             return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);

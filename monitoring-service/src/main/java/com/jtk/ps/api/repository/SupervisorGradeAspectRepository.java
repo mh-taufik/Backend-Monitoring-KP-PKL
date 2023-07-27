@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface SupervisorGradeAspectRepository extends JpaRepository<SupervisorGradeAspect, Integer> {
     SupervisorGradeAspect findById(int id);
+    List<SupervisorGradeAspect> findByProdiId(int prodiId);
 }

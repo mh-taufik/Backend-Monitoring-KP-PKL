@@ -31,6 +31,9 @@ public class SupervisorGradeAspect {
     @Column(name = "name")
     private String name;
 
+    @Column(name = "prodi_id")
+    private Integer prodiId;
+
     @OneToMany(mappedBy = "aspectGrade", cascade = CascadeType.ALL)
     @JsonManagedReference
     List<SupervisorGradeResult> results;

@@ -52,17 +52,17 @@ public interface IMonitoringService {
 
     //Self Assessment
     Boolean isSelfAssessmentExist(int participantId, LocalDate date);
-    CreateId createSelfAssessment(SelfAssessmentRequest request, Integer participantId);
+    CreateId createSelfAssessment(SelfAssessmentRequest request, Integer participantId, Integer prodi);
     SelfAssessmentDetailResponse getSelfAssessmentDetail(int id);
-    List<SelfAssessmentResponse> getSelfAssessmentList(int idParticipant);
-    List<SelfAssessmentGradeDetailResponse> getBestPerformance(int participantId);
-    List<SelfAssessmentGradeDetailResponse> getAverage(int participantId);
-    SelfAssessmentFinalGradeResponse getFinalSelfAssessment(int participantId);
-    void updateSelfAssessment(SelfAssessmentUpdateRequest request, Integer participantId, Integer role);
+    List<SelfAssessmentResponse> getSelfAssessmentList(int idParticipant, int prodi);
+    List<SelfAssessmentGradeDetailResponse> getBestPerformance(int participantId, int prodi);
+    List<SelfAssessmentGradeDetailResponse> getAverage(int participantId, int prodi);
+    SelfAssessmentFinalGradeResponse getFinalSelfAssessment(int participantId, int prodi);
+    void updateSelfAssessment(SelfAssessmentUpdateRequest request, Integer participantId, Integer role, Integer prodi);
     void createSelfAssessmentAspect(SelfAssessmentAspectRequest request, int creator);
     void updateSelfAssessmentAspect(SelfAssessmentAspectRequest request, int creator);
-    List<SelfAssessmentAspectResponse> getActiveSelfAssessmentAspect();
-    List<SelfAssessmentAspectResponse> getSelfAssessmentAspect();
+    List<SelfAssessmentAspectResponse> getActiveSelfAssessmentAspect(int prodi);
+    List<SelfAssessmentAspectResponse> getSelfAssessmentAspect(int prodi);
     List<SelfAssessmentRekapResponse> getRekapSelfAssessment(ERole role, int id, String cookie);
     void createSelfAssessmentMissingAfterDeadline();
 
@@ -72,9 +72,9 @@ public interface IMonitoringService {
     SupervisorGradeDetailResponse getSupervisorGradeDetail(int id);
     List<SupervisorGradeResponse> getSupervisorGradeList(int participantId);
     StatisticResponse getMonitoringStatistic(int participantId);
-    void createSupervisorGradeAspect(SupervisorGradeAspectRequest request, int creator);
-    void updateSupervisorGradeAspect(SupervisorGradeAspectRequest request, int creator);
-    List<SupervisorGradeAspectResponse> getListSupervisorGradeAspect();
+    void createSupervisorGradeAspect(SupervisorGradeAspectRequest request, int creator, int prodi);
+    void updateSupervisorGradeAspect(SupervisorGradeAspectRequest request, int creator, int prodi);
+    List<SupervisorGradeAspectResponse> getListSupervisorGradeAspect(int prodi);
 
     //Laporan KP PKL
     CreateId createLaporan(LaporanCreateRequest laporanCreateRequest, Integer participantId);

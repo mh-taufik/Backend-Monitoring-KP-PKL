@@ -2,7 +2,6 @@ package com.jtk.ps.api.controller;
 
 import com.jtk.ps.api.dto.CheckDate;
 import com.jtk.ps.api.dto.CreateId;
-import com.jtk.ps.api.dto.laporan.LaporanRekapResponse;
 import com.jtk.ps.api.dto.self_assessment.*;
 import com.jtk.ps.api.model.ERole;
 import com.jtk.ps.api.service.IMonitoringService;
@@ -30,7 +29,8 @@ public class SelfAssessmentController {
     public ResponseEntity<Object> saveSelfAssessment(@RequestBody SelfAssessmentRequest selfAssessmentCreateRequest, HttpServletRequest request) {
         try {
             Integer participantId = (Integer) request.getAttribute(Constant.VerifyConstant.ID);
-            CreateId id = monitoringService.createSelfAssessment(selfAssessmentCreateRequest, participantId);
+            Integer prodi = (Integer) request.getAttribute(Constant.VerifyConstant.ID_PRODI);
+            CreateId id = monitoringService.createSelfAssessment(selfAssessmentCreateRequest, participantId, prodi);
             return ResponseHandler.generateResponse("Save SelfAssessment succeed", HttpStatus.OK, id);
         } catch (HttpClientErrorException ex){
             return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
@@ -45,7 +45,8 @@ public class SelfAssessmentController {
         try {
             Integer id = (Integer) request.getAttribute(Constant.VerifyConstant.ID);
             Integer role = (Integer) request.getAttribute(Constant.VerifyConstant.ID_ROLE);
-            monitoringService.updateSelfAssessment(selfAssessmentUpdateRequest, id, role);
+            Integer prodi = (Integer) request.getAttribute(Constant.VerifyConstant.ID_PRODI);
+            monitoringService.updateSelfAssessment(selfAssessmentUpdateRequest, id, role, prodi);
             return ResponseHandler.generateResponse("Update SelfAssessment succeed", HttpStatus.OK);
         } catch (HttpClientErrorException ex){
             return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
@@ -71,7 +72,9 @@ public class SelfAssessmentController {
     @PreAuthorize("hasAnyAuthority('COMMITTEE','PARTICIPANT','SUPERVISOR')")
     public ResponseEntity<Object> getSelfAssessmentList(@PathVariable("id_participant") Integer idParticipant, HttpServletRequest request) {
         try {
-            List<SelfAssessmentResponse> response = monitoringService.getSelfAssessmentList(idParticipant);
+            String cookie = request.getHeader(Constant.PayloadResponseConstant.COOKIE);
+            int prodi = monitoringService.getSupervisorMappingByParticipant(cookie, idParticipant).getProdiId();
+            List<SelfAssessmentResponse> response = monitoringService.getSelfAssessmentList(idParticipant, prodi);
             return ResponseHandler.generateResponse("Get All Self Assessment succeed", HttpStatus.OK, response);
         } catch (HttpClientErrorException ex){
             return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
@@ -83,7 +86,8 @@ public class SelfAssessmentController {
     @PreAuthorize("hasAnyAuthority('COMMITTEE','PARTICIPANT','SUPERVISOR')")
     public ResponseEntity<Object> getFinalSelfAssessmentGrade(@PathVariable("id_participant") Integer idParticipant, HttpServletRequest request) {
         try {
-            SelfAssessmentFinalGradeResponse response = monitoringService.getFinalSelfAssessment(idParticipant);
+            Integer prodi = (Integer) request.getAttribute(Constant.VerifyConstant.ID_PRODI);
+            SelfAssessmentFinalGradeResponse response = monitoringService.getFinalSelfAssessment(idParticipant, prodi);
             return ResponseHandler.generateResponse("Get Final Self Assessment succeed", HttpStatus.OK, response);
         } catch (HttpClientErrorException ex){
             return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
@@ -124,11 +128,12 @@ public class SelfAssessmentController {
     @PreAuthorize("hasAnyAuthority('COMMITTEE','PARTICIPANT','SUPERVISOR')")
     public ResponseEntity<Object> getSelfAssessmentAspect(@RequestParam(value = "type", required = false) String type, HttpServletRequest request) {
         try {
+            Integer prodi = (Integer) request.getAttribute(Constant.VerifyConstant.ID_PRODI);
             if(Objects.equals(type,"active")){
-                List<SelfAssessmentAspectResponse> response = monitoringService.getActiveSelfAssessmentAspect();
+                List<SelfAssessmentAspectResponse> response = monitoringService.getActiveSelfAssessmentAspect(prodi);
                 return ResponseHandler.generateResponse("Get Self Assessment Aspect Active succeed", HttpStatus.OK, response);
             }
-            List<SelfAssessmentAspectResponse> response = monitoringService.getSelfAssessmentAspect();
+            List<SelfAssessmentAspectResponse> response = monitoringService.getSelfAssessmentAspect(prodi);
             return ResponseHandler.generateResponse("Get Self Assessment Aspect succeed", HttpStatus.OK, response);
         } catch (HttpClientErrorException ex){
             return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);

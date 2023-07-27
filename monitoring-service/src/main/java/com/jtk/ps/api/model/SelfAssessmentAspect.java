@@ -32,6 +32,9 @@ public class SelfAssessmentAspect {
     @Column(name = "last_edited_date", nullable = false)
     private LocalDate lastEditedDate;
 
+    @Column(name = "prodi_id")
+    private Integer prodiId;
+
     @OneToOne
     @JoinColumn(name = "status")
     private Status status;

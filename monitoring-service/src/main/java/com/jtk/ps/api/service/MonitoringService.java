@@ -572,8 +572,8 @@ public class MonitoringService implements IMonitoringService {
     }
 
     @Override
-    public List<SelfAssessmentAspectResponse> getActiveSelfAssessmentAspect() {
-        List<SelfAssessmentAspect> aspect = selfAssessmentAspectRepository.findAllActiveAspect();
+    public List<SelfAssessmentAspectResponse> getActiveSelfAssessmentAspect(int prodi) {
+        List<SelfAssessmentAspect> aspect = selfAssessmentAspectRepository.findAllActiveAspect(prodi);
         Deadline deadline = deadlineRepository.findByNameLike("self assessment");
         List<SelfAssessmentAspectResponse> response = new ArrayList<>();
         for(SelfAssessmentAspect temp:aspect){
@@ -583,8 +583,8 @@ public class MonitoringService implements IMonitoringService {
     }
 
     @Override
-    public List<SelfAssessmentAspectResponse> getSelfAssessmentAspect() {
-        List<SelfAssessmentAspect> aspect = selfAssessmentAspectRepository.findAll();
+    public List<SelfAssessmentAspectResponse> getSelfAssessmentAspect(int prodi) {
+        List<SelfAssessmentAspect> aspect = selfAssessmentAspectRepository.findByProdiId(prodi);
         Deadline deadline = deadlineRepository.findByNameLike("self assessment");
         List<SelfAssessmentAspectResponse> response = new ArrayList<>();
         for(SelfAssessmentAspect temp:aspect){
@@ -622,7 +622,7 @@ public class MonitoringService implements IMonitoringService {
     }
 
     @Override
-    public CreateId createSelfAssessment(SelfAssessmentRequest request, Integer participantId) {
+    public CreateId createSelfAssessment(SelfAssessmentRequest request, Integer participantId, Integer prodi) {
         if(selfAssessmentRepository.isExist(participantId, request.getStartDate()))
             throw new IllegalStateException("Self Assessment sudah terbuat, silahkan update");
         SelfAssessment selfAssessment = new SelfAssessment();
@@ -631,7 +631,7 @@ public class MonitoringService implements IMonitoringService {
         selfAssessment.setFinishDate(request.getFinishDate());
         SelfAssessment sa = selfAssessmentRepository.save(selfAssessment);
 
-        List<SelfAssessmentAspect> aspectList = selfAssessmentAspectRepository.findAll();
+        List<SelfAssessmentAspect> aspectList = selfAssessmentAspectRepository.findByProdiId(prodi);
         List<SelfAssessmentGrade> gradeList = new ArrayList<>();
         for (SelfAssessmentAspect aspect : aspectList) {
             boolean find = false;
@@ -691,7 +691,7 @@ public class MonitoringService implements IMonitoringService {
     }
 
     @Override
-    public List<SelfAssessmentResponse> getSelfAssessmentList(int idParticipant) {
+    public List<SelfAssessmentResponse> getSelfAssessmentList(int idParticipant, int prodi) {
         List<SelfAssessment> selfAssessments = selfAssessmentRepository.findByParticipantIdOrderByStartDateAsc(idParticipant);
         if(selfAssessments.size() == 0)
             throw new IllegalStateException("Self Assessment belum dibuat");
@@ -737,13 +737,13 @@ public class MonitoringService implements IMonitoringService {
             }
         }
 
-        responses.add(new SelfAssessmentResponse(idParticipant, null, null, null, getBestPerformance(idParticipant)));
+        responses.add(new SelfAssessmentResponse(idParticipant, null, null, null, getBestPerformance(idParticipant, prodi)));
         return responses;
     }
 
     @Override
-    public List<SelfAssessmentGradeDetailResponse> getBestPerformance(int participantId) {
-        List<SelfAssessmentAspect> aspectList = selfAssessmentAspectRepository.findAll();
+    public List<SelfAssessmentGradeDetailResponse> getBestPerformance(int participantId, int prodi) {
+        List<SelfAssessmentAspect> aspectList = selfAssessmentAspectRepository.findByProdiId(prodi);
         List<SelfAssessmentGradeDetailResponse> grades = new ArrayList<>();
         for(SelfAssessmentAspect aspect:aspectList){
             SelfAssessmentGrade grade = selfAssessmentGradeRepository.findMaxGradeByParticipantIdAndAspectId(participantId, aspect.getId());
@@ -773,8 +773,8 @@ public class MonitoringService implements IMonitoringService {
     }
 
     @Override
-    public List<SelfAssessmentGradeDetailResponse> getAverage(int participantId) {
-        List<SelfAssessmentAspect> aspectList = selfAssessmentAspectRepository.findAll();
+    public List<SelfAssessmentGradeDetailResponse> getAverage(int participantId, int prodi) {
+        List<SelfAssessmentAspect> aspectList = selfAssessmentAspectRepository.findByProdiId(prodi);
         List<SelfAssessmentGradeDetailResponse> grades = new ArrayList<>();
         for(SelfAssessmentAspect aspect:aspectList){
             SelfAssessmentGrade grade = selfAssessmentGradeRepository.findAvgGradeByParticipantIdAndAspectId(participantId, aspect.getId());
@@ -805,9 +805,9 @@ public class MonitoringService implements IMonitoringService {
     }
 
     @Override
-    public SelfAssessmentFinalGradeResponse getFinalSelfAssessment(int participantId) {
-        List<SelfAssessmentGradeDetailResponse> maxGrade = getBestPerformance(participantId);
-        List<SelfAssessmentGradeDetailResponse> avgGrade = getAverage(participantId);
+    public SelfAssessmentFinalGradeResponse getFinalSelfAssessment(int participantId, int prodi) {
+        List<SelfAssessmentGradeDetailResponse> maxGrade = getBestPerformance(participantId, prodi);
+        List<SelfAssessmentGradeDetailResponse> avgGrade = getAverage(participantId, prodi);
         List<SelfAssessmentGradeDetailResponse> finalGrade = new ArrayList<>();
         for(SelfAssessmentGradeDetailResponse temp:maxGrade){
             for(SelfAssessmentGradeDetailResponse temp2:avgGrade){
@@ -829,7 +829,7 @@ public class MonitoringService implements IMonitoringService {
     }
 
     @Override
-    public void updateSelfAssessment(SelfAssessmentUpdateRequest request, Integer participantId, Integer role) {
+    public void updateSelfAssessment(SelfAssessmentUpdateRequest request, Integer participantId, Integer role, Integer prodi) {
         SelfAssessment selfAssessment = selfAssessmentRepository.findById((int)request.getId());
         if(role == ERole.PARTICIPANT.id){
             if (selfAssessment.getParticipantId() != participantId)
@@ -843,7 +843,7 @@ public class MonitoringService implements IMonitoringService {
             selfAssessment.setFinishDate(request.getFinishDate());
             SelfAssessment sa = selfAssessmentRepository.save(selfAssessment);
 
-            List<SelfAssessmentAspect> aspectList = selfAssessmentAspectRepository.findAll();
+            List<SelfAssessmentAspect> aspectList = selfAssessmentAspectRepository.findByProdiId(prodi);
             List<SelfAssessmentGrade> gradeList = new ArrayList<>();
             for (SelfAssessmentAspect aspect : aspectList) {
                 for(AssessmentGradeRequest grade: request.getGrade()) {
@@ -887,7 +887,7 @@ public class MonitoringService implements IMonitoringService {
                         LocalDate.now(ZoneId.of("Asia/Jakarta")).with(TemporalAdjusters.previous(MONDAY)),
                         LocalDate.now(ZoneId.of("Asia/Jakarta")).with(TemporalAdjusters.previous(FRIDAY)),
                         null));
-                List<SelfAssessmentAspect> aspectList = selfAssessmentAspectRepository.findAllActiveAspect();
+                List<SelfAssessmentAspect> aspectList = selfAssessmentAspectRepository.findAllActiveAspect(map.getProdiId());
                 List<SelfAssessmentGrade> gradeList = new ArrayList<>();
                 for (SelfAssessmentAspect aspect : aspectList) {
                     gradeList.add(new SelfAssessmentGrade(null, sa, aspect, 0, "-"));
@@ -1061,7 +1061,7 @@ public class MonitoringService implements IMonitoringService {
     }
 
     @Override
-    public void createSupervisorGradeAspect(SupervisorGradeAspectRequest request, int creator) {
+    public void createSupervisorGradeAspect(SupervisorGradeAspectRequest request, int creator, int prodi) {
         SupervisorGradeAspect aspect = new SupervisorGradeAspect();
         aspect.setId(null);
         aspect.setMaxGrade(request.getMaxGrade());
@@ -1069,11 +1069,12 @@ public class MonitoringService implements IMonitoringService {
         aspect.setEditedBy(creator);
         aspect.setLastEditDate(LocalDate.now(ZoneId.of("Asia/Jakarta")));
         aspect.setName(request.getName());
+        aspect.setProdiId(prodi);
         supervisorGradeAspectRepository.save(aspect);
     }
 
     @Override
-    public void updateSupervisorGradeAspect(SupervisorGradeAspectRequest request, int creator) {
+    public void updateSupervisorGradeAspect(SupervisorGradeAspectRequest request, int creator, int prodi) {
         SupervisorGradeAspect aspect = new SupervisorGradeAspect();
         if(request != null){
             aspect.setId(request.getId());
@@ -1082,13 +1083,14 @@ public class MonitoringService implements IMonitoringService {
             aspect.setEditedBy(creator);
             aspect.setLastEditDate(LocalDate.now(ZoneId.of("Asia/Jakarta")));
             aspect.setName(request.getName());
+            aspect.setProdiId(prodi);
             supervisorGradeAspectRepository.save(aspect);
         }
     }
 
     @Override
-    public List<SupervisorGradeAspectResponse> getListSupervisorGradeAspect() {
-        List<SupervisorGradeAspect> aspectList = supervisorGradeAspectRepository.findAll();
+    public List<SupervisorGradeAspectResponse> getListSupervisorGradeAspect(int prodi) {
+        List<SupervisorGradeAspect> aspectList = supervisorGradeAspectRepository.findByProdiId(prodi);
         List<SupervisorGradeAspectResponse> response = new ArrayList<>();
         for (SupervisorGradeAspect aspect:aspectList){
             response.add(new SupervisorGradeAspectResponse(aspect.getId(), aspect.getDescription(), aspect.getMaxGrade(), aspect.getEditedBy(), aspect.getLastEditDate(), aspect.getName()));
