@@ -1367,12 +1367,12 @@ public class MonitoringService implements IMonitoringService {
         //get company
         if(!type.equals("simple")){
             HashMap<Integer, String> companyList = new HashMap<>();
-            ResponseEntity<ResponseList<CompanyResponse>> companyRes = restTemplate.exchange("http://company-service/company/get-all?type=dropdown",
+            ResponseEntity<ResponseList<CompanyResponse>> companyRes = restTemplate.exchange("http://company-service/company/get-all",
                     HttpMethod.GET, req, new ParameterizedTypeReference<>() {
                     });
             List<CompanyResponse> companyResponses = Objects.requireNonNull(companyRes.getBody()).getData();
             for (CompanyResponse company : companyResponses) {
-                companyList.put(company.getId(), company.getName());
+                companyList.put(company.getIdCompany(), company.getCompanyName());
             }
             user.add(companyList);
         }
@@ -1473,13 +1473,11 @@ public class MonitoringService implements IMonitoringService {
         FinalMapResponse finalMappingResponse = Objects.requireNonNull(mappingRes.getBody()).getData();
 
         if(!companyList.isEmpty()){
-            for(Integer key: companyList.keySet()){
-                for(FinalMappingItem item:finalMappingResponse.getFinalMapping()){
-                    if(companyList.get(key).equals(item.getCompany().getName())){
-                        response.add(new SupervisorMappingResponse(key, companyList.get(key),
-                                null, null, prodi, null, item.getParticipant())
-                        );
-                    }
+            for(FinalMappingItem item:finalMappingResponse.getFinalMapping()){
+                if(companyList.containsKey(item.getCompany().getId())){
+                    response.add(new SupervisorMappingResponse(item.getCompany().getId(), companyList.get(item.getCompany().getId()),
+                            null, null, prodi, null, item.getParticipant())
+                    );
                 }
             }
         }
