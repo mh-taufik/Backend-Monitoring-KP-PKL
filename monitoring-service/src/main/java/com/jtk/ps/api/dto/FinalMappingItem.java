@@ -1,5 +1,6 @@
 package com.jtk.ps.api.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.jtk.ps.api.dto.supervisor_mapping.Participant;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,7 +12,9 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class FinalMappingItem{
+	@JsonProperty("company")
 	private Company company;
+	@JsonProperty("participant")
 	private List<Participant> participant;
 
 	public Company getCompany(){

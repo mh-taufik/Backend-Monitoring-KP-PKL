@@ -1,5 +1,6 @@
 package com.jtk.ps.api.model;
 
+import com.jtk.ps.api.dto.supervisor_mapping.SupervisorMappingResponse;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -91,5 +92,4 @@ public class SupervisorMapping {
     public void setCreateBy(Integer createBy) {
         this.createBy = createBy;
     }
-
 }

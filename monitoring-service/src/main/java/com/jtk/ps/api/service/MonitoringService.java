@@ -316,8 +316,25 @@ public class MonitoringService implements IMonitoringService {
         List<SupervisorMapping> mapping = new ArrayList<>();
         if(role.id == ERole.SUPERVISOR.id)
             mapping = supervisorMappingRepository.findByLecturerId(id, LocalDate.now(ZoneId.of("Asia/Jakarta")).getYear());
-        if(role.id == ERole.COMMITTEE.id)
-            mapping = supervisorMappingRepository.findByProdiId(id, LocalDate.now(ZoneId.of("Asia/Jakarta")).getYear());
+        if (role.id == ERole.COMMITTEE.id) {
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(Constant.PayloadResponseConstant.COOKIE, cookie);
+            HttpEntity<String> req = new HttpEntity<>(headers);
+            ResponseEntity<Response<FinalMapResponse>> mappingRes = restTemplate.exchange("http://mapping-service/mapping/final",
+                    HttpMethod.GET, req, new ParameterizedTypeReference<>() {
+                    });
+            FinalMapResponse finalMappingResponse = Objects.requireNonNull(mappingRes.getBody()).getData();
+
+            companyList.clear();
+            for (FinalMappingItem item : finalMappingResponse.getFinalMapping()) {
+                List<SupervisorMapping> finalMapping = new ArrayList<>();
+                companyList.put(item.getCompany().getId(), item.getCompany().getName());
+                item.getParticipant().forEach(participant -> {
+                    finalMapping.add(new SupervisorMapping(null, null, item.getCompany().getId(), participant.getId(), null, id, null));
+                });
+                mapping.addAll(finalMapping);
+            }
+        }
 
         for(SupervisorMapping map:mapping){
             String status = "Belum Mengumpulkan";
@@ -514,8 +531,25 @@ public class MonitoringService implements IMonitoringService {
         List<SupervisorMapping> mapping = new ArrayList<>();
         if(role.id == ERole.SUPERVISOR.id)
             mapping = supervisorMappingRepository.findByLecturerId(id, LocalDate.now(ZoneId.of("Asia/Jakarta")).getYear());
-        else if(role.id == ERole.COMMITTEE.id)
-            mapping = supervisorMappingRepository.findByProdiId(id, LocalDate.now(ZoneId.of("Asia/Jakarta")).getYear());
+        if (role.id == ERole.COMMITTEE.id) {
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(Constant.PayloadResponseConstant.COOKIE, cookie);
+            HttpEntity<String> req = new HttpEntity<>(headers);
+            ResponseEntity<Response<FinalMapResponse>> mappingRes = restTemplate.exchange("http://mapping-service/mapping/final",
+                    HttpMethod.GET, req, new ParameterizedTypeReference<>() {
+                    });
+            FinalMapResponse finalMappingResponse = Objects.requireNonNull(mappingRes.getBody()).getData();
+
+            companyList.clear();
+            for (FinalMappingItem item : finalMappingResponse.getFinalMapping()) {
+                List<SupervisorMapping> finalMapping = new ArrayList<>();
+                companyList.put(item.getCompany().getId(), item.getCompany().getName());
+                item.getParticipant().forEach(participant -> {
+                    finalMapping.add(new SupervisorMapping(null, null, item.getCompany().getId(), participant.getId(), null, id, null));
+                });
+                mapping.addAll(finalMapping);
+            }
+        }
 
         Deadline logbook = deadlineRepository.findByNameLike("logbook");
         final Set<DayOfWeek> businessDays = Set.of(MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY);
@@ -600,10 +634,27 @@ public class MonitoringService implements IMonitoringService {
         HashMap<Integer, String> companyList = user.get(1);
         List<SelfAssessmentRekapResponse> response = new ArrayList<>();
         List<SupervisorMapping> mapping = new ArrayList<>();
-        if(role.id == ERole.SUPERVISOR.id)
+        if (role.id == ERole.SUPERVISOR.id)
             mapping = supervisorMappingRepository.findByLecturerId(id, LocalDate.now(ZoneId.of("Asia/Jakarta")).getYear());
-        if(role.id == ERole.COMMITTEE.id)
-            mapping = supervisorMappingRepository.findByProdiId(id, LocalDate.now(ZoneId.of("Asia/Jakarta")).getYear());
+        if (role.id == ERole.COMMITTEE.id) {
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(Constant.PayloadResponseConstant.COOKIE, cookie);
+            HttpEntity<String> req = new HttpEntity<>(headers);
+            ResponseEntity<Response<FinalMapResponse>> mappingRes = restTemplate.exchange("http://mapping-service/mapping/final",
+                    HttpMethod.GET, req, new ParameterizedTypeReference<>() {
+                    });
+            FinalMapResponse finalMappingResponse = Objects.requireNonNull(mappingRes.getBody()).getData();
+
+            companyList.clear();
+            for (FinalMappingItem item : finalMappingResponse.getFinalMapping()) {
+                List<SupervisorMapping> finalMapping = new ArrayList<>();
+                companyList.put(item.getCompany().getId(), item.getCompany().getName());
+                item.getParticipant().forEach(participant -> {
+                    finalMapping.add(new SupervisorMapping(null, null, item.getCompany().getId(), participant.getId(), null, id, null));
+                });
+                mapping.addAll(finalMapping);
+            }
+        }
 
         for(SupervisorMapping map:mapping){
             String status = "Belum Mengumpulkan";
@@ -898,26 +949,28 @@ public class MonitoringService implements IMonitoringService {
     }
 
     @Override
-    public void createSelfAssessmentAspect(SelfAssessmentAspectRequest request, int creator) {
+    public void createSelfAssessmentAspect(SelfAssessmentAspectRequest request, int creator, int prodi) {
         SelfAssessmentAspect aspect = new SelfAssessmentAspect();
         aspect.setId(null);
         aspect.setName(request.getName());
         aspect.setDescription(request.getDescription());
         aspect.setStartAssessmentDate(request.getStartAssessmentDate());
         aspect.setEditedBy(creator);
+        aspect.setProdiId(prodi);
         aspect.setLastEditedDate(LocalDate.now(ZoneId.of("Asia/Jakarta")));
         aspect.setStatus(statusRepository.findById((int)request.getStatus()));
         selfAssessmentAspectRepository.save(aspect);
     }
 
     @Override
-    public void updateSelfAssessmentAspect(SelfAssessmentAspectRequest request, int creator) {
+    public void updateSelfAssessmentAspect(SelfAssessmentAspectRequest request, int creator, int prodi) {
         SelfAssessmentAspect aspect = new SelfAssessmentAspect();
         aspect.setId(request.getId());
         aspect.setName(request.getName());
         aspect.setDescription(request.getDescription());
         aspect.setStartAssessmentDate(request.getStartAssessmentDate());
         aspect.setEditedBy(creator);
+        aspect.setProdiId(prodi);
         aspect.setLastEditedDate(LocalDate.now(ZoneId.of("Asia/Jakarta")));
         aspect.setStatus(statusRepository.findById((int)request.getStatus()));
         selfAssessmentAspectRepository.save(aspect);
@@ -1188,8 +1241,25 @@ public class MonitoringService implements IMonitoringService {
         List<SupervisorMapping> mapping = new ArrayList<>();
         if(role.id == ERole.SUPERVISOR.id)
             mapping = supervisorMappingRepository.findByLecturerId(id, LocalDate.now(ZoneId.of("Asia/Jakarta")).getYear());
-        if(role.id == ERole.COMMITTEE.id)
-            mapping = supervisorMappingRepository.findByProdiId(id, LocalDate.now(ZoneId.of("Asia/Jakarta")).getYear());
+        if (role.id == ERole.COMMITTEE.id) {
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(Constant.PayloadResponseConstant.COOKIE, cookie);
+            HttpEntity<String> req = new HttpEntity<>(headers);
+            ResponseEntity<Response<FinalMapResponse>> mappingRes = restTemplate.exchange("http://mapping-service/mapping/final",
+                    HttpMethod.GET, req, new ParameterizedTypeReference<>() {
+                    });
+            FinalMapResponse finalMappingResponse = Objects.requireNonNull(mappingRes.getBody()).getData();
+
+            companyList.clear();
+            for (FinalMappingItem item : finalMappingResponse.getFinalMapping()) {
+                List<SupervisorMapping> finalMapping = new ArrayList<>();
+                companyList.put(item.getCompany().getId(), item.getCompany().getName());
+                item.getParticipant().forEach(participant -> {
+                    finalMapping.add(new SupervisorMapping(null, null, item.getCompany().getId(), participant.getId(), null, id, null));
+                });
+                mapping.addAll(finalMapping);
+            }
+        }
 
         for(SupervisorMapping map:mapping){
             String status = "Belum Mengumpulkan";

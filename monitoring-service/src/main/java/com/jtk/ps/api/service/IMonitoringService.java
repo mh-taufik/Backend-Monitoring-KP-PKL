@@ -59,8 +59,8 @@ public interface IMonitoringService {
     List<SelfAssessmentGradeDetailResponse> getAverage(int participantId, int prodi);
     SelfAssessmentFinalGradeResponse getFinalSelfAssessment(int participantId, int prodi);
     void updateSelfAssessment(SelfAssessmentUpdateRequest request, Integer participantId, Integer role, Integer prodi);
-    void createSelfAssessmentAspect(SelfAssessmentAspectRequest request, int creator);
-    void updateSelfAssessmentAspect(SelfAssessmentAspectRequest request, int creator);
+    void createSelfAssessmentAspect(SelfAssessmentAspectRequest request, int creator, int prodi);
+    void updateSelfAssessmentAspect(SelfAssessmentAspectRequest request, int creator, int prodi);
     List<SelfAssessmentAspectResponse> getActiveSelfAssessmentAspect(int prodi);
     List<SelfAssessmentAspectResponse> getSelfAssessmentAspect(int prodi);
     List<SelfAssessmentRekapResponse> getRekapSelfAssessment(ERole role, int id, String cookie);

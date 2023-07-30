@@ -101,7 +101,8 @@ public class SelfAssessmentController {
     public ResponseEntity<Object> createSelfAssessmentAspect(@RequestBody SelfAssessmentAspectRequest selfAssessmentAspectRequest, HttpServletRequest request) {
         try {
             Integer id = (Integer) Objects.requireNonNull(request.getAttribute(Constant.VerifyConstant.ID));
-            monitoringService.createSelfAssessmentAspect(selfAssessmentAspectRequest, id);
+            Integer prodi = (Integer) request.getAttribute(Constant.VerifyConstant.ID_PRODI);
+            monitoringService.createSelfAssessmentAspect(selfAssessmentAspectRequest, id, prodi);
             return ResponseHandler.generateResponse("Create Self Assessment Aspect succeed", HttpStatus.OK, id);
         } catch (HttpClientErrorException ex){
             return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
@@ -115,7 +116,8 @@ public class SelfAssessmentController {
     public ResponseEntity<Object> updateSelfAssessmentAspect(@RequestBody SelfAssessmentAspectRequest selfAssessmentAspectRequest, HttpServletRequest request) {
         try {
             Integer id = (Integer) Objects.requireNonNull(request.getAttribute(Constant.VerifyConstant.ID));
-            monitoringService.updateSelfAssessmentAspect(selfAssessmentAspectRequest, id);
+            Integer prodi = (Integer) request.getAttribute(Constant.VerifyConstant.ID_PRODI);
+            monitoringService.updateSelfAssessmentAspect(selfAssessmentAspectRequest, id, prodi);
             return ResponseHandler.generateResponse("Update Self Assessment Aspect succeed", HttpStatus.OK);
         } catch (HttpClientErrorException ex){
             return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);

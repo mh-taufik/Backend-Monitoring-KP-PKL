@@ -7,15 +7,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d4c7c1a4-fecb-4126-864a-961220f9e7ef" name="Changes" comment="Add prodi for SelfAssessmentAspect and SupervisorGradeAspect">
+    <list default="true" id="d4c7c1a4-fecb-4126-864a-961220f9e7ef" name="Changes" comment="fix function getRekap for all document">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/controller/SelfAssessmentController.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/controller/SelfAssessmentController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/controller/SupervisorGradeController.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/controller/SupervisorGradeController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/model/SelfAssessmentAspect.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/model/SelfAssessmentAspect.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/model/SupervisorGradeAspect.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/model/SupervisorGradeAspect.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/repository/DeadlineRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/repository/DeadlineRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/repository/SelfAssessmentAspectRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/repository/SelfAssessmentAspectRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/repository/SupervisorGradeAspectRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/repository/SupervisorGradeAspectRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/dto/Company.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/dto/Company.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/dto/FinalMappingItem.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/dto/FinalMappingItem.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/model/SupervisorMapping.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/model/SupervisorMapping.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/service/IMonitoringService.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/service/IMonitoringService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/service/MonitoringService.java" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring-service/src/main/java/com/jtk/ps/api/service/MonitoringService.java" afterDir="false" />
     </list>
@@ -272,13 +269,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1674536022871</updated>
-    </task>
-    <task id="LOCAL-00007" summary="update create dokumen return id">
-      <created>1685903386930</created>
-      <option name="number" value="00007" />
-      <option name="presentableId" value="LOCAL-00007" />
-      <option name="project" value="LOCAL" />
-      <updated>1685903386930</updated>
     </task>
     <task id="LOCAL-00008" summary="update api rpp create and update">
       <created>1685959349757</created>
@@ -616,7 +606,14 @@
       <option name="project" value="LOCAL" />
       <updated>1690307611674</updated>
     </task>
-    <option name="localTasksCounter" value="56" />
+    <task id="LOCAL-00056" summary="Add prodi for SelfAssessmentAspect and SupervisorGradeAspect">
+      <created>1690461049353</created>
+      <option name="number" value="00056" />
+      <option name="presentableId" value="LOCAL-00056" />
+      <option name="project" value="LOCAL" />
+      <updated>1690461049356</updated>
+    </task>
+    <option name="localTasksCounter" value="57" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -631,7 +628,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fix SelfAssessmentController" />
     <MESSAGE value="Fix GradeLogbook" />
     <MESSAGE value="Fix RppUpdate" />
     <MESSAGE value="Fix SelfAssessmentRepository" />
@@ -656,7 +652,8 @@
     <MESSAGE value="Fix getDashboardDataCommittee and getDashboardDataLecturer" />
     <MESSAGE value="Fix getDashboardDataCommittee and getDashboardDataLecturer &#10;Add createSelfAssessmentMissingAfterDeadline" />
     <MESSAGE value="Add prodi for SelfAssessmentAspect and SupervisorGradeAspect" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add prodi for SelfAssessmentAspect and SupervisorGradeAspect" />
+    <MESSAGE value="fix function getRekap for all document" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix function getRekap for all document" />
   </component>
   <component name="XDebuggerManager">
     <pin-to-top-manager>
