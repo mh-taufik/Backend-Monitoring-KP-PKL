@@ -1792,6 +1792,26 @@ public class MonitoringService implements IMonitoringService {
         List<HashMap<Integer, String>> user = getUserList(cookie, null, "simple");
         HashMap<Integer, String> participantList = user.get(0);
         HashMap<Integer, String> companyList = user.get(1);
+        int mappingDone = supervisorMapping.size();
+        if(supervisorMapping.size() < participantList.size()){
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(Constant.PayloadResponseConstant.COOKIE, cookie);
+            HttpEntity<String> req = new HttpEntity<>(headers);
+            ResponseEntity<Response<FinalMapResponse>> mappingRes = restTemplate.exchange("http://mapping-service/mapping/final",
+                    HttpMethod.GET, req, new ParameterizedTypeReference<>() {
+                    });
+            FinalMapResponse finalMappingResponse = Objects.requireNonNull(mappingRes.getBody()).getData();
+
+            supervisorMapping.clear();
+            for (FinalMappingItem item : finalMappingResponse.getFinalMapping()) {
+                List<SupervisorMapping> finalMapping = new ArrayList<>();
+                companyList.put(item.getCompany().getId(), item.getCompany().getName());
+                item.getParticipant().forEach(participant -> {
+                    finalMapping.add(new SupervisorMapping(null, null, item.getCompany().getId(), participant.getId(), null, prodiId, null));
+                });
+                supervisorMapping.addAll(finalMapping);
+            }
+        }
 
         Deadline logbook = deadlineRepository.findByNameLike("logbook");
         int logbookStartWeek = logbook.getStartAssignmentDate().get(ChronoField.ALIGNED_WEEK_OF_YEAR);
@@ -1895,17 +1915,10 @@ public class MonitoringService implements IMonitoringService {
         all.setLaporanMissing(missingLaporan);
         all.setLaporanSubmitted(submittedLaporan);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(Constant.PayloadResponseConstant.COOKIE, cookie);
-        HttpEntity<String> req = new HttpEntity<>(headers);
-        ResponseEntity<ResponseList<ParticipantDropdownResponse>> participantRes = restTemplate.exchange("http://participant-service/participant/get-all?type=dropdown",
-                HttpMethod.GET, req, new ParameterizedTypeReference<>() {
-                });
-        Integer totalParticipant = Objects.requireNonNull(participantRes.getBody()).getData().size();
         response.setAll(all);
         response.setWeekly(weekly);
-        response.setSupervisorMappingDone(supervisorMapping.size());
-        response.setSupervisorMappingUndone(totalParticipant - supervisorMapping.size());
+        response.setSupervisorMappingDone(mappingDone);
+        response.setSupervisorMappingUndone(participantList.size() - mappingDone);
 
         return response;
     }
