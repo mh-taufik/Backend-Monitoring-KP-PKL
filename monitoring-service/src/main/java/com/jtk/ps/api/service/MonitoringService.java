@@ -28,8 +28,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.Month;
 import java.time.ZoneId;
 import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAdjusters;
@@ -354,7 +356,7 @@ public class MonitoringService implements IMonitoringService {
 
     @Override
     public Boolean isLogbookExist(int participantId, LocalDate date) {
-        HashMap<LocalDate, String> hariLibur = getHariLiburFromDate(LocalDate.now(ZoneId.of("Asia/Jakarta")));
+        HashMap<LocalDate, String> hariLibur = getHariLiburFromDate(date);
         if(hariLibur.containsKey(date)) {
             throw new IllegalStateException("Hari ini merupakan " + hariLibur.get(date));
         }
@@ -2012,8 +2014,8 @@ public class MonitoringService implements IMonitoringService {
             HashMap<LocalDate, String> result = new HashMap<>();
             Boolean finish = false;
             for(int i=1;i<split.length;i++){
-                String[] temp = split[i].split("[ .]");
-                LocalDate dateRes = LocalDate.of(Integer.valueOf(temp[3]), EMonth.valueOf(temp[2]).id, Integer.valueOf(temp[1]));
+                String[] temp = split[i].split("[ .-]");
+                LocalDate dateRes = LocalDate.of(Integer.valueOf(temp[3]), Month.of(Integer.valueOf(temp[2])), Integer.valueOf(temp[1]));
                 String descRes = "";
                 for(int j=5;j<temp.length;j++){
                     if(temp[j].contains("\n")){
