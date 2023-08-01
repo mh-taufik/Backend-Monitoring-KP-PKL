@@ -73,9 +73,16 @@ public class SelfAssessmentController {
     public ResponseEntity<Object> getSelfAssessmentList(@PathVariable("id_participant") Integer idParticipant, HttpServletRequest request) {
         try {
             String cookie = request.getHeader(Constant.PayloadResponseConstant.COOKIE);
-            int prodi = monitoringService.getSupervisorMappingByParticipant(cookie, idParticipant).getProdiId();
-            List<SelfAssessmentResponse> response = monitoringService.getSelfAssessmentList(idParticipant, prodi);
-            return ResponseHandler.generateResponse("Get All Self Assessment succeed", HttpStatus.OK, response);
+            Integer role = (Integer) request.getAttribute(Constant.VerifyConstant.ID_ROLE);
+            if(role == ERole.SUPERVISOR.id){
+                int prodi = monitoringService.getSupervisorMappingByParticipant(cookie, idParticipant).getProdiId();
+                List<SelfAssessmentResponse> response = monitoringService.getSelfAssessmentList(idParticipant, prodi);
+                return ResponseHandler.generateResponse("Get All Self Assessment succeed", HttpStatus.OK, response);
+            }else{
+                int prodi = (Integer) request.getAttribute(Constant.PayloadResponseConstant.ID_PRODI);
+                List<SelfAssessmentResponse> response = monitoringService.getSelfAssessmentList(idParticipant, prodi);
+                return ResponseHandler.generateResponse("Get All Self Assessment succeed", HttpStatus.OK, response);
+            }
         } catch (HttpClientErrorException ex){
             return ResponseHandler.generateResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {

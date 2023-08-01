@@ -774,12 +774,6 @@ public class MonitoringService implements IMonitoringService {
                         temp2.getDescription())
                 );
             }
-            Collections.sort(responses, new Comparator<SelfAssessmentResponse>() {
-                @Override
-                public int compare(SelfAssessmentResponse o1, SelfAssessmentResponse o2) {
-                    return o1.getStartDate().compareTo(o2.getStartDate());
-                }
-            });
             responses.add(new SelfAssessmentResponse(temp.getParticipantId(), temp.getId(), temp.getStartDate(), temp.getFinishDate(), grade));
             dateList.remove(temp.getStartDate());
         }
@@ -789,6 +783,13 @@ public class MonitoringService implements IMonitoringService {
                 responses.add(new SelfAssessmentResponse(idParticipant, null, date, date.plusDays(4), null));
             }
         }
+
+        Collections.sort(responses, new Comparator<>() {
+            @Override
+            public int compare(SelfAssessmentResponse o1, SelfAssessmentResponse o2) {
+                return o1.getStartDate().compareTo(o2.getStartDate());
+            }
+        });
 
         responses.add(new SelfAssessmentResponse(idParticipant, null, null, null, getBestPerformance(idParticipant, prodi)));
         return responses;
