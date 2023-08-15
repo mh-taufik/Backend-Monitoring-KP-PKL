@@ -562,11 +562,13 @@ public class MonitoringService implements IMonitoringService {
         }else{
             logbookDateList = logbook.getStartAssignmentDate().datesUntil(LocalDate.now(ZoneId.of("Asia/Jakarta")).plusDays(1)).filter((t -> businessDays.contains(t.getDayOfWeek()))).collect(Collectors.groupingBy(o -> o.get(ChronoField.ALIGNED_WEEK_OF_YEAR)));
         }
+        Map<Integer, List<LocalDate>> tempList = new LinkedHashMap<>();
+        logbookDateList.entrySet().stream().sorted(Map.Entry.<Integer, List<LocalDate>>comparingByKey()).forEach(i -> {tempList.put(i.getKey(),i.getValue());});
 
         //mengelompokan logbook per 2 minggu
         int totalLogbook = 0;
         Map<Integer, List<LocalDate>> newDateList = new HashMap<>();
-        for(Integer key:logbookDateList.keySet()){
+        for(Integer key:tempList.keySet()){
             if((key - logbookStartWeek) % 2 != 0) {
                 List<LocalDate> temp = newDateList.get(totalLogbook);
                 temp.addAll(logbookDateList.get(key));
@@ -1617,11 +1619,13 @@ public class MonitoringService implements IMonitoringService {
         }else{
             logbookDateList = logbook.getStartAssignmentDate().datesUntil(LocalDate.now(ZoneId.of("Asia/Jakarta")).plusDays(1)).filter((t -> businessDays.contains(t.getDayOfWeek()))).collect(Collectors.groupingBy(o -> o.get(ChronoField.ALIGNED_WEEK_OF_YEAR)));
         }
+        Map<Integer, List<LocalDate>> tempList = new LinkedHashMap<>();
+        logbookDateList.entrySet().stream().sorted(Map.Entry.<Integer, List<LocalDate>>comparingByKey()).forEach(i -> {tempList.put(i.getKey(),i.getValue());});
 
         //mengelompokan logbook per 2 minggu
         int totalLogbook = 0;
         Map<Integer, List<LocalDate>> newDateList = new HashMap<>();
-        for(Integer key:logbookDateList.keySet()){
+        for(Integer key:tempList.keySet()){
             if((key - logbookStartWeek) % 2 != 0) {
                 List<LocalDate> temp = newDateList.get(totalLogbook);
                 temp.addAll(logbookDateList.get(key));
@@ -1687,11 +1691,13 @@ public class MonitoringService implements IMonitoringService {
         }else{
             logbookDateList = logbook.getStartAssignmentDate().datesUntil(LocalDate.now(ZoneId.of("Asia/Jakarta")).plusDays(1)).filter((t -> businessDays.contains(t.getDayOfWeek()))).collect(Collectors.groupingBy(o -> o.get(ChronoField.ALIGNED_WEEK_OF_YEAR)));
         }
+        Map<Integer, List<LocalDate>> tempList = new LinkedHashMap<>();
+        logbookDateList.entrySet().stream().sorted(Map.Entry.<Integer, List<LocalDate>>comparingByKey()).forEach(i -> {tempList.put(i.getKey(),i.getValue());});
 
         //mengelompokan logbook per 2 minggu
         int totalLogbook = 0;
         Map<Integer, List<LocalDate>> newDateList = new HashMap<>();
-        for(Integer key:logbookDateList.keySet()){
+        for(Integer key:tempList.keySet()){
             if((key - logbookStartWeek) % 2 != 0) {
                 List<LocalDate> temp = newDateList.get(totalLogbook);
                 temp.addAll(logbookDateList.get(key));
@@ -1824,11 +1830,13 @@ public class MonitoringService implements IMonitoringService {
         }else{
             logbookDateList = logbook.getStartAssignmentDate().datesUntil(LocalDate.now(ZoneId.of("Asia/Jakarta")).plusDays(1)).filter((t -> businessDays.contains(t.getDayOfWeek()))).collect(Collectors.groupingBy(o -> o.get(ChronoField.ALIGNED_WEEK_OF_YEAR)));
         }
+        Map<Integer, List<LocalDate>> tempList = new LinkedHashMap<>();
+        logbookDateList.entrySet().stream().sorted(Map.Entry.<Integer, List<LocalDate>>comparingByKey()).forEach(i -> {tempList.put(i.getKey(),i.getValue());});
 
         //mengelompokan logbook per 2 minggu
         int totalLogbook = 0;
         Map<Integer, List<LocalDate>> newDateList = new HashMap<>();
-        for(Integer key:logbookDateList.keySet()){
+        for(Integer key:tempList.keySet()){
             if((key - logbookStartWeek) % 2 != 0) {
                 List<LocalDate> temp = newDateList.get(totalLogbook);
                 temp.addAll(logbookDateList.get(key));
